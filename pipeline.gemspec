@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.summary     = %q{The build pipeline}
 
   s.add_dependency 'rake'
+  s.add_dependency 'smart_colored'
 
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'guard'

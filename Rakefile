@@ -16,6 +16,23 @@ gem = Gem::PackageTask.new(spec) do |t|
   end
 end
 
-desc "Publish the gem file #{File.basename gem.gem_spec.cache_file}"
-task push: :gem do
+Pipeline::Tasks::BinPath.new
+
+desc 'Publish the gem file ' + File.basename(gem.gem_spec.cache_file)
+Pipeline::Tasks::MSDeploy.new :push => :bin_path do |t|
+  t.log_file = 'tmp/msdeploy.log'
+  t.args = {
+    verb: :sync,
+    source: {
+      content_path: File.expand_path('deploy')
+    },
+    dest: {
+      computer_name: 'somewhere',
+      username: 'someone',
+      password: 'secret',
+      content_path: 'C:/GROSSWEBER/gems/gems'
+    },
+    usechecksum: true,
+    allow_untrusted: true
+  }
 end
