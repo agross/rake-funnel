@@ -19,7 +19,7 @@ end
 Pipeline::Tasks::BinPath.new
 
 desc 'Publish the gem file ' + File.basename(gem.gem_spec.cache_file)
-Pipeline::Tasks::MSDeploy.new :push => :bin_path do |t|
+Pipeline::Tasks::MSDeploy.new :push => [:bin_path, :gem] do |t|
   t.log_file = 'tmp/msdeploy.log'
   t.args = {
     verb: :sync,
