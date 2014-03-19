@@ -17,6 +17,7 @@ guard 'rspec',
   :all_after_pass => false,
   :notification => true,
   :cmd => 'bundle exec rspec' do
+    watch('.rspec')
     watch(%r{^spec/.+_spec\.rb$})
     watch(%r{^lib/(.+)\.rb$})
     watch('spec/spec_helper.rb') { 'spec' }
