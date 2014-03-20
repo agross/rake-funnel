@@ -1,10 +1,12 @@
 require 'rake'
 require 'rake/clean'
-require 'pipeline'
 require 'open3'
 require 'ostruct'
+require 'pipeline'
 
-describe Pipeline::Tasks::MSDeploy do
+include Pipeline::Tasks
+
+describe MSDeploy do
 
   before {
     CLEAN.clear
@@ -27,13 +29,13 @@ describe Pipeline::Tasks::MSDeploy do
   describe 'overriding defaults' do
     context 'when task name is specified' do
       it 'should have a default log file equal to the task name' do
-        Pipeline::Tasks::MSDeploy.new(:foo).log_file.should == 'foo.log'
+        MSDeploy.new(:foo).log_file.should == 'foo.log'
       end
     end
 
     context 'when task name and log file is specified' do
       subject! {
-        Pipeline::Tasks::MSDeploy.new(:foo) do |t|
+        MSDeploy.new(:foo) do |t|
           t.log_file = 'bar.log'
         end
       }
@@ -45,78 +47,6 @@ describe Pipeline::Tasks::MSDeploy do
       it 'should add the log file to the files to be cleaned' do
         CLEAN.should include(subject.log_file)
       end
-    end
-  end
-
-  describe 'argument conversion' do
-    it 'should convert verb => <true boolean> to -verb' do
-      subject.args = { verb: true }
-      subject.transform_args.should =~ ['-verb']
-    end
-
-    it 'should convert verb => <truthy arg> to -verb:value' do
-      subject.args = { verb: 1 }
-      subject.transform_args.should =~ ['-verb:1']
-    end
-
-    it 'should omit verb => <false boolean>' do
-      subject.args = { verb: false }
-      subject.transform_args.should_not include('-verb')
-    end
-
-    it 'should omit verb => <falsy arg>' do
-      subject.args = { verb: nil }
-      subject.transform_args.should_not include('-verb')
-    end
-
-    it 'should convert verb => <symbol> to -verb:symbol-as-string' do
-      subject.args = { verb: :foo }
-      subject.transform_args.should =~ ['-verb:foo']
-    end
-
-    it 'should convert verb => <string> args to -verb:string value' do
-      subject.args = { verb: 'string' }
-      subject.transform_args.should =~ ['-verb:string']
-    end
-
-    it 'should convert verb => <enumerable> to -verb:value1,value2,value3' do
-      subject.args = { verb: [1, 'a', :b, :some_value, true, false] }
-      subject.transform_args.should =~ ['-verb:1,a,b,someValue,true,false']
-    end
-
-    it 'should convert verb => <hash> to -verb:key1=value1,key2=value2' do
-      subject.args = { verb: { key1: 'value1', second_key: :second_value } }
-      subject.transform_args.should =~ ['-verb:key1=value1,secondKey=secondValue']
-    end
-
-    it 'should convert true flags in a hash to -verb:flag' do
-      subject.args = { verb: { flag: true } }
-      subject.transform_args.should =~ ['-verb:flag']
-    end
-
-    it 'should omit false flags in a hash' do
-      subject.args = { verb: { flag: false } }
-      subject.transform_args.should =~ ['-verb']
-    end
-
-    it 'should convert snake case symbols to camel case' do
-      subject.args = { some_verb: :some_value }
-      subject.transform_args.should =~ ['-someVerb:someValue']
-    end
-
-    it 'should enclose values with whitespace in "' do
-      subject.args = { verb: 'some value' }
-      subject.transform_args.should =~ ['-verb:"some value"']
-    end
-
-    it 'should enclose enumerable values with whitespace in "' do
-      subject.args = { verb: [1, 'some value'] }
-      subject.transform_args.should =~ ['-verb:1,"some value"']
-    end
-
-    it 'should enclose hash values with whitespace in "' do
-      subject.args = { verb: { key: 'some value' } }
-      subject.transform_args.should =~ ['-verb:key="some value"']
     end
   end
 
@@ -148,6 +78,14 @@ describe Pipeline::Tasks::MSDeploy do
             username: 'bob',
             password: 'secret'
             },
+          skip: [
+            { directory: 'logs'},
+            {
+              object_name: 'filePath',
+              skip_action: 'Delete',
+              absolute_path: 'App_Offline\.htm$'
+            }
+          ],
           usechecksum: true,
           allow_untrusted: true
         }
@@ -159,6 +97,8 @@ describe Pipeline::Tasks::MSDeploy do
           -verb:sync
           -source:contentPath=deploy
           -dest:computerName=remote.example.com,username=bob,password=secret
+          -skip:directory=logs
+          -skip:objectName=filePath,skipAction=Delete,absolutePath=App_Offline\.htm$
           -usechecksum
           -allowUntrusted
           )
@@ -198,15 +138,15 @@ describe Pipeline::Tasks::MSDeploy do
           expect { Rake::Task[:msdeploy].invoke }.to raise_error(Pipeline::ExecutionError)
         end
 
-        it "should report the exit code" do
+        it 'should report the exit code' do
           expect { Rake::Task[:msdeploy].invoke }.to raise_error(Pipeline::ExecutionError, /exit code 127/)
         end
 
-        it "should report the command that was run" do
+        it 'should report the command that was run' do
           expect { Rake::Task[:msdeploy].invoke }.to raise_error(Pipeline::ExecutionError, /command/)
         end
 
-        it "should report logged lines" do
+        it 'should report logged lines' do
           expect { Rake::Task[:msdeploy].invoke }.to raise_error(Pipeline::ExecutionError, /errors/)
         end
       end
@@ -215,26 +155,24 @@ describe Pipeline::Tasks::MSDeploy do
     describe "MSDeploy's idiotic command line parser that requires quotes inside but not outside parameters" do
       before { Open3.stub(:popen2e) }
 
-      context 'when values contain spaces' do
-        it 'should escape the string before calling sh' do
-          subject.msdeploy = 'path to/msdeploy'
-          subject.log_file = 'path to/msdeploy.log'
-          subject.args = {
-            'simple key' => 'simple value',
-            hash: {
-              'hash key 1' => 'hash value 1',
-              'hash key 2' => 'hash value 2'
-              },
-            array: ['array value 1', 'array value 2'],
-            'some flag' => true
-          }
+      it 'should escape the string before calling sh' do
+        subject.msdeploy = 'path to/msdeploy'
+        subject.log_file = 'path to/msdeploy.log'
+        subject.args = {
+          'simple key' => 'simple value',
+          hash: {
+            'hash key 1' => 'hash value 1',
+            'hash key 2' => 'hash value 2'
+            },
+          array: ['array value 1', 'array value 2'],
+          'some flag' => true
+        }
 
-          Rake::Task[:msdeploy].invoke
+        Rake::Task[:msdeploy].invoke
 
-          args = '"path to/msdeploy" -"simple key":"simple value" -hash:"hash key 1"="hash value 1","hash key 2"="hash value 2" -array:"array value 1","array value 2" -"some flag"'
+        args = '"path to/msdeploy" -"simple key":"simple value" -hash:"hash key 1"="hash value 1","hash key 2"="hash value 2" -array:"array value 1" -array:"array value 2" -"some flag"'
 
-          expect(Open3).to have_received(:popen2e).with(args)
-        end
+        expect(Open3).to have_received(:popen2e).with(args)
       end
     end
   end

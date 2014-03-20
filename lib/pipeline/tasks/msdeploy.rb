@@ -3,6 +3,10 @@ require 'rake/tasklib'
 require 'open3'
 require 'smart_colored/extend'
 
+Dir["#{File.dirname(__FILE__)}/msdeploy_support/*.rb"].each do |path|
+  require path
+end
+
 module Pipeline::Tasks
   class MSDeploy < Rake::TaskLib
     attr_accessor :name, :msdeploy, :log_file, :args
@@ -20,28 +24,6 @@ module Pipeline::Tasks
       @log_file || "#{@name}.log"
     end
 
-    def transform_args
-      args = []
-
-      @args.each do |key, value|
-        key = camel_case(key)
-
-        if value.kind_of?(Enumerable)
-          value = value.map do |left, right|
-            left = nil if right.kind_of?(FalseClass)
-            right = needs_equal(camel_case(right))
-            "#{camel_case(left)}#{right}"
-          end.join(',')
-        else
-          value = camel_case(value)
-        end
-
-        args << "#{needs_dash(key, value)}#{needs_colon(value)}"
-      end
-
-      args
-    end
-
     private
     def define
       CLEAN.include(log_file)
@@ -49,11 +31,11 @@ module Pipeline::Tasks
       task @name do
         mkdir_p(File.dirname(log_file))
 
-        cmd = [@msdeploy, transform_args]
+        cmd = [@msdeploy, MSDeploySupport::Mapper.map(@args)]
 
         run_with_redirected_output(cmd) do |ok, status_code, command, log|
           if ok
-            puts "Deployment successful."
+            puts 'Deployment successful.'
           else
             message = %Q(
 Deployment errors occurred, exit code #{status_code}. Please review #{log_file}.
@@ -75,7 +57,7 @@ Tried to execute:
     end
 
     def run_with_redirected_output(cmd)
-      cmd = cmd.flatten.map {|e| quote(e) }.join(' ')
+      cmd = cmd.flatten.map {|c| MSDeploySupport::Mapper.quote(c) }.join(' ')
       puts cmd
 
       all_messages = StringIO.new
@@ -108,30 +90,6 @@ Tried to execute:
       ensure
         all_messages.close
       end
-    end
-
-    def needs_dash(key, value)
-      "-#{key}" if value
-    end
-
-    def needs_colon(value)
-      return nil if value.kind_of?(TrueClass)
-      ":#{value}" if value && !value.to_s.empty?
-    end
-
-    def needs_equal(value)
-      return nil if value.kind_of?(TrueClass)
-      "=#{value}" if value
-    end
-
-    def camel_case(value)
-      return quote(value) unless value.kind_of?(Symbol)
-      value.camelize
-    end
-
-    def quote(value)
-      return %Q{"#{value}"} if value =~ /\s/ && value !~ /"/
-      value
     end
   end
 end
