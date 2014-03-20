@@ -16,6 +16,7 @@ gem = Gem::PackageTask.new(spec) do |t|
   end
 end
 
+Pipeline::Tasks::Timing.new
 Pipeline::Tasks::BinPath.new
 
 desc 'Publish the gem file ' + File.basename(gem.gem_spec.cache_file)
