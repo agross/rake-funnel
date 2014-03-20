@@ -5,7 +5,7 @@ describe Pipeline::Tasks::BinPath do
 
   before {
     Rake::Task.clear
-    subject.should_not be_nil
+    subject.should be
   }
 
   describe 'defaults' do
