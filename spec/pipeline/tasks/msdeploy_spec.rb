@@ -2,6 +2,7 @@ require 'rake'
 require 'rake/clean'
 require 'pipeline'
 require 'open3'
+require 'ostruct'
 
 describe Pipeline::Tasks::MSDeploy do
 
@@ -86,6 +87,16 @@ describe Pipeline::Tasks::MSDeploy do
       subject.transform_args.should =~ ['-verb:key1=value1,secondKey=secondValue']
     end
 
+    it 'should convert true flags in a hash to -verb:flag' do
+      subject.args = { verb: { :flag => true } }
+      subject.transform_args.should =~ ['-verb:flag']
+    end
+
+    it 'should omit false flags in a hash' do
+      subject.args = { verb: { :flag => false } }
+      subject.transform_args.should =~ ['-verb']
+    end
+
     it 'should convert snake case symbols to camel case' do
       subject.args = { some_verb: :some_value }
       subject.transform_args.should =~ ['-someVerb:someValue']
@@ -109,67 +120,100 @@ describe Pipeline::Tasks::MSDeploy do
 
   describe 'execution' do
     before {
-      Open3.stub(:popen2e)
+      $stdout.stub(:puts)
+      $stderr.stub(:puts)
       subject.stub(:mkdir_p)
     }
 
-    it 'should create the directory for the log file' do
-      subject.log_file = 'somewhere/else/msdeploy.log'
+    describe 'success' do
+      before { Open3.stub(:popen2e) }
 
-      Rake::Task[:msdeploy].invoke
+      it 'should create the directory for the log file' do
+        subject.log_file = 'somewhere/else/msdeploy.log'
 
-      expect(subject).to have_received(:mkdir_p).with('somewhere/else')
+        Rake::Task[:msdeploy].invoke
+
+        expect(subject).to have_received(:mkdir_p).with('somewhere/else')
+      end
+
+      it 'should run' do
+        subject.args = {
+          verb: :sync,
+          source: {
+            content_path: 'deploy'
+            },
+          dest: {
+            computer_name: 'remote.example.com',
+            username: 'bob',
+            password: 'secret'
+            },
+          usechecksum: true,
+          allow_untrusted: true
+        }
+
+        Rake::Task[:msdeploy].invoke
+
+        args = %w(
+          msdeploy
+          -verb:sync
+          -source:contentPath=deploy
+          -dest:computerName=remote.example.com,username=bob,password=secret
+          -usechecksum
+          -allowUntrusted
+          )
+
+        expect(Open3).to have_received(:popen2e).with(args.join(' '))
+      end
     end
 
-    it 'should run' do
-      subject.args = {
-        verb: :sync,
-        source: {
-          content_path: 'deploy'
-          },
-        dest: {
-          computer_name: 'remote.example.com',
-          username: 'bob',
-          password: 'secret'
-          },
-        usechecksum: true,
-        allow_untrusted: true
-      }
+    context 'failure' do
+      describe 'error detection' do
+        it 'should fail when process status reports failure' do
+          error_exit = OpenStruct.new(value: OpenStruct.new(success?: false))
+          Open3.stub(:popen2e).and_yield(nil, StringIO.new('success output'), error_exit)
 
-      Rake::Task[:msdeploy].invoke
+          expect { Rake::Task[:msdeploy].invoke }.to raise_error(Pipeline::ExecutionError)
+        end
 
-      args = %w(
-        msdeploy
-        -verb:sync
-        -source:contentPath=deploy
-        -dest:computerName=remote.example.com,username=bob,password=secret
-        -usechecksum
-        -allowUntrusted
-        )
+        it 'should fail when an error is logged' do
+          success_exit = OpenStruct.new(value: OpenStruct.new(success?: true))
+          Open3.stub(:popen2e).and_yield(nil, StringIO.new('Error: foo'), success_exit)
 
-      expect(Open3).to have_received(:popen2e).with(args.join(' '))
-    end
+          expect { Rake::Task[:msdeploy].invoke }.to raise_error(Pipeline::ExecutionError)
+        end
 
-    context 'when MSDeploy execution fails' do
-      before { subject.stub(:run_with_redirected_output).and_yield(false, 127, "errors") }
+        it 'should fail when an exception is logged' do
+          success_exit = OpenStruct.new(value: OpenStruct.new(success?: true))
+          Open3.stub(:popen2e).and_yield(nil, StringIO.new('Exception: foo'), success_exit)
 
-      it "should fail when MSDeploy's exit code is not 0" do
-        expect { Rake::Task[:msdeploy].invoke }.to raise_error(Pipeline::ExecutionError)
+          expect { Rake::Task[:msdeploy].invoke }.to raise_error(Pipeline::ExecutionError)
+        end
       end
 
-      it "should report the exit code" do
-        expect { Rake::Task[:msdeploy].invoke }.to raise_error(Pipeline::ExecutionError, /exit code 127/)
-      end
+      describe 'error reporting' do
+        before { subject.stub(:run_with_redirected_output).and_yield(false, 127, 'command', 'errors') }
 
-      it "should report logged lines" do
-        expect { Rake::Task[:msdeploy].invoke }.to raise_error(Pipeline::ExecutionError, /errors/)
-      end
+        it "should fail when MSDeploy's exit code is not 0" do
+          expect { Rake::Task[:msdeploy].invoke }.to raise_error(Pipeline::ExecutionError)
+        end
 
-      # No idea how to test this...
-      # it 'should fail when an error is logged'
+        it "should report the exit code" do
+          expect { Rake::Task[:msdeploy].invoke }.to raise_error(Pipeline::ExecutionError, /exit code 127/)
+        end
+
+        it "should report the command that was run" do
+          expect { Rake::Task[:msdeploy].invoke }.to raise_error(Pipeline::ExecutionError, /command/)
+        end
+
+        it "should report logged lines" do
+          expect { Rake::Task[:msdeploy].invoke }.to raise_error(Pipeline::ExecutionError, /errors/)
+        end
+      end
     end
 
     describe "MSDeploy's idiotic command line parser that requires quotes inside but not outside parameters" do
+      before { Open3.stub(:popen2e) }
+
       context 'when values contain spaces' do
         it 'should escape the string before calling sh' do
           subject.msdeploy = 'path to/msdeploy'

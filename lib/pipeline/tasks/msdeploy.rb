@@ -28,8 +28,9 @@ module Pipeline::Tasks
 
         if value.kind_of?(Enumerable)
           value = value.map do |left, right|
-            right = camel_case(right)
-            "#{camel_case(left)}#{needs_equal(right)}"
+            left = nil if right.kind_of?(FalseClass)
+            right = needs_equal(camel_case(right))
+            "#{camel_case(left)}#{right}"
           end.join(',')
         else
           value = camel_case(value)
@@ -49,9 +50,8 @@ module Pipeline::Tasks
         mkdir_p(File.dirname(log_file))
 
         cmd = [@msdeploy, transform_args]
-        cmd = cmd.flatten.map {|e| quote(e) }.join(' ')
 
-        run_with_redirected_output(cmd) do |ok, status_code, log|
+        run_with_redirected_output(cmd) do |ok, status_code, command, log|
           if ok
             puts "Deployment successful."
           else
@@ -60,6 +60,9 @@ Deployment errors occurred, exit code #{status_code}. Please review #{log_file}.
 
 10 last logged lines:
 #{log}
+
+Tried to execute:
+#{command}
 
 )
 
@@ -72,6 +75,7 @@ Deployment errors occurred, exit code #{status_code}. Please review #{log_file}.
     end
 
     def run_with_redirected_output(cmd)
+      cmd = cmd.flatten.map {|e| quote(e) }.join(' ')
       puts cmd
 
       all_messages = StringIO.new
@@ -82,7 +86,7 @@ Deployment errors occurred, exit code #{status_code}. Please review #{log_file}.
         log = -> (msg) {
           File.open(log_file, 'a') { |f| f.write(msg) }
 
-          all_messages.puts(msg);
+          all_messages.puts(msg)
 
           stdout = stderr if msg =~ /error|exception/i
           stdout.call(msg)
@@ -93,8 +97,9 @@ Deployment errors occurred, exit code #{status_code}. Please review #{log_file}.
             log.call(line)
           end
 
-          ret = [wait_thread.value.success? && output == stdout,
+          ret = [wait_thread.value.success? && stdout != stderr,
                  wait_thread.value.exitstatus,
+                 cmd,
                  all_messages.string.split("\n").last(10).join("\n")]
           yield ret if block_given?
 
@@ -111,10 +116,11 @@ Deployment errors occurred, exit code #{status_code}. Please review #{log_file}.
 
     def needs_colon(value)
       return nil if value.kind_of?(TrueClass)
-      ":#{value}" if value
+      ":#{value}" if value && !value.to_s.empty?
     end
 
     def needs_equal(value)
+      return nil if value.kind_of?(TrueClass)
       "=#{value}" if value
     end
 
