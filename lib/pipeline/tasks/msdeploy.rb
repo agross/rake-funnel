@@ -126,7 +126,7 @@ Tried to execute:
 
     def camel_case(value)
       return quote(value) unless value.kind_of?(Symbol)
-      value.to_s.split('_').inject([]){ |buffer, e| buffer.push(buffer.empty? ? e : e.capitalize) }.join
+      value.camelize
     end
 
     def quote(value)
