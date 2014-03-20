@@ -9,6 +9,8 @@ describe Pipeline::Tasks::MSDeploy do
   before {
     CLEAN.clear
     Rake::Task.clear
+    File.stub(:open)
+    subject.stub(:mkdir_p)
   }
 
   describe 'defaults' do
@@ -122,7 +124,6 @@ describe Pipeline::Tasks::MSDeploy do
     before {
       $stdout.stub(:puts)
       $stderr.stub(:puts)
-      subject.stub(:mkdir_p)
     }
 
     describe 'success' do
