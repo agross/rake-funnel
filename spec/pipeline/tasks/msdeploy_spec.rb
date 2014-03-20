@@ -85,17 +85,17 @@ describe Pipeline::Tasks::MSDeploy do
     end
 
     it 'should convert verb => <hash> to -verb:key1=value1,key2=value2' do
-      subject.args = { verb: { :key1 => 'value1', :second_key => :second_value } }
+      subject.args = { verb: { key1: 'value1', second_key: :second_value } }
       subject.transform_args.should =~ ['-verb:key1=value1,secondKey=secondValue']
     end
 
     it 'should convert true flags in a hash to -verb:flag' do
-      subject.args = { verb: { :flag => true } }
+      subject.args = { verb: { flag: true } }
       subject.transform_args.should =~ ['-verb:flag']
     end
 
     it 'should omit false flags in a hash' do
-      subject.args = { verb: { :flag => false } }
+      subject.args = { verb: { flag: false } }
       subject.transform_args.should =~ ['-verb']
     end
 
@@ -115,7 +115,7 @@ describe Pipeline::Tasks::MSDeploy do
     end
 
     it 'should enclose hash values with whitespace in "' do
-      subject.args = { verb: { :key => 'some value' } }
+      subject.args = { verb: { key: 'some value' } }
       subject.transform_args.should =~ ['-verb:key="some value"']
     end
   end
