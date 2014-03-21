@@ -18,6 +18,7 @@ end
 
 Pipeline::Tasks::Timing.new
 Pipeline::Tasks::BinPath.new
+include Pipeline::Integration::TeamCityBlocks
 
 desc 'Publish the gem file ' + File.basename(gem.gem_spec.cache_file)
 Pipeline::Tasks::MSDeploy.new :push => [:bin_path, :gem] do |t|
