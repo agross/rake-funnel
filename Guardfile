@@ -14,7 +14,7 @@ end
 
 guard 'rspec',
   :all_on_start => true,
-  :all_after_pass => false,
+  :all_after_pass => true,
   :notification => true,
   :cmd => 'bundle exec rspec' do
     watch('.rspec')
