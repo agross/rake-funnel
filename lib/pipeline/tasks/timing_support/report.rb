@@ -49,7 +49,7 @@ module Pipeline::Tasks::TimingSupport
 
       puts '-' * HEADER_WIDTH
       puts 'Total'.ljust(columns[0].width) + ' ' * SPACE + format(Time.now - @stats.started_at)
-      puts status_message
+      status_message
       puts '-' * HEADER_WIDTH
     end
 
@@ -71,8 +71,11 @@ module Pipeline::Tasks::TimingSupport
       status = @opts[:failed] ? 'Failed' : 'OK'
       status = 'Status'.ljust(columns[0].width) + ' ' * SPACE + status
 
-      return status.bold.red if @opts[:failed]
-      status.bold.green
+      if @opts[:failed]
+        $stderr.puts status.bold.red
+      else
+        $stdout.puts status.bold.green
+      end
     end
   end
 end

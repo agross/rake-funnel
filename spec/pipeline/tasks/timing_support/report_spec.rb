@@ -13,6 +13,7 @@ describe Pipeline::Tasks::TimingSupport::Report do
 
   before {
     $stdout.stub(:puts)
+    $stderr.stub(:puts)
     subject.render
   }
 
@@ -46,7 +47,7 @@ describe Pipeline::Tasks::TimingSupport::Report do
       let(:opts) { { :failed => true } }
 
       it 'should print the failed build status' do
-        expect($stdout).to have_received(:puts).with(/Status\s+Failed/)
+        expect($stderr).to have_received(:puts).with(/Status\s+Failed/)
       end
     end
   end
