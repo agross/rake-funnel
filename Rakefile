@@ -33,6 +33,7 @@ Pipeline::Tasks::MSDeploy.new :push => [:bin_path, :gem] do |t|
       password: ENV['DEPLOY_PASSWORD'] || '',
       content_path: 'C:/GROSSWEBER/gems/gems'
     },
+    skip: [{ skipAction: :delete }],
     usechecksum: true,
     allow_untrusted: true
   }
