@@ -5,15 +5,25 @@ describe Pipeline::Tasks::Timing do
 
   include Rake::DSL
 
-  before { Rake.application = nil }
+  before {
+    Rake.application = nil
+    Rake::Task.clear
+
+    define_tasks.should be
+    subject.should be
+  }
+
+  let(:define_tasks) { task :task }
+
+  after {
+    subject.reset!
+  }
 
   describe 'defaults' do
     its(:name) { should == :timing }
     its(:stats) { should have(0).items }
 
     it 'should add itself to the top level tasks' do
-      subject.should be
-
       Rake.application.top_level_tasks.should include(:timing)
     end
 
@@ -21,7 +31,7 @@ describe Pipeline::Tasks::Timing do
       Rake.application.stub(:handle_options)
       Rake.application.init
 
-      subject.should be
+      Pipeline::Tasks::Timing.new
 
       Rake.application.top_level_tasks.should have_at_least(2).items
       Rake.application.top_level_tasks.last.should == :timing
@@ -29,46 +39,82 @@ describe Pipeline::Tasks::Timing do
   end
 
   describe 'execution' do
+    before {
+      Rake.application.stub(:init)
+      Rake.application.stub(:load_rakefile)
+      Rake.application.top_level_tasks.unshift(:task)
+      Rake.application.stub(:exit_because_of_exception)
 
-    before { subject.should be }
+      $stdout.stub(:puts)
+      $stderr.stub(:puts)
+      # The 'rake aborted!' message is #printed on $stderr.
+      $stderr.stub(:print)
 
-    it 'should execute tasks' do
-      output = double.as_null_object
+      Rake.application.run
+    }
 
-      task :task do
-        output.print 'hello from task'
+    context 'with task defined' do
+      let(:define_tasks) {
+        task :task do
+          puts 'hello'
+        end
+      }
+
+      it 'should execute tasks' do
+        expect($stdout).to have_received(:puts).with('hello')
       end
 
-      Rake::Task[:task].invoke
+      it 'should record timing information for executed tasks' do
+        subject.stats.should have(2).items
+        subject.stats.first[:task].name.should == 'task'
+        subject.stats.first[:time].should be_a(Float)
+      end
 
-      expect(output).to have_received(:print).with('hello from task')
+      it 'should record timing information for itself' do
+        subject.stats.should have(2).items
+
+        # Ruby has no #last on Enumerable, WTF.
+        subject.stats.reverse_each.first[:task].name.should == 'timing'
+      end
     end
 
-    it 'should record timing information for executed tasks' do
-      task :task
+    context 'with unreachable task defined' do
+      let(:define_tasks) {
+        task :task
+        task :not_executed
+      }
 
-      Rake::Task[:task].invoke
-
-      subject.stats.should have(1).items
-      subject.stats.first[:task].name.should == 'task'
-      subject.stats.first[:time].should be_a(Float)
+      it 'should not record timing information for unexecuted tasks' do
+        subject.stats.map { |s| s[:task].name }.should_not include('not_executed')
+      end
     end
 
-    it 'should not record timing information for unexecuted tasks' do
-      task :task
+    describe 'build finished' do
+      context 'when rake succeeded' do
+        it 'should print the report' do
+          expect($stdout).to have_received(:puts).with(/Build time report/)
+        end
 
-      subject.stats.should have(0).items
-    end
+        it 'should report success' do
+          expect($stdout).to have_received(:puts).with(/Status\s+OK/)
+        end
+      end
 
-    it 'should print the report' do
-      task :default
+      context 'when rake failed' do
+        let(:define_tasks) {
+          task :task do
+            raise
+          end
+        }
 
-      Rake.application.stub(:handle_options)
-      $stdout.stub(:puts)
+        it 'should print the report' do
+          expect($stdout).to have_received(:puts).with(/Build time report/)
+        end
 
-      Rake.application.top_level
-
-      expect($stdout).to have_received(:puts).with(/Build time report/)
+        it 'should report failure' do
+          expect($stderr).to have_received(:puts).with(/Status\s+Failed/)
+        end
+      end
     end
   end
 end
