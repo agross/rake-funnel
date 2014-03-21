@@ -1,28 +1,34 @@
 require 'pipeline'
 
-# Does not work when included in the example group for some reason.
 include Pipeline::Integration
 
-describe Pipeline::Integration::TeamCity do
+describe TeamCity do
+  let(:original_project) { ENV['TEAMCITY_PROJECT_NAME'] }
+
   before {
-    @original_project = ENV['TEAMCITY_PROJECT_NAME']
     ENV.delete 'TEAMCITY_PROJECT_NAME'
   }
 
   after {
-    ENV['TEAMCITY_PROJECT_NAME'] = @original_project
+    ENV['TEAMCITY_PROJECT_NAME'] = original_project
   }
 
   context 'when running outside TeamCity' do
-    it 'should not publish messages' do
+    it 'should detect' do
       TeamCity.running?.should == false
+    end
+
+    it 'should not publish messages' do
+      $stdout.should_not_receive(:puts)
+
+      TeamCity.progress_start 'foo'
     end
   end
 
   context 'when running inside TeamCity' do
     before { ENV['TEAMCITY_PROJECT_NAME'] = 'foo' }
 
-    it 'should publish messages' do
+    it 'should detect' do
       TeamCity.running?.should == true
     end
 
