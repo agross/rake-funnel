@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
     s.add_development_dependency 'ruby_gntp'
     s.add_development_dependency 'wdm'
   when /linux/i
-    s.add_development_dependency 'rb-inotify', '~> 0.8.8'
+    s.add_development_dependency 'rb-inotify'
   when /mac|darwin/i
     s.add_development_dependency 'rb-fsevent'
     s.add_development_dependency 'growl'
