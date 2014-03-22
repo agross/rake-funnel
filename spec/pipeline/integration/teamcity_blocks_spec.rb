@@ -30,8 +30,6 @@ describe TeamCityBlocks do
   after { TeamCityBlocks.reset! }
 
   describe 'running a rake task' do
-    let (:teamcity_running) { true }
-
     it 'should write block start' do
       expect(TeamCity).to have_received(:block_opened).with(name: 'task')
     end
@@ -57,7 +55,7 @@ describe TeamCityBlocks do
     end
   end
 
-  context 'when the block module is reset' do
+  context 'when the module is reset' do
     let(:reset) { true }
 
     it 'should not write' do

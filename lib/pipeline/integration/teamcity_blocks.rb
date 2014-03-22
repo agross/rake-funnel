@@ -2,62 +2,47 @@ require 'rake'
 
 module Pipeline::Integration
   module TeamCityBlocks
-    @rake_executes = []
-
     def self.included(mod)
-      patch_rake_task(self)
+      patch.apply!
     end
 
     def self.reset!
-      reset_rake_task(self)
+      patch.revert!
     end
 
     private
-    def self.reset_rake_task(caller)
-      return unless caller.patched?
-
-      ::Rake.module_eval do
-        Rake::Task.class_eval do
-          old_execute = caller.pop
-
-          define_method(:execute) do |args|
-            old_execute.bind(self).call(args)
-          end
-        end
-      end
+    def self.patch
+      @patch ||= create_patch
     end
 
-    def self.patch_rake_task(caller)
-      return if caller.patched?
+    def self.create_patch
+      Pipeline::Support::Patch.new do |p|
+        p.setup do
+          Rake::Task.class_eval do
+            old_execute = instance_method(:execute)
 
-      ::Rake.module_eval do
-        Rake::Task.class_eval do
-          old_execute = caller.push(instance_method(:execute))
+            define_method(:execute) do |args|
+              TeamCity.block_opened({ name: name })
 
-          define_method(:execute) do |args|
-            TeamCity.block_opened({ name: name })
+              begin
+                old_execute.bind(self).call(args)
+              ensure
+                TeamCity.block_closed({ name: name })
+              end
+            end
 
-            begin
-              old_execute.bind(self).call(args)
-            ensure
-              TeamCity.block_closed({ name: name })
+            old_execute
+          end
+        end
+
+        p.reset do |memo|
+          Rake::Task.class_eval do
+            define_method(:execute) do |args|
+              memo.bind(self).call(args)
             end
           end
         end
       end
-    end
-
-    def self.push(rake_execute)
-      @rake_executes.push(rake_execute)
-      rake_execute
-    end
-
-    def self.pop
-      @rake_executes.pop
-    end
-
-    def self.patched?
-      @rake_executes.any?
     end
   end
 end
