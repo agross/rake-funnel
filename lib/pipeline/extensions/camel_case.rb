@@ -1,4 +1,4 @@
-module Pipeline::Patches
+module Pipeline::Extensions
   module CamelCase
     def camelize
       self
@@ -11,9 +11,9 @@ module Pipeline::Patches
 end
 
 class String
-  include Pipeline::Patches::CamelCase
+  include Pipeline::Extensions::CamelCase
 end
 
 class Symbol
-  include Pipeline::Patches::CamelCase
+  include Pipeline::Extensions::CamelCase
 end

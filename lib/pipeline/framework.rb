@@ -1,3 +1,4 @@
+module Pipeline::Extensions; end
 module Pipeline::Integration; end
 module Pipeline::Support; end
 module Pipeline::Tasks; end

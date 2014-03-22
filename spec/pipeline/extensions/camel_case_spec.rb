@@ -1,6 +1,6 @@
 require 'pipeline'
 
-describe Pipeline::Patches::CamelCase do
+describe Pipeline::Extensions::CamelCase do
   it 'should not touch values without underscores' do
     'foo'.camelize.should == 'foo'
   end
