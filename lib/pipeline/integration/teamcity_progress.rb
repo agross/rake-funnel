@@ -1,7 +1,7 @@
 require 'rake'
 
 module Pipeline::Integration
-  module TeamCityBlocks
+  module TeamCityProgress
     def self.included(mod)
       patch.apply!
     end
@@ -22,12 +22,12 @@ module Pipeline::Integration
             old_execute = instance_method(:execute)
 
             define_method(:execute) do |args|
-              TeamCity.block_opened({ name: name })
+              TeamCity.progress_start(name)
 
               begin
                 old_execute.bind(self).call(args)
               ensure
-                TeamCity.block_closed({ name: name })
+                TeamCity.progress_finish(name)
               end
             end
 

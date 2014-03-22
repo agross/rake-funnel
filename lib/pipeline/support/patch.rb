@@ -1,6 +1,8 @@
 module Pipeline::Support
   class Patch
-    def initialize
+    def initialize(context = nil)
+      @context = context
+
       yield self if block_given?
     end
 
@@ -14,7 +16,7 @@ module Pipeline::Support
 
     def apply!
       return self if @memo
-      @memo = (@setup || noop).call
+      @memo = (@setup || noop).call(@context)
 
       self
     end
