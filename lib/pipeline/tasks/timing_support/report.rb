@@ -36,7 +36,7 @@ module Pipeline::Tasks::TimingSupport
     end
 
     def render
-      puts "\n\n" + '-' * HEADER_WIDTH
+      puts '-' * HEADER_WIDTH
       puts 'Build time report'
       puts '-' * HEADER_WIDTH
 
