@@ -54,6 +54,7 @@ module Pipeline::Integration
                 error = e
               ensure
                 context.finished.call(self, args, error)
+                raise error if error
               end
             end
 

@@ -75,12 +75,17 @@ describe ProgressReport do
 
         begin
           Rake::Task[:task].invoke
-        rescue Pipeline::ExecutionError
+        rescue Pipeline::ExecutionError => e
+          @raised_error = e
         end
       }
 
       it 'should write block end' do
         expect(TeamCity).to have_received(:block_closed).with(name: 'task')
+      end
+
+      it 'should keep the error' do
+        @raised_error.should be_a_kind_of(Pipeline::ExecutionError)
       end
     end
 
