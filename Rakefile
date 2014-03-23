@@ -18,6 +18,7 @@ end
 
 Pipeline::Tasks::Timing.new
 Pipeline::Tasks::BinPath.new
+Pipeline::Integration::SyncOutput.new
 Pipeline::Integration::ProgressReport.new
 
 desc 'Publish the gem file ' + File.basename(gem.gem_spec.cache_file)
