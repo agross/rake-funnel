@@ -25,6 +25,7 @@ describe ProgressReport do
         TeamCity.stub(:block_closed)
         TeamCity.stub(:progress_start)
         TeamCity.stub(:progress_finished)
+        TeamCity.stub(:build_problem)
       }
 
       before {
@@ -43,6 +44,10 @@ describe ProgressReport do
 
       it 'should write block end' do
         expect(TeamCity).to have_received(:block_closed).with(name: 'task')
+      end
+
+      it 'should not report build problems' do
+        expect(TeamCity).to_not have_received(:build_problem)
       end
 
       context 'not on TeamCity' do
@@ -66,11 +71,12 @@ describe ProgressReport do
       before {
         TeamCity.stub(:running)
         TeamCity.stub(:block_closed)
+        TeamCity.stub(:build_problem)
       }
 
       before {
         task :task do
-          raise Pipeline::ExecutionError.new('task error')
+          raise Pipeline::ExecutionError.new('task error' * 4000)
         end
 
         begin
@@ -86,6 +92,22 @@ describe ProgressReport do
 
       it 'should keep the error' do
         @raised_error.should be_a_kind_of(Pipeline::ExecutionError)
+      end
+
+      context 'on TeamCity' do
+        let(:teamcity_running?) { true }
+
+        it 'should report the error as a build problem' do
+          expect(TeamCity).to have_received(:build_problem)
+          end
+
+        it 'should report the error message' do
+          expect(TeamCity).to have_received(:build_problem).with(hash_including({ description: be_an_instance_of(String) }))
+          end
+
+        it 'should report the first 4000 characters of the error message' do
+          expect(TeamCity).to have_received(:build_problem).with(hash_including({ description: have(4000).items }))
+        end
       end
     end
 

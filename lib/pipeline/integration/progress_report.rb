@@ -12,6 +12,7 @@ module Pipeline::Integration
       end
 
       task_finished do |task, args, error|
+        TeamCity.build_problem({ description: error.message[0..4000 - 1] }) if error
         TeamCity.progress_finish(task.name)
         TeamCity.block_closed({ name: task.name })
       end
