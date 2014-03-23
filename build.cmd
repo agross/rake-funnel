@@ -6,11 +6,8 @@ set LANG=en_US.UTF-8
 :build
 cls
 
-set CI=
-if defined TEAMCITY_PROJECT_NAME set CI=--without development
-
 call bundle.cmd check
-if errorlevel 1 call bundle.cmd install %CI%
+if errorlevel 1 call bundle.cmd install
 if errorlevel 1 goto wait
 
 cls
