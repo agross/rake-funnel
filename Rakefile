@@ -16,9 +16,13 @@ spec = Gem::Specification.load('pipeline.gemspec')
 gem = Gem::PackageTask.new(spec) do |t|
   t.package_dir = 'deploy'
 
-  task gem: :spec do
+  task :gem do
     rm_rf t.package_dir_path
   end
+end
+
+task gem: :spec do
+  Pipeline::Integration::TeamCity.build_number(spec.version.to_s)
 end
 
 desc 'Publish the gem file ' + File.basename(gem.gem_spec.cache_file)
