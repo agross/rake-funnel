@@ -62,3 +62,7 @@ Pipeline::Tasks::MSDeploy.new :push => :bin_path do |t|
     allow_untrusted: true
   }
 end
+
+task :fail do
+  raise 'something bad happened'
+end
