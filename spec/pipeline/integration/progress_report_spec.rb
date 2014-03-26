@@ -5,6 +5,8 @@ include Pipeline::Integration
 
 describe ProgressReport do
 
+  class SpecificError < StandardError; end
+
   include Rake::DSL
 
   let!(:report) { described_class.new }
@@ -116,7 +118,7 @@ describe ProgressReport do
         end
       }
 
-      let(:error) { Pipeline::ExecutionError.new('task error' * 4000) }
+      let(:error) { SpecificError.new('task error' * 4000) }
 
       before {
         task :task do
@@ -126,7 +128,7 @@ describe ProgressReport do
         begin
           Rake::Task[:task].invoke
         rescue Rake::ApplicationAbortedException => e
-        rescue Pipeline::ExecutionError => e
+        rescue SpecificError => e
           @raised_error = e
         end
       }
@@ -135,7 +137,7 @@ describe ProgressReport do
         it_behaves_like :block_report
 
         it 'should not swallow the error' do
-          @raised_error.should be_a_kind_of(Pipeline::ExecutionError)
+          @raised_error.should be_a_kind_of(SpecificError)
         end
       end
 
@@ -167,7 +169,7 @@ describe ProgressReport do
         context 'with rake runner' do
           let(:teamcity_rake_runner?) { true }
           let(:error) {
-            Rake::ApplicationAbortedException.new(StandardError.new('inner message'))
+            Rake::ApplicationAbortedException.new(SpecificError.new('inner message'))
           }
 
           it 'should report the inner error as a build problem (as it will be wrapped in a ApplicationAbortedException)' do
@@ -257,7 +259,7 @@ describe ProgressReport do
     end
 
     context 'when task fails' do
-      let(:error) { Pipeline::ExecutionError.new('task error') }
+      let(:error) { SpecificError.new('task error') }
 
       before {
         task :task do
@@ -266,7 +268,7 @@ describe ProgressReport do
 
         begin
           Rake::Task[:task].invoke
-        rescue Pipeline::ExecutionError
+        rescue SpecificError
         end
       }
 
