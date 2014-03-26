@@ -27,7 +27,7 @@ end
 
 desc 'Publish the gem file ' + File.basename(gem.gem_spec.cache_file)
 Pipeline::Tasks::MSDeploy.new :push => [:bin_path, :gem] do |t|
-  t.log_file = 'tmp/msdeploy.log'
+  t.log_file = 'deploy/msdeploy.log'
   t.args = {
     verb: :sync,
     source: {
@@ -48,7 +48,7 @@ end
 Pipeline::Tasks::MSDeploy.new :push => :bin_path do |t|
   cmd = 'gem generate_index -V --directory=C:/GROSSWEBER/gems & icacls C:/GROSSWEBER/gems /reset /t /c /q'
 
-  t.log_file = 'tmp/msdeploy.log'
+  t.log_file = 'deploy/msdeploy.log'
   t.args = {
     verb: :sync,
     source: {
