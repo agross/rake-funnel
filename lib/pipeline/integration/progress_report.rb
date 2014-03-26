@@ -6,12 +6,17 @@ module Pipeline::Integration
 
     def initialize
       task_starting do |task, args|
-        TeamCity.block_opened({ name: task.name })
-        TeamCity.progress_start(task.name)
+        unless TeamCity.rake_runner?
+          TeamCity.block_opened({ name: task.name })
+          TeamCity.progress_start(task.name)
+        end
+
         puts "\n[#{task.name}]" unless TeamCity.running?
       end
 
       task_finished do |task, args, error|
+        next if TeamCity.rake_runner?
+
         TeamCity.build_problem({ description: error.message[0..4000 - 1] }) if error
         TeamCity.progress_finish(task.name)
         TeamCity.block_closed({ name: task.name })

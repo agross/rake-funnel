@@ -18,9 +18,11 @@ describe ProgressReport do
   describe 'running a rake task' do
     describe 'default actions' do
       let(:teamcity_running?) { false }
+      let(:teamcity_rake_runner?) { false }
 
       before {
         TeamCity.stub(:running?).and_return(teamcity_running?)
+        TeamCity.stub(:rake_runner?).and_return(teamcity_rake_runner?)
         TeamCity.stub(:block_opened)
         TeamCity.stub(:block_closed)
         TeamCity.stub(:progress_start)
@@ -61,8 +63,34 @@ describe ProgressReport do
       context 'on TeamCity' do
         let(:teamcity_running?) { true }
 
-        it 'should not write task name in square brackets since it would clutter the output' do
-          expect($stdout).to_not have_received(:puts).with("\n[task]")
+        context 'without rake runner' do
+          it 'should not write task name in square brackets since it would clutter the output' do
+            expect($stdout).to_not have_received(:puts).with("\n[task]")
+          end
+        end
+
+        context 'with rake runner' do
+          let(:teamcity_rake_runner?) { true }
+
+          it 'should not write task name in square brackets since it would clutter the output' do
+            expect($stdout).to_not have_received(:puts).with("\n[task]")
+          end
+
+          it 'should not write block start' do
+            expect(TeamCity).not_to have_received(:block_opened)
+          end
+
+          it 'should not write progress start' do
+            expect(TeamCity).not_to have_received(:progress_start)
+          end
+
+          it 'should not write block end' do
+            expect(TeamCity).not_to have_received(:block_closed)
+          end
+
+          it 'should not report build problems' do
+            expect(TeamCity).to_not have_received(:build_problem)
+          end
         end
       end
     end
