@@ -9,33 +9,27 @@ describe ProgressReport do
 
   let!(:report) { described_class.new }
 
+  let(:teamcity_running?) { false }
+  let(:teamcity_rake_runner?) { false }
+
   before { $stdout.stub(:puts) }
+
+  before {
+    TeamCity.stub(:running?).and_return(teamcity_running?)
+    TeamCity.stub(:rake_runner?).and_return(teamcity_rake_runner?)
+    TeamCity.stub(:block_opened)
+    TeamCity.stub(:block_closed)
+    TeamCity.stub(:progress_start)
+    TeamCity.stub(:progress_finish)
+    TeamCity.stub(:build_problem)
+  }
 
   before { Rake::Task.clear }
 
   after { report.reset! }
 
-  describe 'running a rake task' do
-    describe 'default actions' do
-      let(:teamcity_running?) { false }
-      let(:teamcity_rake_runner?) { false }
-
-      before {
-        TeamCity.stub(:running?).and_return(teamcity_running?)
-        TeamCity.stub(:rake_runner?).and_return(teamcity_rake_runner?)
-        TeamCity.stub(:block_opened)
-        TeamCity.stub(:block_closed)
-        TeamCity.stub(:progress_start)
-        TeamCity.stub(:progress_finished)
-        TeamCity.stub(:build_problem)
-      }
-
-      before {
-        task :task
-
-        Rake::Task[:task].invoke
-      }
-
+  describe 'defaults' do
+    shared_examples :block_report do
       it 'should write block start' do
         expect(TeamCity).to have_received(:block_opened).with(name: 'task')
       end
@@ -44,16 +38,46 @@ describe ProgressReport do
         expect(TeamCity).to have_received(:progress_start).with('task')
       end
 
+      it 'should write progress finish' do
+        expect(TeamCity).to have_received(:progress_finish).with('task')
+      end
+
       it 'should write block end' do
         expect(TeamCity).to have_received(:block_closed).with(name: 'task')
       end
+    end
+
+    shared_examples :no_block_report do
+      it 'should not write block start' do
+        expect(TeamCity).not_to have_received(:block_opened)
+      end
+
+      it 'should not write progress start' do
+        expect(TeamCity).not_to have_received(:progress_start)
+      end
+
+      it 'should not write progress finish' do
+        expect(TeamCity).not_to have_received(:progress_finish)
+      end
+
+      it 'should not write block end' do
+        expect(TeamCity).not_to have_received(:block_closed)
+      end
+    end
+
+    context 'when task succeeds' do
+      before {
+        task :task
+
+        Rake::Task[:task].invoke
+      }
 
       it 'should not report build problems' do
         expect(TeamCity).to_not have_received(:build_problem)
       end
 
       context 'not on TeamCity' do
-        let(:teamcity_running?) { false }
+        it_behaves_like :block_report
 
         it 'should write task name in square brackets' do
           expect($stdout).to have_received(:puts).with("\n[task]")
@@ -63,86 +87,98 @@ describe ProgressReport do
       context 'on TeamCity' do
         let(:teamcity_running?) { true }
 
+        it 'should not write task name in square brackets since it would clutter the output' do
+          expect($stdout).to_not have_received(:puts).with("\n[task]")
+        end
+
         context 'without rake runner' do
-          it 'should not write task name in square brackets since it would clutter the output' do
-            expect($stdout).to_not have_received(:puts).with("\n[task]")
-          end
+          it_behaves_like :block_report
         end
 
         context 'with rake runner' do
           let(:teamcity_rake_runner?) { true }
 
-          it 'should not write task name in square brackets since it would clutter the output' do
-            expect($stdout).to_not have_received(:puts).with("\n[task]")
-          end
-
-          it 'should not write block start' do
-            expect(TeamCity).not_to have_received(:block_opened)
-          end
-
-          it 'should not write progress start' do
-            expect(TeamCity).not_to have_received(:progress_start)
-          end
-
-          it 'should not write block end' do
-            expect(TeamCity).not_to have_received(:block_closed)
-          end
-
-          it 'should not report build problems' do
-            expect(TeamCity).to_not have_received(:build_problem)
-          end
+          it_behaves_like :no_block_report
         end
       end
     end
 
     context 'when task fails' do
       before {
-        TeamCity.stub(:running)
-        TeamCity.stub(:block_closed)
-        TeamCity.stub(:build_problem)
+        module Rake
+          class ApplicationAbortedException < StandardError
+            attr_reader :inner_exception
+
+            def initialize(other_exception)
+              @inner_exception = other_exception
+            end
+          end
+        end
       }
+
+      let(:error) { Pipeline::ExecutionError.new('task error' * 4000) }
 
       before {
         task :task do
-          raise Pipeline::ExecutionError.new('task error' * 4000)
+          raise error
         end
 
         begin
           Rake::Task[:task].invoke
+        rescue Rake::ApplicationAbortedException => e
         rescue Pipeline::ExecutionError => e
           @raised_error = e
         end
       }
 
-      it 'should write block end' do
-        expect(TeamCity).to have_received(:block_closed).with(name: 'task')
-      end
+      context 'not on TeamCity' do
+        it_behaves_like :block_report
 
-      it 'should keep the error' do
-        @raised_error.should be_a_kind_of(Pipeline::ExecutionError)
+        it 'should not swallow the error' do
+          @raised_error.should be_a_kind_of(Pipeline::ExecutionError)
+        end
       end
 
       context 'on TeamCity' do
         let(:teamcity_running?) { true }
 
-        it 'should report the error as a build problem' do
-          expect(TeamCity).to have_received(:build_problem)
+        describe 'build problems' do
+          it 'should report build problems' do
+            expect(TeamCity).to have_received(:build_problem)
           end
 
-        it 'should report the error message' do
-          expect(TeamCity).to have_received(:build_problem).with(hash_including({ description: be_an_instance_of(String) }))
+          it 'should report the error message' do
+            expect(TeamCity).to have_received(:build_problem).with(hash_including({ description: be_an_instance_of(String) }))
           end
 
-        it 'should report the first 4000 characters of the error message' do
-          expect(TeamCity).to have_received(:build_problem).with(hash_including({ description: have(4000).items }))
+          it 'should report the first 4000 characters of the error message' do
+            expect(TeamCity).to have_received(:build_problem).with(hash_including({ description: have(4000).items }))
+          end
+        end
+
+        context 'without rake runner' do
+          it_behaves_like :block_report
+
+          it 'should report the error as a build problem' do
+            expect(TeamCity).to have_received(:build_problem)
+          end
+        end
+
+        context 'with rake runner' do
+          let(:teamcity_rake_runner?) { true }
+          let(:error) {
+            Rake::ApplicationAbortedException.new(StandardError.new('inner message'))
+          }
+
+          it 'should report the inner error as a build problem (as it will be wrapped in a ApplicationAbortedException)' do
+            expect(TeamCity).to have_received(:build_problem).with({ description: 'inner message' })
+          end
         end
       end
     end
 
     context 'when report was reset' do
-      before {
-        TeamCity.stub(:block_opened)
-      }
+      let(:teamcity_running?) { true }
 
       before {
         report.reset!
@@ -194,7 +230,7 @@ describe ProgressReport do
 
         it 'should receive task' do
           expect(receiver).to have_received(:starting).with(hash_including({ task: kind_of(Rake::Task) }))
-          end
+        end
 
         it 'should receive task arguments' do
           expect(receiver).to have_received(:starting).with(hash_including({ args: kind_of(Rake::TaskArguments) }))

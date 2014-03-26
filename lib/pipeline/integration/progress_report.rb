@@ -15,9 +15,14 @@ module Pipeline::Integration
       end
 
       task_finished do |task, args, error|
-        next if TeamCity.rake_runner?
+        if error.respond_to?(:inner_exception)
+          error = error.inner_exception
+        end
 
         TeamCity.build_problem({ description: error.message[0..4000 - 1] }) if error
+
+        next if TeamCity.rake_runner?
+
         TeamCity.progress_finish(task.name)
         TeamCity.block_closed({ name: task.name })
       end
