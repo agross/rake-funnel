@@ -3,6 +3,11 @@ require 'pipeline'
 require 'rubygems/package_task'
 require 'rspec/core/rake_task'
 
+Pipeline::Tasks::Timing.new
+Pipeline::Tasks::BinPath.new
+Pipeline::Integration::SyncOutput.new
+Pipeline::Integration::ProgressReport.new
+
 task default: :spec
 
 RSpec::Core::RakeTask.new(:spec)
@@ -15,11 +20,6 @@ gem = Gem::PackageTask.new(spec) do |t|
     rm_rf t.package_dir_path
   end
 end
-
-Pipeline::Tasks::Timing.new
-Pipeline::Tasks::BinPath.new
-Pipeline::Integration::SyncOutput.new
-Pipeline::Integration::ProgressReport.new
 
 desc 'Publish the gem file ' + File.basename(gem.gem_spec.cache_file)
 Pipeline::Tasks::MSDeploy.new :push => [:bin_path, :gem] do |t|
