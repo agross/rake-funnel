@@ -64,5 +64,9 @@ Pipeline::Tasks::MSDeploy.new :push => :bin_path do |t|
 end
 
 task :fail do
-  raise 'something bad happened'
+  raise 'this build is expected to fail'
+end
+
+task :long_running do
+  sleep(30)
 end
