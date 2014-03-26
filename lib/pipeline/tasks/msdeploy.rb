@@ -37,16 +37,13 @@ module Pipeline::Tasks
           if ok
             puts 'Deployment successful.'
           else
-            message = %Q(
-Deployment errors occurred, exit code #{status_code}. Please review #{log_file}.
+            message = %Q(Deployment errors occurred, exit code #{status_code}. Please review #{log_file}.
 
 10 last logged lines:
 #{log}
 
 Tried to execute:
-#{command}
-
-)
+#{command})
 
             raise Pipeline::ExecutionError.new(message)
           end
