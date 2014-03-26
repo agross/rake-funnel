@@ -18,6 +18,10 @@ describe TeamCity do
       TeamCity.running?.should == false
     end
 
+    it "should not detect TeamCity's rake runner" do
+      TeamCity.rake_runner?.should == false
+    end
+
     it 'should not publish messages' do
       $stdout.should_not_receive(:puts)
 
@@ -30,6 +34,15 @@ describe TeamCity do
 
     it 'should detect' do
       TeamCity.running?.should == true
+    end
+
+    it "should detect TeamCity's rake runner" do
+      module ::Rake
+        module TeamCityApplication
+        end
+      end
+
+      TeamCity.rake_runner?.should == true
     end
 
     describe 'service messages' do

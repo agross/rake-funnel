@@ -5,6 +5,10 @@ module Pipeline::Integration
         ENV.include?('TEAMCITY_PROJECT_NAME')
       end
 
+      def rake_runner?
+        running? && Object.const_defined?('Rake') && Rake.const_defined?('TeamCityApplication')
+      end
+
       def method_missing(method, *args, &block)
         return unless running?
 
