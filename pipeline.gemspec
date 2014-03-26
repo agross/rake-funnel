@@ -33,7 +33,7 @@ Gem::Specification.new do |s|
   end
 
   git = ENV['TEAMCITY_GIT_PATH'] || 'git'
-  s.files         = `#{git} ls-files`.split("\n")
+  s.files         = `"#{git}" ls-files`.split("\n")
   s.test_files    = s.files.grep(%r{^(test|spec|features)/})
   s.executables   = s.files.grep(%r{^bin/}).map { |f| File.basename(f) }
   s.require_paths = ['lib']
