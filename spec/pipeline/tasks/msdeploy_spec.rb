@@ -125,9 +125,23 @@ describe MSDeploy do
 
         it 'should fail when an exception is logged' do
           success_exit = OpenStruct.new(value: OpenStruct.new(success?: true))
-          Open3.stub(:popen2e).and_yield(nil, StringIO.new('Exception: foo'), success_exit)
+          Open3.stub(:popen2e).and_yield(nil, StringIO.new('System.NullReferenceException: foo'), success_exit)
 
           expect { Rake::Task[:msdeploy].invoke }.to raise_error(Pipeline::ExecutionError)
+        end
+
+        it 'should not fail when a line contains "error" somewhere in the middle' do
+          success_exit = OpenStruct.new(value: OpenStruct.new(success?: true))
+          Open3.stub(:popen2e).and_yield(nil, StringIO.new('updated: error.html'), success_exit)
+
+          expect { Rake::Task[:msdeploy].invoke }.not_to raise_error
+        end
+
+        it 'should not fail when a line contains "exception" somewhere in the middle' do
+          success_exit = OpenStruct.new(value: OpenStruct.new(success?: true))
+          Open3.stub(:popen2e).and_yield(nil, StringIO.new('updated: exception.html'), success_exit)
+
+          expect { Rake::Task[:msdeploy].invoke }.not_to raise_error
         end
       end
 

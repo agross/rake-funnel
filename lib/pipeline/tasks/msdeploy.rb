@@ -70,7 +70,7 @@ Tried to execute:
 
           all_messages.puts(msg)
 
-          stdout = stderr if msg =~ /error|exception/i
+          stdout = stderr if msg =~ /^(error|[\w\.]*exception)/i
           stdout.call(msg)
         }
 
