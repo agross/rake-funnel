@@ -17,14 +17,14 @@ describe MSDeploy do
     its(:args) { should == {} }
 
     it 'should add the log file to the files to be cleaned' do
-      CLEAN.should include(subject.log_file)
+      expect(CLEAN).to include(subject.log_file)
     end
   end
 
   describe 'overriding defaults' do
     context 'when task name is specified' do
       it 'should have a default log file equal to the task name' do
-        MSDeploy.new(:foo).log_file.should == 'foo.log'
+        expect(MSDeploy.new(:foo).log_file).to eq('foo.log')
       end
     end
 
@@ -36,17 +36,17 @@ describe MSDeploy do
       }
 
       it 'should use custom log file' do
-        subject.log_file.should == 'bar.log'
+        expect(subject.log_file).to eq('bar.log')
       end
 
       it 'should add the log file to the files to be cleaned' do
-        CLEAN.should include(subject.log_file)
+        expect(CLEAN).to include(subject.log_file)
       end
     end
   end
 
   describe 'execution' do
-    before { subject.stub(:shell) }
+    before { allow(subject).to receive(:shell) }
 
     it 'should run with shell' do
       subject.args = {

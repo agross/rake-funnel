@@ -2,10 +2,10 @@ require 'pipeline'
 
 describe Pipeline::Integration::SyncOutput do
   before {
-    $stdout.stub(:sync=)
-    $stderr.stub(:sync=)
+    allow($stdout).to receive(:sync=)
+    allow($stderr).to receive(:sync=)
 
-    subject.should be
+    expect(subject).to be
   }
 
   it 'should immediately flush stdout' do

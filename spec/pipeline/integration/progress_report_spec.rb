@@ -14,16 +14,16 @@ describe ProgressReport do
   let(:teamcity_running?) { false }
   let(:teamcity_rake_runner?) { false }
 
-  before { $stdout.stub(:puts) }
+  before { allow($stdout).to receive(:puts) }
 
   before {
-    TeamCity.stub(:running?).and_return(teamcity_running?)
-    TeamCity.stub(:rake_runner?).and_return(teamcity_rake_runner?)
-    TeamCity.stub(:block_opened)
-    TeamCity.stub(:block_closed)
-    TeamCity.stub(:progress_start)
-    TeamCity.stub(:progress_finish)
-    TeamCity.stub(:build_problem)
+    allow(TeamCity).to receive(:running?).and_return(teamcity_running?)
+    allow(TeamCity).to receive(:rake_runner?).and_return(teamcity_rake_runner?)
+    allow(TeamCity).to receive(:block_opened)
+    allow(TeamCity).to receive(:block_closed)
+    allow(TeamCity).to receive(:progress_start)
+    allow(TeamCity).to receive(:progress_finish)
+    allow(TeamCity).to receive(:build_problem)
   }
 
   before { Rake::Task.clear }
@@ -137,7 +137,7 @@ describe ProgressReport do
         it_behaves_like :block_report
 
         it 'should not swallow the error' do
-          @raised_error.should be_a_kind_of(SpecificError)
+          expect(@raised_error).to be_a_kind_of(SpecificError)
         end
       end
 

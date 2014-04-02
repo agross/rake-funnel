@@ -63,7 +63,7 @@ describe Pipeline::ExecutionError do
     subject { described_class.new(nil, nil, output) }
 
     it 'should display the last 10 lines of output' do
-      subject.to_s.should_not =~ /^output 0/
+      expect(subject.to_s).not_to match(/^output 0/)
     end
   end
 end

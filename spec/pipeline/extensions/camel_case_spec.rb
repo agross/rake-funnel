@@ -2,18 +2,18 @@ require 'pipeline'
 
 describe Pipeline::Extensions::CamelCase do
   it 'should not touch values without underscores' do
-    'foo'.camelize.should == 'foo'
+    expect('foo'.camelize).to eq('foo')
   end
 
   it 'should convert strings with underscores' do
-    'foo_bar'.camelize.should == 'fooBar'
+    expect('foo_bar'.camelize).to eq('fooBar')
   end
 
   it 'should convert symbols to string' do
-    :foo.camelize.should == 'foo'
+    expect(:foo.camelize).to eq('foo')
   end
 
   it 'should convert symbols with underscores' do
-    :foo_bar.camelize.should == 'fooBar'
+    expect(:foo_bar.camelize).to eq('fooBar')
   end
 end

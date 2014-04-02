@@ -4,11 +4,11 @@ require 'smart_colored/extend'
 
 describe Pipeline::Extensions::Shell do
   before {
-    Open3.stub(:popen2e).and_yield(nil, stdout_and_stderr, exit)
+    allow(Open3).to receive(:popen2e).and_yield(nil, stdout_and_stderr, exit)
 
-    $stdout.stub(:puts)
-    $stderr.stub(:puts)
-    Rake.stub(:rake_output_message)
+    allow($stdout).to receive(:puts)
+    allow($stderr).to receive(:puts)
+    allow(Rake).to receive(:rake_output_message)
   }
 
   let(:exit) { OpenStruct.new(value: OpenStruct.new( success?: true, exitstatus: 0)) }
@@ -52,7 +52,7 @@ describe Pipeline::Extensions::Shell do
   end
 
   it 'should return nil' do
-    subject.shell('foo').should be_nil
+    expect(subject.shell('foo')).to be_nil
   end
 
   describe 'output redirection' do
@@ -70,8 +70,8 @@ describe Pipeline::Extensions::Shell do
 
   describe 'log file' do
     before {
-      subject.stub(:mkdir_p)
-      File.stub(:open)
+      allow(subject).to receive(:mkdir_p)
+      allow(File).to receive(:open)
     }
 
     let(:log_file) { nil }
@@ -193,15 +193,15 @@ describe Pipeline::Extensions::Shell do
         end
 
         it 'should report the exit code' do
-          expect{ subject.shell('foo') }.to raise_error { |e| e.exit_code.should == exit.value.exitstatus }
+          expect{ subject.shell('foo') }.to raise_error { |e| expect(e.exit_code).to eq(exit.value.exitstatus) }
         end
 
         it 'should report the command that was run' do
-          expect{ subject.shell('foo') }.to raise_error { |e| e.command.should == 'foo' }
+          expect{ subject.shell('foo') }.to raise_error { |e| expect(e.command).to eq('foo') }
         end
 
         it 'should report logged lines' do
-          expect{ subject.shell('foo') }.to raise_error { |e| e.output.should == stdout_and_stderr.string }
+          expect{ subject.shell('foo') }.to raise_error { |e| expect(e.output).to eq(stdout_and_stderr.string) }
         end
       end
 

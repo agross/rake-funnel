@@ -5,24 +5,24 @@ describe Pipeline::Tasks::BinPath do
 
   before {
     Rake::Task.clear
-    subject.should be
+    expect(subject).to be
   }
 
   describe 'defaults' do
     its(:name) { should == :bin_path }
-    its(:pattern) { should =~ ['tools/*', 'tools/*/bin'] }
+    its(:pattern) { is_expected.to match_array(%w(tools/* tools/*/bin)) }
   end
 
   describe 'execution' do
     before {
-      ENV.stub(:[]).with('PATH').and_return('default PATH contents')
-      ENV.stub(:[]=)
+      allow(ENV).to receive(:[]).with('PATH').and_return('default PATH contents')
+      allow(ENV).to receive(:[]=)
     }
 
     it 'should prepend matching folders to the PATH environment variable' do
-      subject.pattern = ['foo', 'bar']
+      subject.pattern = %w(foo bar)
 
-      Dir.stub(:[]).with(*subject.pattern).and_return(subject.pattern)
+      allow(Dir).to receive(:[]).with(*subject.pattern).and_return(subject.pattern)
 
       Rake::Task[:bin_path].invoke
 

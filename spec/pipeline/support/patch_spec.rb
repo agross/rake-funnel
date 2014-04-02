@@ -39,7 +39,7 @@ describe Pipeline::Support::Patch do
       end
 
       it 'should return self' do
-        ret.should eq(subject)
+        expect(ret).to eq(subject)
       end
     end
 
@@ -54,7 +54,7 @@ describe Pipeline::Support::Patch do
       end
 
       it 'should return self' do
-        ret.should eq(subject)
+        expect(ret).to eq(subject)
       end
     end
 

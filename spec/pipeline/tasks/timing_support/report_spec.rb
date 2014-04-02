@@ -12,8 +12,8 @@ describe Pipeline::Tasks::TimingSupport::Report do
   let(:opts) { {} }
 
   before {
-    $stdout.stub(:puts)
-    $stderr.stub(:puts)
+    allow($stdout).to receive(:puts)
+    allow($stderr).to receive(:puts)
     subject.render
   }
 
