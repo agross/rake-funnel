@@ -16,7 +16,9 @@ Gem::Specification.new do |s|
   s.add_dependency 'rake'
   s.add_dependency 'smart_colored'
 
-  s.add_development_dependency 'rspec'
+  s.add_development_dependency 'rspec', '>= 3.0.0beta2'
+  s.add_development_dependency 'rspec-its'
+  s.add_development_dependency 'rspec-collection_matchers'
   s.add_development_dependency 'guard'
   s.add_development_dependency 'guard-rspec'
   s.add_development_dependency 'guard-bundler'

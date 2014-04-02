@@ -1,3 +1,5 @@
+require 'rspec/its'
+require 'rspec/collection_matchers'
 require 'pipeline'
 
 # When invoked via the rspec rake task, output needs to by synced.
