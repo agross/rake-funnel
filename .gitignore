@@ -2,3 +2,5 @@
 deploy/
 pkg/
 tmp/
+
+Gemfile.lock
