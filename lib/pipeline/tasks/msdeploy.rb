@@ -27,9 +27,8 @@ module Pipeline::Tasks
       CLEAN.include(log_file)
 
       task @name do
-        cmd = [@msdeploy, MSDeploySupport::Mapper.map(@args)]
+        cmd = [MSDeploySupport::Mapper.quote(@msdeploy), MSDeploySupport::Mapper.map(@args)]
           .flatten
-          .map {|c| MSDeploySupport::Mapper.quote(c) }
           .join(' ')
 
         shell(cmd, log_file: log_file, error_lines: /^(error|[\w\.]*exception)/i)

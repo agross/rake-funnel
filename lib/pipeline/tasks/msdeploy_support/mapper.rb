@@ -12,7 +12,8 @@ module Pipeline::Tasks::MSDeploySupport
       end
 
       def quote(value)
-        return %Q{"#{value}"} if value =~ /\s/ && value !~ /"/
+        value = value.gsub(/"/, '""') if value.kind_of?(String)
+        return %Q{"#{value}"} if value =~ /\s/
         value
       end
 
@@ -22,6 +23,8 @@ module Pipeline::Tasks::MSDeploySupport
           value = value.map { |k, v|
             map_nested(k, v)
           }.reject(&:nil?).join(',')
+        else
+          value = camel_case(value)
         end
 
         map_top_level(key, value)
@@ -33,7 +36,7 @@ module Pipeline::Tasks::MSDeploySupport
 
         prefix, separator, value = omit_true(value)
 
-        "#{prefix}#{camel_case(key)}#{separator}#{camel_case(value)}"
+        "#{prefix}#{camel_case(key)}#{separator}#{value}"
       end
 
       def map_nested(key, value)

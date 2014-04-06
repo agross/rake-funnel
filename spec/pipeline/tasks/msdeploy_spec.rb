@@ -49,6 +49,15 @@ describe MSDeploy do
     before { allow(subject).to receive(:shell) }
 
     it 'should run with shell' do
+      Rake::Task[:msdeploy].invoke
+
+      expect(subject).to have_received(:shell)
+        .with('msdeploy',
+          { :log_file => 'msdeploy.log',
+            :error_lines => /^(error|[\w\.]*exception)/i })
+    end
+
+    it 'should execute with args' do
       subject.args = {
         verb: :sync,
         source: {
@@ -57,7 +66,8 @@ describe MSDeploy do
         dest: {
           computer_name: 'remote.example.com',
           username: 'bob',
-          password: 'secret'
+          password: 'secret',
+          auto: true
           },
         skip: [
           { directory: 'logs'},
@@ -77,11 +87,74 @@ describe MSDeploy do
         msdeploy
         -verb:sync
         -source:contentPath=deploy
-        -dest:computerName=remote.example.com,username=bob,password=secret
+        -dest:computerName=remote.example.com,username=bob,password=secret,auto=true
         -skip:directory=logs
         -skip:objectName=filePath,skipAction=Delete,absolutePath=App_Offline\.htm$
         -usechecksum
         -allowUntrusted
+        )
+
+      expect(subject).to have_received(:shell)
+        .with(args.join(' '),
+          { :log_file => 'msdeploy.log',
+            :error_lines => /^(error|[\w\.]*exception)/i })
+    end
+
+    it 'should support real-world runCommand args' do
+      subject.args = {
+        verb: :sync,
+        source: {
+          run_command: 'cd "C:\Program Files"',
+          wait_interval: 1
+          },
+        dest: {
+          computer_name: 'remote.example.com',
+          username: 'bob',
+          password: 'secret',
+          auto: true
+          }
+      }
+
+      Rake::Task[:msdeploy].invoke
+
+      args = %w(
+        msdeploy
+        -verb:sync
+        -source:runCommand="cd ""C:\Program Files""",waitInterval=1
+        -dest:computerName=remote.example.com,username=bob,password=secret,auto=true
+        )
+
+      expect(subject).to have_received(:shell)
+        .with(args.join(' '),
+          { :log_file => 'msdeploy.log',
+            :error_lines => /^(error|[\w\.]*exception)/i })
+    end
+
+    it 'should support real-world preSync runCommand args' do
+      subject.args = {
+        verb: :sync,
+        pre_sync: {
+          run_command: 'cd "C:\Program Files"',
+          :dont_use_command_exe => :true
+          },
+        source: {
+          content_path: 'deploy'
+          },
+        dest: {
+          computer_name: 'remote.example.com',
+          username: 'bob',
+          password: 'secret'
+          }
+      }
+
+      Rake::Task[:msdeploy].invoke
+
+      args = %w(
+        msdeploy
+        -verb:sync
+        -preSync:runCommand="cd ""C:\Program Files""",dontUseCommandExe=true
+        -source:contentPath=deploy
+        -dest:computerName=remote.example.com,username=bob,password=secret
         )
 
       expect(subject).to have_received(:shell)

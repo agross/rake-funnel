@@ -140,39 +140,86 @@ describe Mapper do
   end
 
   describe 'whitespace' do
-    it 'should enclose keys in "' do
-      args = { 'some key' => 1 }
-      expect(Mapper.map(args)).to match_array(['-"some key":1'])
+    describe 'keys' do
+      context 'without quotes' do
+        it 'should enclose keys in "' do
+          args = { 'some key' => 1 }
+          expect(Mapper.map(args)).to match_array(['-"some key":1'])
+        end
+
+        it 'should enclose hash keys in "' do
+          args = { verb: { 'some key' => 1 } }
+          expect(Mapper.map(args)).to match_array(['-verb:"some key"=1'])
+        end
+
+        it 'should enclose enumerable hash keys in "' do
+          args = { verb: [{ 'some key' => 1 }] }
+          expect(Mapper.map(args)).to match_array(['-verb:"some key"=1'])
+        end
+        end
+
+      context 'with quotes' do
+        it 'should escape quotes' do
+          args = { 'some "key"' => 1 }
+          expect(Mapper.map(args)).to match_array(['-"some ""key""":1'])
+        end
+
+        it 'should escape quotes in hash keys' do
+          args = { verb: { 'some "key"' => 1 } }
+          expect(Mapper.map(args)).to match_array(['-verb:"some ""key"""=1'])
+        end
+
+        it 'should escape quotes in enumerable hash keys' do
+          args = { verb: [{ 'some "key"' => 1 }] }
+          expect(Mapper.map(args)).to match_array(['-verb:"some ""key"""=1'])
+        end
+      end
     end
 
-    it 'should enclose hash keys in "' do
-      args = { verb: { 'some key' => 1 } }
-      expect(Mapper.map(args)).to match_array(['-verb:"some key"=1'])
-    end
+    describe 'values' do
+      context 'without quotes' do
+        it 'should enclose values in "' do
+          args = { verb: 'some value' }
+          expect(Mapper.map(args)).to match_array(['-verb:"some value"'])
+        end
 
-    it 'should enclose enumerable hash keys in "' do
-      args = { verb: [{ 'some key' => 1 }] }
-      expect(Mapper.map(args)).to match_array(['-verb:"some key"=1'])
-    end
+        it 'should enclose enumerable values in "' do
+          args = { verb: ['some value'] }
+          expect(Mapper.map(args)).to match_array(['-verb:"some value"'])
+        end
 
-    it 'should enclose values in "' do
-      args = { verb: 'some value' }
-      expect(Mapper.map(args)).to match_array(['-verb:"some value"'])
-    end
+        it 'should enclose hash values in "' do
+          args = { verb: { key: 'some value' } }
+          expect(Mapper.map(args)).to match_array(['-verb:key="some value"'])
+        end
 
-    it 'should enclose enumerable values in "' do
-      args = { verb: ['some value'] }
-      expect(Mapper.map(args)).to match_array(['-verb:"some value"'])
-    end
+        it 'should enclose enumerable hash values in "' do
+          args = { verb: [{ key: 'some value' }] }
+          expect(Mapper.map(args)).to match_array(['-verb:key="some value"'])
+        end
+      end
 
-    it 'should enclose hash values in "' do
-      args = { verb: { key: 'some value' } }
-      expect(Mapper.map(args)).to match_array(['-verb:key="some value"'])
-    end
+      context 'with quotes' do
+        it 'should escape quotes' do
+          args = { verb: 'some "value"' }
+          expect(Mapper.map(args)).to match_array(['-verb:"some ""value"""'])
+        end
 
-    it 'should enclose enumerable hash values in "' do
-      args = { verb: [{ key: 'some value' }] }
-      expect(Mapper.map(args)).to match_array(['-verb:key="some value"'])
+        it 'should escape quotes in enumerable values' do
+          args = { verb: ['some "value"'] }
+          expect(Mapper.map(args)).to match_array(['-verb:"some ""value"""'])
+        end
+
+        it 'should escape quotes in hash values' do
+          args = { verb: { key: 'some "value"' } }
+          expect(Mapper.map(args)).to match_array(['-verb:key="some ""value"""'])
+        end
+
+        it 'should escape quotes in enumerable hash values' do
+          args = { verb: [{ key: 'some "value"' }] }
+          expect(Mapper.map(args)).to match_array(['-verb:key="some ""value"""'])
+        end
+      end
     end
   end
 end
