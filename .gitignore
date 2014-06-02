@@ -1,7 +1,6 @@
 .idea/
 coverage/
 deploy/
-pkg/
 tmp/
 
 Gemfile.lock
