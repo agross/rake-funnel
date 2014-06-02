@@ -13,6 +13,8 @@ Gem::Specification.new do |s|
   s.description = %q{A standardized build pipeline}
   s.summary     = %q{The build pipeline}
 
+  s.required_ruby_version = '>= 2.0.0'
+
   s.add_dependency 'rake'
   s.add_dependency 'smart_colored'
 
