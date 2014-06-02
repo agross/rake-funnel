@@ -1,18 +1,17 @@
-require 'rake'
-require 'pipeline'
+require 'rake/funnel'
 require 'rubygems/package_task'
 require 'rspec/core/rake_task'
 
-Pipeline::Tasks::Timing.new
-Pipeline::Tasks::BinPath.new
-Pipeline::Integration::SyncOutput.new
-Pipeline::Integration::ProgressReport.new
+Rake::Funnel::Tasks::Timing.new
+Rake::Funnel::Tasks::BinPath.new
+Rake::Funnel::Integration::SyncOutput.new
+Rake::Funnel::Integration::ProgressReport.new
 
 task default: :spec
 
 RSpec::Core::RakeTask.new(:spec)
 
-spec = Gem::Specification.load('pipeline.gemspec')
+spec = Gem::Specification.load('rake-funnel.gemspec')
 gem = Gem::PackageTask.new(spec) do |t|
   t.package_dir = 'deploy'
 
@@ -22,11 +21,11 @@ gem = Gem::PackageTask.new(spec) do |t|
 end
 
 task gem: :spec do
-  Pipeline::Integration::TeamCity.build_number(spec.version.to_s)
+  Rake::Funnel::Integration::TeamCity.build_number(spec.version.to_s)
 end
 
 desc 'Publish the gem file ' + File.basename(gem.gem_spec.cache_file)
-Pipeline::Tasks::MSDeploy.new :push => [:bin_path, :gem] do |t|
+Rake::Funnel::Tasks::MSDeploy.new :push => [:bin_path, :gem] do |t|
   t.log_file = 'deploy/msdeploy.log'
   t.args = {
     verb: :sync,
