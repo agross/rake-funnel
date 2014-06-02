@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.authors     = ['Alexander Groß']
   s.email       = ['agross@therightstuff.de']
   s.homepage    = 'http://grossweber.com'
-  s.licenses    = ['BSD']
+  s.license     = 'BSD'
   s.description = %q{A standardized build pipeline}
   s.summary     = %q{The build pipeline}
 
