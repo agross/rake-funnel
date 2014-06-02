@@ -1,6 +1,9 @@
 require 'rspec/its'
 require 'rspec/collection_matchers'
 require 'rake/funnel'
+require 'coveralls'
+
+Coveralls.wear!
 
 # When invoked via the rspec rake task, output needs to by synced.
 Rake::Funnel::Integration::SyncOutput.new
