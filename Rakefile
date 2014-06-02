@@ -39,8 +39,8 @@ Pipeline::Tasks::MSDeploy.new :push => [:bin_path, :gem] do |t|
     },
     dest: {
       computer_name: 'gems.grossweber.com',
-      username: ENV['DEPLOY_USER'] || '',
-      password: ENV['DEPLOY_PASSWORD'] || '',
+      username: ENV['DEPLOY_USER'],
+      password: ENV['DEPLOY_PASSWORD'],
       content_path: 'C:/GROSSWEBER/gems/gems'
     },
     skip: [{ skipAction: :delete }],
