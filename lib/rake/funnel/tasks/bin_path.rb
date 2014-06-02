@@ -6,7 +6,7 @@ module Rake::Funnel::Tasks
 
     def initialize(name = :bin_path)
       @name = name
-      @pattern = ['tools/*', 'tools/*/bin']
+      @pattern = %w(tools/* tools/*/bin)
 
       yield self if block_given?
       define
