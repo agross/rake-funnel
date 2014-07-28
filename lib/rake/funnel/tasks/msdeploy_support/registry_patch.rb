@@ -1,5 +1,3 @@
-require 'win32/registry'
-
 module Rake::Funnel::Tasks::MSDeploySupport
   class RegistryPatch
     Key = 'SOFTWARE\Microsoft\IIS Extensions\MSDeploy\3'
@@ -21,6 +19,12 @@ module Rake::Funnel::Tasks::MSDeploySupport
     end
 
     def create_patch
+      begin
+        require 'win32/registry'
+      rescue LoadError
+        return Rake::Funnel::Support::Patch.new(self)
+      end
+
       Rake::Funnel::Support::Patch.new(self) do |p|
         key_created = false
         version_created = false

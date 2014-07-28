@@ -14,7 +14,7 @@ describe RegistryPatch do
     end
   end
 
-  describe 'patching' do
+  describe 'patching', platform: :win32 do
     context 'MSDeploy registry key and "Version" value does not exist' do
       let(:key){
         k = instance_double(Win32::Registry)

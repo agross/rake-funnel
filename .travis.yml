@@ -1,6 +1,6 @@
 language: ruby
 bundler_args: --without development
-script: bundle exec rspec
+script: bundle exec rspec --tag ~platform:win32
 rvm:
   - 2.0.0
   - 2.1.0
