@@ -31,7 +31,9 @@ module Rake::Funnel::Tasks
           .flatten
           .join(' ')
 
-        shell(cmd, log_file: log_file, error_lines: /^(error|[\w\.]*exception)/i)
+        MSDeploySupport::RegistryPatch.new do
+          shell(cmd, log_file: log_file, error_lines: /^(error|[\w\.]*exception)/i)
+        end
       end
 
       self

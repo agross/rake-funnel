@@ -46,15 +46,18 @@ describe MSDeploy do
   end
 
   describe 'execution' do
-    before { allow(subject).to receive(:shell) }
+    before {
+      allow(subject).to receive(:shell)
+      allow(RegistryPatch).to receive(:new).and_yield
+    }
 
     it 'should run with shell' do
       Rake::Task[:msdeploy].invoke
 
       expect(subject).to have_received(:shell)
-        .with('msdeploy',
-          { :log_file => 'msdeploy.log',
-            :error_lines => /^(error|[\w\.]*exception)/i })
+      .with('msdeploy',
+        { :log_file => 'msdeploy.log',
+          :error_lines => /^(error|[\w\.]*exception)/i })
     end
 
     it 'should execute with args' do
@@ -62,15 +65,15 @@ describe MSDeploy do
         verb: :sync,
         source: {
           content_path: 'deploy'
-          },
+        },
         dest: {
           computer_name: 'remote.example.com',
           username: 'bob',
           password: 'secret',
           auto: true
-          },
+        },
         skip: [
-          { directory: 'logs'},
+          { directory: 'logs' },
           {
             object_name: 'filePath',
             skip_action: 'Delete',
@@ -95,9 +98,9 @@ describe MSDeploy do
         )
 
       expect(subject).to have_received(:shell)
-        .with(args.join(' '),
-          { :log_file => 'msdeploy.log',
-            :error_lines => /^(error|[\w\.]*exception)/i })
+      .with(args.join(' '),
+        { :log_file => 'msdeploy.log',
+          :error_lines => /^(error|[\w\.]*exception)/i })
     end
 
     it 'should support real-world runCommand args' do
@@ -106,13 +109,13 @@ describe MSDeploy do
         source: {
           run_command: 'cd "C:\Program Files"',
           wait_interval: 1
-          },
+        },
         dest: {
           computer_name: 'remote.example.com',
           username: 'bob',
           password: 'secret',
           auto: true
-          }
+        }
       }
 
       Rake::Task[:msdeploy].invoke
@@ -125,9 +128,9 @@ describe MSDeploy do
         )
 
       expect(subject).to have_received(:shell)
-        .with(args.join(' '),
-          { :log_file => 'msdeploy.log',
-            :error_lines => /^(error|[\w\.]*exception)/i })
+      .with(args.join(' '),
+        { :log_file => 'msdeploy.log',
+          :error_lines => /^(error|[\w\.]*exception)/i })
     end
 
     it 'should support real-world preSync runCommand args' do
@@ -136,15 +139,15 @@ describe MSDeploy do
         pre_sync: {
           run_command: 'cd "C:\Program Files"',
           :dont_use_command_exe => :true
-          },
+        },
         source: {
           content_path: 'deploy'
-          },
+        },
         dest: {
           computer_name: 'remote.example.com',
           username: 'bob',
           password: 'secret'
-          }
+        }
       }
 
       Rake::Task[:msdeploy].invoke
@@ -158,29 +161,39 @@ describe MSDeploy do
         )
 
       expect(subject).to have_received(:shell)
-        .with(args.join(' '),
-          { :log_file => 'msdeploy.log',
-            :error_lines => /^(error|[\w\.]*exception)/i })
+      .with(args.join(' '),
+        { :log_file => 'msdeploy.log',
+          :error_lines => /^(error|[\w\.]*exception)/i })
     end
 
-    describe "MSDeploy's idiotic command line parser that requires quotes inside but not outside parameters" do
-      it 'should escape the string before calling shell' do
-        subject.msdeploy = 'path to/msdeploy'
-        subject.args = {
-          'simple key' => 'simple value',
-          hash: {
-            'hash key 1' => 'hash value 1',
-            'hash key 2' => 'hash value 2'
+    describe "MSDeploy's idiocy" do
+      describe 'version registry value that is required to exist' do
+        it 'should patch the registry' do
+          Rake::Task[:msdeploy].invoke
+
+          expect(RegistryPatch).to have_received(:new)
+        end
+      end
+
+      describe 'command line parser that requires quotes inside but not outside parameters' do
+        it 'should escape the string before calling shell' do
+          subject.msdeploy = 'path to/msdeploy'
+          subject.args = {
+            'simple key' => 'simple value',
+            hash: {
+              'hash key 1' => 'hash value 1',
+              'hash key 2' => 'hash value 2'
             },
-          array: ['array value 1', 'array value 2'],
-          'some flag' => true
-        }
+            array: ['array value 1', 'array value 2'],
+            'some flag' => true
+          }
 
-        Rake::Task[:msdeploy].invoke
+          Rake::Task[:msdeploy].invoke
 
-        args = '"path to/msdeploy" -"simple key":"simple value" -hash:"hash key 1"="hash value 1","hash key 2"="hash value 2" -array:"array value 1" -array:"array value 2" -"some flag"'
+          args = '"path to/msdeploy" -"simple key":"simple value" -hash:"hash key 1"="hash value 1","hash key 2"="hash value 2" -array:"array value 1" -array:"array value 2" -"some flag"'
 
-        expect(subject).to have_received(:shell).with(args, be_an_instance_of(Hash))
+          expect(subject).to have_received(:shell).with(args, be_an_instance_of(Hash))
+        end
       end
     end
   end
