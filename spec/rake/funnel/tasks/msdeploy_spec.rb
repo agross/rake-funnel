@@ -24,13 +24,13 @@ describe MSDeploy do
   describe 'overriding defaults' do
     context 'when task name is specified' do
       it 'should have a default log file equal to the task name' do
-        expect(MSDeploy.new(:foo).log_file).to eq('foo.log')
+        expect(described_class.new(:foo).log_file).to eq('foo.log')
       end
     end
 
     context 'when task name and log file is specified' do
       subject! {
-        MSDeploy.new(:foo) do |t|
+        described_class.new(:foo) do |t|
           t.log_file = 'bar.log'
         end
       }
@@ -52,7 +52,7 @@ describe MSDeploy do
     }
 
     it 'should run with shell' do
-      Rake::Task[:msdeploy].invoke
+      Rake::Task[subject.name].invoke
 
       expect(subject).to have_received(:shell)
       .with('msdeploy',
@@ -84,7 +84,7 @@ describe MSDeploy do
         allow_untrusted: true
       }
 
-      Rake::Task[:msdeploy].invoke
+      Rake::Task[subject.name].invoke
 
       args = %w(
         msdeploy
@@ -118,7 +118,7 @@ describe MSDeploy do
         }
       }
 
-      Rake::Task[:msdeploy].invoke
+      Rake::Task[subject.name].invoke
 
       args = %w(
         msdeploy
@@ -150,7 +150,7 @@ describe MSDeploy do
         }
       }
 
-      Rake::Task[:msdeploy].invoke
+      Rake::Task[subject.name].invoke
 
       args = %w(
         msdeploy
@@ -169,7 +169,7 @@ describe MSDeploy do
     describe "MSDeploy's idiocy" do
       describe 'version registry value that is required to exist' do
         it 'should patch the registry' do
-          Rake::Task[:msdeploy].invoke
+          Rake::Task[subject.name].invoke
 
           expect(RegistryPatch).to have_received(:new)
         end

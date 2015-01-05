@@ -25,7 +25,7 @@ describe Rake::Funnel::Extensions::Shell do
 
       subject.shell(arg)
 
-      expect(Open3).to have_received(:popen2e).with('simple')
+      expect(Open3).to have_received(:popen2e).with(arg)
     end
 
     it 'should accept commands with arguments as array' do
