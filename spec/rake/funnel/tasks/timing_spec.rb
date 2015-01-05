@@ -28,7 +28,7 @@ describe Rake::Funnel::Tasks::Timing do
     end
 
     it 'should append itself to the top level tasks' do
-      allow(Rake.application).to receive(:handle_options)
+      allow(Rake.application).to receive(:handle_options).and_return([])
       Rake.application.init
 
       Rake::Funnel::Tasks::Timing.new
