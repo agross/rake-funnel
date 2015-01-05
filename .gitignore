@@ -4,3 +4,4 @@ deploy/
 tmp/
 
 Gemfile.lock
+cacert.pem
