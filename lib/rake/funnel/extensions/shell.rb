@@ -18,9 +18,10 @@ module Rake::Funnel::Extensions
       log = StringIO.new
 
       begin
+        cmd = cmd.flatten.reject(&:nil?)
         Rake.rake_output_message(cmd.join(' '))
 
-        Open3.popen2e(*cmd) do |stdin, stdout_and_stderr, wait_thread|
+        Open3.popen2e(*cmd) do |_, stdout_and_stderr, wait_thread|
           stdout_and_stderr.each do |line|
             out = stdout
             out = stderr if error_lines && line =~ error_lines

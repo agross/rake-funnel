@@ -11,7 +11,7 @@ describe Rake::Funnel::Extensions::Shell do
     allow(Rake).to receive(:rake_output_message)
   }
 
-  let(:exit) { OpenStruct.new(value: OpenStruct.new( success?: true, exitstatus: 0)) }
+  let(:exit) { OpenStruct.new(value: OpenStruct.new(success?: true, exitstatus: 0)) }
 
   let(:stdout_and_stderr) { StringIO.new("output 1\noutput 2\n") }
 
@@ -29,17 +29,35 @@ describe Rake::Funnel::Extensions::Shell do
     end
 
     it 'should accept commands with arguments as array' do
-      args = %w(1 2)
+      args = %w(simple 1 2)
 
       subject.shell(args)
 
-      expect(Open3).to have_received(:popen2e).with(args)
+      expect(Open3).to have_received(:popen2e).with(*args)
     end
 
     it 'should accept commands with arguments' do
       subject.shell('1', 2)
 
       expect(Open3).to have_received(:popen2e).with('1', 2)
+    end
+
+    it 'should reject nil' do
+      subject.shell(1, nil)
+
+      expect(Open3).to have_received(:popen2e).with(1)
+    end
+
+    it 'should accept nested arrays' do
+      subject.shell([1, 2, [3]])
+
+      expect(Open3).to have_received(:popen2e).with(1, 2, 3)
+    end
+
+    it 'should reject nested nils' do
+      subject.shell([1, nil, [3]])
+
+      expect(Open3).to have_received(:popen2e).with(1, 3)
     end
 
     it 'should echo the command' do
@@ -169,13 +187,13 @@ describe Rake::Funnel::Extensions::Shell do
     context 'error lines logged' do
       context 'without block' do
         it 'should fail' do
-          expect{ subject.shell('foo', error_lines: /.*/) }.to raise_error(Rake::Funnel::ExecutionError)
+          expect { subject.shell('foo', error_lines: /.*/) }.to raise_error(Rake::Funnel::ExecutionError)
         end
       end
 
       context 'with block' do
         it 'should not fail' do
-          expect{ subject.shell('foo', error_lines: /.*/) {} }.not_to raise_error
+          expect { subject.shell('foo', error_lines: /.*/) {} }.not_to raise_error
         end
 
         it 'should yield the error' do
@@ -189,25 +207,25 @@ describe Rake::Funnel::Extensions::Shell do
 
       context 'without block' do
         it 'should fail' do
-          expect{ subject.shell('foo') }.to raise_error(Rake::Funnel::ExecutionError)
+          expect { subject.shell('foo') }.to raise_error(Rake::Funnel::ExecutionError)
         end
 
         it 'should report the exit code' do
-          expect{ subject.shell('foo') }.to raise_error { |e| expect(e.exit_code).to eq(exit.value.exitstatus) }
+          expect { subject.shell('foo') }.to raise_error { |e| expect(e.exit_code).to eq(exit.value.exitstatus) }
         end
 
         it 'should report the command that was run' do
-          expect{ subject.shell('foo') }.to raise_error { |e| expect(e.command).to eq('foo') }
+          expect { subject.shell('foo') }.to raise_error { |e| expect(e.command).to eq('foo') }
         end
 
         it 'should report logged lines' do
-          expect{ subject.shell('foo') }.to raise_error { |e| expect(e.output).to eq(stdout_and_stderr.string) }
+          expect { subject.shell('foo') }.to raise_error { |e| expect(e.output).to eq(stdout_and_stderr.string) }
         end
       end
 
       context 'with block' do
         it 'should not fail' do
-          expect{ subject.shell('foo') {} }.not_to raise_error
+          expect { subject.shell('foo') {} }.not_to raise_error
         end
 
         it 'should yield the error' do
