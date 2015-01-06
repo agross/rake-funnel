@@ -11,7 +11,6 @@ module Rake::Funnel::Integration::TeamCity
 
           unless TeamCity.rake_runner?
             ServiceMessages.block_opened({ name: task.name })
-            ServiceMessages.progress_start(task.name)
           end
         end
 
@@ -26,7 +25,6 @@ module Rake::Funnel::Integration::TeamCity
 
           next if Rake::Funnel::Integration::TeamCity.rake_runner?
 
-          ServiceMessages.progress_finish(task.name)
           ServiceMessages.block_closed({ name: task.name })
         end
       end

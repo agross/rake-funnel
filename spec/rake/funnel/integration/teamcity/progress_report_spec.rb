@@ -35,14 +35,6 @@ describe ProgressReport do
       expect(ServiceMessages).to have_received(:block_opened).with(name: 'task')
     end
 
-    it 'should write progress start' do
-      expect(ServiceMessages).to have_received(:progress_start).with('task')
-    end
-
-    it 'should write progress finish' do
-      expect(ServiceMessages).to have_received(:progress_finish).with('task')
-    end
-
     it 'should write block end' do
       expect(ServiceMessages).to have_received(:block_closed).with(name: 'task')
     end
@@ -51,14 +43,6 @@ describe ProgressReport do
   shared_examples :no_block_report do
     it 'should not write block start' do
       expect(ServiceMessages).not_to have_received(:block_opened)
-    end
-
-    it 'should not write progress start' do
-      expect(ServiceMessages).not_to have_received(:progress_start)
-    end
-
-    it 'should not write progress finish' do
-      expect(ServiceMessages).not_to have_received(:progress_finish)
     end
 
     it 'should not write block end' do
