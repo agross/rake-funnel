@@ -6,7 +6,7 @@ module Rake::Funnel::Tasks
 
     def initialize(name = :bin_path)
       @name = name
-      @pattern = %w(tools/* tools/*/bin)
+      @pattern = %w(tools/* tools/*/bin packages/**/tools)
 
       yield self if block_given?
       define
@@ -15,7 +15,10 @@ module Rake::Funnel::Tasks
     private
     def define
       task @name do
-        add_pattern_to_path_environment
+        puts 'Added the following paths to the PATH environment variable:'
+        add_pattern_to_path_environment.each do |p|
+          puts "  - #{p}"
+        end
       end
 
       self
@@ -23,9 +26,9 @@ module Rake::Funnel::Tasks
 
     def add_pattern_to_path_environment
       bin_paths = Dir[*@pattern].map { |path| File.expand_path(path) }
-      bin_paths << ENV['PATH']
 
-      ENV['PATH'] = bin_paths.join(File::PATH_SEPARATOR)
+      ENV['PATH'] = ([] << bin_paths << ENV['PATH']).flatten.join(File::PATH_SEPARATOR)
+      bin_paths
     end
   end
 end
