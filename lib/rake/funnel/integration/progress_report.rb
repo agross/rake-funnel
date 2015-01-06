@@ -6,33 +6,17 @@ module Rake::Funnel::Integration
 
     def initialize
       task_starting do |task, args|
-        unless TeamCity.rake_runner?
-          TeamCity.block_opened({ name: task.name })
-          TeamCity.progress_start(task.name)
-        end
-
-        puts "\n[#{task.name}]" unless TeamCity.running?
+        puts "\n[#{task.name}]" unless Rake::Funnel::Integration::TeamCity.running?
       end
 
-      task_finished do |task, args, error|
-        if error.respond_to?(:inner_exception)
-          error = error.inner_exception
-        end
-
-        TeamCity.build_problem({ description: error.message[0..4000 - 1] }) if error
-
-        next if TeamCity.rake_runner?
-
-        TeamCity.progress_finish(task.name)
-        TeamCity.block_closed({ name: task.name })
-      end
+      task_finished { |task, args, error| }
 
       yield self if block_given?
 
       patch.apply!
     end
 
-    def reset!
+    def disable!
       patch.revert!
     end
 
