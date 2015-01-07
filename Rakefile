@@ -27,26 +27,29 @@ task gem: :spec do
   Rake::Funnel::Integration::TeamCity::ServiceMessages.build_number(spec.version.to_s)
 end
 
-desc 'Publish the gem file ' + File.basename(gem.gem_spec.cache_file)
+desc "Publish the gem file #{gem.gem_spec.file_name}"
 Rake::Funnel::Tasks::MSDeploy.new :push => [:bin_path, :gem] do |t|
+  remote_dir = 'C:/GROSSWEBER/gems'
+  gem = File.join(File.expand_path(gem.package_dir), gem.gem_spec.file_name)
+
   t.log_file = 'deploy/msdeploy.log'
   t.args = {
     verb: :sync,
     post_sync: {
-      run_command: 'gem generate_index -V --directory=C:/GROSSWEBER/gems & icacls C:/GROSSWEBER/gems /reset /t /c /q',
+      run_command: "gem generate_index -V --directory=#{remote_dir} & icacls C:/GROSSWEBER/gems /reset /t /c /q",
       wait_interval: 60 * 1000
     },
     source: {
-      content_path: File.expand_path('deploy')
+      file_path: gem
     },
     dest: {
       computer_name: 'gems.grossweber.com',
       username: ENV['DEPLOY_USER'],
       password: ENV['DEPLOY_PASSWORD'],
-      content_path: 'C:/GROSSWEBER/gems/gems'
+      file_path: File.join(remote_dir, 'gems', File.basename(gem))
     },
-    skip: [{ skipAction: :delete }],
-    usechecksum: nil,
+    skip: [{ skip_action: :delete }],
+    use_check_sum: nil,
     allow_untrusted: nil
   }
 end
