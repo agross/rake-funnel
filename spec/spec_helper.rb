@@ -9,8 +9,6 @@ Coveralls.wear! if Coveralls.will_run?
 Rake::Funnel::Integration::SyncOutput.new
 
 RSpec.configure do |config|
-  config.order = :random
-
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end

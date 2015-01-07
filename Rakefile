@@ -10,7 +10,9 @@ Rake::Funnel::Integration::TeamCity::ProgressReport.new
 
 task default: :spec
 
-RSpec::Core::RakeTask.new(:spec)
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.rspec_opts = '--order random'
+end
 
 spec = Gem::Specification.load('rake-funnel.gemspec')
 gem = Gem::PackageTask.new(spec) do |t|
