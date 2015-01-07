@@ -39,7 +39,7 @@ module Rake::Funnel::Tasks
         end
 
         mapper = Rake::Funnel::Support::Mapper.new(:MSBuild)
-        cmd = [msbuild, project_or_solution, mapper.map(args)].flatten.reject(&:nil?)
+        cmd = [msbuild, project_or_solution, *mapper.map(args)]
 
         shell(cmd)
       end
