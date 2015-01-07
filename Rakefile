@@ -24,7 +24,7 @@ gem = Gem::PackageTask.new(spec) do |t|
 end
 
 task gem: :spec do
-  Rake::Funnel::Integration::TeamCity.build_number(spec.version.to_s)
+  Rake::Funnel::Integration::TeamCity::ServiceMessages.build_number(spec.version.to_s)
 end
 
 desc 'Publish the gem file ' + File.basename(gem.gem_spec.cache_file)
