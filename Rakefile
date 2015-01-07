@@ -34,7 +34,7 @@ Rake::Funnel::Tasks::MSDeploy.new :push => [:bin_path, :gem] do |t|
     verb: :sync,
     post_sync: {
       run_command: 'gem generate_index -V --directory=C:/GROSSWEBER/gems & icacls C:/GROSSWEBER/gems /reset /t /c /q',
-      :wait_interval => 60 * 1000
+      wait_interval: 60 * 1000
     },
     source: {
       content_path: File.expand_path('deploy')
@@ -46,8 +46,8 @@ Rake::Funnel::Tasks::MSDeploy.new :push => [:bin_path, :gem] do |t|
       content_path: 'C:/GROSSWEBER/gems/gems'
     },
     skip: [{ skipAction: :delete }],
-    usechecksum: true,
-    allow_untrusted: true
+    usechecksum: nil,
+    allow_untrusted: nil
   }
 end
 

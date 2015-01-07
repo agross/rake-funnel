@@ -2,13 +2,12 @@ require 'rake/tasklib'
 
 module Rake::Funnel::Tasks
   class MSBuild < Rake::TaskLib
-    attr_accessor :name, :clr_version, :project_or_solution, :switches, :properties, :search_pattern
+    attr_accessor :name, :clr_version, :project_or_solution, :args, :search_pattern
 
     def initialize(name = :compile)
       @name = name
       @clr_version = 'v4.0.30319'
-      @switches = {}
-      @properties = {}
+      @args = {}
       @search_pattern = %w(**/*.sln)
 
       yield self if block_given?
@@ -39,7 +38,8 @@ module Rake::Funnel::Tasks
           raise Rake::Funnel::AmbiguousFileError.new('No projects or more than one project found.', @name, @search_pattern, candidates)
         end
 
-        cmd = [msbuild, project_or_solution, map_switches, map_properties].flatten.reject(&:nil?)
+        mapper = Rake::Funnel::Support::Mapper.new(:MSBuild)
+        cmd = [msbuild, project_or_solution, mapper.map(args)].flatten.reject(&:nil?)
 
         shell(cmd)
       end
@@ -55,20 +55,6 @@ module Rake::Funnel::Tasks
 
     def candidates
       Dir.glob(@search_pattern).select { |f| File.file?(f) }
-    end
-
-    def map_switches
-      (@switches || {}).map { |key, value|
-        v = ":#{value}" unless value.kind_of? TrueClass or value.kind_of? FalseClass
-        "/#{key}#{v}" if value
-      }
-    end
-
-    def map_properties
-      (@properties || {}).map { |key, value|
-        v = "=#{value}" unless value.kind_of? TrueClass or value.kind_of? FalseClass
-        "/property:#{key}#{v}" if value
-      }
     end
   end
 end

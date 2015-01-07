@@ -80,8 +80,8 @@ describe MSDeploy do
             absolute_path: 'App_Offline\.htm$'
           }
         ],
-        usechecksum: true,
-        allow_untrusted: true
+        usechecksum: nil,
+        allow_untrusted: nil
       }
 
       Rake::Task[subject.name].invoke
@@ -185,7 +185,7 @@ describe MSDeploy do
               'hash key 2' => 'hash value 2'
             },
             array: ['array value 1', 'array value 2'],
-            'some flag' => true
+            'some flag' => nil
           }
 
           Rake::Task[:msdeploy].invoke

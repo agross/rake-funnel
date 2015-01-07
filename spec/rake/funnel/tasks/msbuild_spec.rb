@@ -13,8 +13,7 @@ describe MSBuild do
     its(:clr_version) { should == 'v4.0.30319' }
     its(:msbuild) { should == 'C:/Windows/Microsoft.NET/Framework/v4.0.30319/msbuild.exe' }
     its(:project_or_solution) { should == nil }
-    its(:switches) { should == {} }
-    its(:properties) { should == {} }
+    its(:args) { should == {} }
     its(:search_pattern) { should == %w(**/*.sln) }
   end
 
@@ -77,7 +76,7 @@ describe MSBuild do
       subject! {
         described_class.new do |t|
           t.search_pattern = %W(#{dir}/**/*.sln #{dir}/**/*.??proj)
-          t.switches = t.properties = nil
+          t.args = nil
         end
       }
 
@@ -125,20 +124,18 @@ describe MSBuild do
     end
 
     describe 'arguments' do
-      let(:switches) {}
-      let(:properties) {}
+      let(:args) {}
 
       subject! {
         described_class.new do |t|
-          t.switches = switches
-          t.properties = properties
+          t.args = args
           t.project_or_solution = 'dummy value such that it runs'
         end
       }
 
       describe 'key-value' do
         context 'value given' do
-          let(:switches) { { target: 'Rebuild' } }
+          let(:args) { { target: 'Rebuild' } }
 
           it 'should pass arg' do
             Rake::Task[subject.name].invoke
@@ -148,51 +145,51 @@ describe MSBuild do
         end
 
         context 'value nil' do
-          let(:switches) { { target: nil } }
+          let(:args) { { target: nil } }
 
           it 'should not pass arg' do
             Rake::Task[subject.name].invoke
 
-            expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution])
+            expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution, '/target'])
           end
         end
       end
 
       describe 'flags' do
         context 'flag on' do
-          let(:switches) { { nologo: true } }
+          let(:args) { { node_reuse: true } }
 
           it 'should pass arg' do
             Rake::Task[subject.name].invoke
 
-            expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution, '/nologo'])
+            expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution, '/nodeReuse:true'])
           end
         end
 
         context 'flag off' do
-          let(:switches) { { nologo: false } }
+          let(:args) { { node_reuse: false } }
 
           it 'should not pass arg' do
             Rake::Task[subject.name].invoke
 
-            expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution])
+            expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution, '/nodeReuse:false'])
           end
         end
 
         context 'flag nil' do
-          let(:switches) { { nologo: nil } }
+          let(:args) { { nologo: nil } }
 
           it 'should not pass arg' do
             Rake::Task[subject.name].invoke
 
-            expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution])
+            expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution, '/nologo'])
           end
         end
       end
 
       describe 'properties' do
         context 'value given' do
-          let(:properties) { { Configuration: 'Debug' } }
+          let(:args) { { property: { Configuration: 'Debug' } } }
 
           it 'should pass arg' do
             Rake::Task[subject.name].invoke
@@ -202,12 +199,12 @@ describe MSBuild do
         end
 
         context 'value nil' do
-          let(:properties) { { Configuration: nil } }
+          let(:args) { { property: { Configuration: nil } } }
 
           it 'should not pass arg' do
             Rake::Task[subject.name].invoke
 
-            expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution])
+            expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution, '/property:Configuration'])
           end
         end
       end

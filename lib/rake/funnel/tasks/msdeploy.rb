@@ -27,7 +27,8 @@ module Rake::Funnel::Tasks
       CLEAN.include(log_file)
 
       task @name do
-        cmd = [MSDeploySupport::Mapper.quote(@msdeploy), MSDeploySupport::Mapper.map(@args)]
+        mapper = Rake::Funnel::Support::Mapper.new(:MSDeploy)
+        cmd = [quote(msdeploy), mapper.map(args)]
           .flatten
           .join(' ')
 
@@ -37,6 +38,12 @@ module Rake::Funnel::Tasks
       end
 
       self
+    end
+
+    def quote(value)
+      value = value.gsub(/"/, '""') if value.kind_of?(String)
+      return %Q{"#{value}"} if value =~ /\s/
+      value
     end
   end
 end
