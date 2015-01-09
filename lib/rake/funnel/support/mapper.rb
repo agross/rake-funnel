@@ -31,9 +31,15 @@ module Rake::Funnel::Support
   end
 
   class Mapper
-    def initialize(style)
+    def initialize(style = :Default)
+      raise "You cannot use a 'nil' mapper. Available mappers are: #{MapperStyles.constants.sort.join(', ')}" if style.nil?
+
       @style = style
-      @style = MapperStyles.const_get(style).new if style.kind_of?(Symbol)
+      begin
+        @style = MapperStyles.const_get(style).new if style.kind_of?(Symbol)
+      rescue => ex
+        raise "Something went wrong while creating the '#{style}' mapper: #{ex}"
+      end
     end
 
     def map(args = {})
@@ -49,7 +55,7 @@ module Rake::Funnel::Support
 
       @style
         .generate_from(model)
-        .map { |args| args.map { |arg| camel_case(arg) }}
+        .map { |args| args.map { |arg| camel_case_symbols(arg) }}
         .map(&:join)
     end
 
@@ -67,7 +73,7 @@ module Rake::Funnel::Support
       end
     end
 
-    def camel_case(value)
+    def camel_case_symbols(value)
       return value unless value.kind_of?(Symbol)
       value.camelize
     end
