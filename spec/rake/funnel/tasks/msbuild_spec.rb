@@ -10,25 +10,28 @@ describe MSBuild do
 
   describe 'defaults' do
     its(:name) { should == :compile }
-    its(:clr_version) { should == 'v4.0.30319' }
-    its(:msbuild) { should == 'C:/Windows/Microsoft.NET/Framework/v4.0.30319/msbuild.exe' }
     its(:project_or_solution) { should == nil }
     its(:args) { should == {} }
     its(:search_pattern) { should == %w(**/*.sln) }
+
+    context 'on Windows', platform: :win32 do
+      before {
+        allow(Rake::Win32).to receive(:windows?).and_return(true)
+      }
+
+      its(:msbuild) { should =~ /msbuild\.exe$/ }
+    end
+
+    context 'not on Windows' do
+      before {
+        allow(Rake::Win32).to receive(:windows?).and_return(false)
+      }
+
+      its(:msbuild) { should == 'xbuild' }
+    end
   end
 
   describe 'overriding defaults' do
-    context 'when framework version is specified' do
-      subject {
-        described_class.new do |t|
-          t.clr_version = 'v3.5'
-        end
-      }
-
-      its(:clr_version) { should == 'v3.5' }
-      its(:msbuild) { should == 'C:/Windows/Microsoft.NET/Framework/v3.5/msbuild.exe' }
-    end
-
     context 'when msbuild executable is specified' do
       subject {
         described_class.new do |t|

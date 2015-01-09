@@ -1,12 +1,15 @@
 require 'rake/tasklib'
 
+Dir["#{File.dirname(__FILE__)}/msbuild_support/*.rb"].each do |path|
+  require path
+end
+
 module Rake::Funnel::Tasks
   class MSBuild < Rake::TaskLib
-    attr_accessor :name, :clr_version, :project_or_solution, :args, :search_pattern
+    attr_accessor :name, :project_or_solution, :args, :search_pattern
 
     def initialize(name = :compile)
       @name = name
-      @clr_version = 'v4.0.30319'
       @args = {}
       @search_pattern = %w(**/*.sln)
 
@@ -15,7 +18,7 @@ module Rake::Funnel::Tasks
     end
 
     def msbuild
-      @_msbuild || File.join('C:/Windows/Microsoft.NET/Framework/', @clr_version, 'msbuild.exe')
+      @_msbuild || MSBuildSupport::BuildTool.find
     end
 
     def msbuild=(value)
@@ -38,8 +41,11 @@ module Rake::Funnel::Tasks
           raise Rake::Funnel::AmbiguousFileError.new('No projects or more than one project found.', @name, @search_pattern, candidates)
         end
 
-        mapper = Rake::Funnel::Support::Mapper.new(:MSBuild)
-        cmd = [msbuild, project_or_solution, *mapper.map(args)]
+        cmd = [
+          msbuild,
+          project_or_solution,
+          *Rake::Funnel::Support::Mapper.new(:MSBuild).map(args)
+        ]
 
         shell(cmd)
       end
