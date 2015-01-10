@@ -15,9 +15,9 @@ module Rake::Funnel::Tasks
     private
     def define
       task @name do
-        puts 'Added the following paths to the PATH environment variable:'
+        Rake.rake_output_message 'Added the following paths to the PATH environment variable:'
         add_pattern_to_path_environment.each do |p|
-          puts "  - #{p}"
+          Rake.rake_output_message "  - #{p}"
         end
       end
 

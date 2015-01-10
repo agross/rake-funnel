@@ -16,7 +16,7 @@ describe Rake::Funnel::Tasks::BinPath do
     before {
       allow(ENV).to receive(:[]).with('PATH').and_return('default PATH contents')
       allow(ENV).to receive(:[]=)
-      allow($stdout).to receive(:puts)
+      allow(Rake).to receive(:rake_output_message)
     }
 
     before {
@@ -34,8 +34,8 @@ describe Rake::Funnel::Tasks::BinPath do
     end
 
     it 'should report added paths' do
-      expect($stdout).to have_received(:puts).with(%r|/foo$|)
-      expect($stdout).to have_received(:puts).with(%r|/bar$|)
+      expect(Rake).to have_received(:rake_output_message).with(%r|/foo$|)
+      expect(Rake).to have_received(:rake_output_message).with(%r|/bar$|)
     end
   end
 end
