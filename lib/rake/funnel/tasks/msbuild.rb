@@ -26,7 +26,7 @@ module Rake::Funnel::Tasks
     end
 
     def project_or_solution
-      @_project_or_solution || search_sln
+      MSBuildSupport::Solution.new(@_project_or_solution || search_pattern, self)
     end
 
     def project_or_solution=(value)
@@ -35,15 +35,11 @@ module Rake::Funnel::Tasks
 
     private
     def define
-      desc "Compile #{project_or_solution}"
+      desc "Compile #{project_or_solution.find_or_nil}"
       task @name do
-        if project_or_solution.nil?
-          raise Rake::Funnel::AmbiguousFileError.new('No projects or more than one project found.', @name, @search_pattern, candidates)
-        end
-
         cmd = [
           msbuild,
-          project_or_solution,
+          project_or_solution.find,
           *Rake::Funnel::Support::Mapper.new(:MSBuild).map(args)
         ]
 
@@ -51,16 +47,6 @@ module Rake::Funnel::Tasks
       end
 
       self
-    end
-
-    def search_sln
-      return candidates.first if candidates.one?
-
-      nil
-    end
-
-    def candidates
-      Dir.glob(@search_pattern).select { |f| File.file?(f) }
     end
   end
 end

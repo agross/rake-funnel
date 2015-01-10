@@ -10,25 +10,17 @@ describe MSBuild do
 
   describe 'defaults' do
     its(:name) { should == :compile }
-    its(:project_or_solution) { should == nil }
+    its(:project_or_solution) { should be_instance_of(MSBuildSupport::Solution) }
     its(:args) { should == {} }
     its(:search_pattern) { should == %w(**/*.sln) }
 
     describe 'build tool' do
       before {
-        allow(Rake::Win32).to receive(:windows?).and_return(windows?)
+        allow(MSBuildSupport::BuildTool).to receive(:find).and_return('build tool')
       }
 
-      context 'on Windows', platform: :win32 do
-        let(:windows?) { true }
-
-        its(:msbuild) { should =~ /msbuild\.exe$/ }
-      end
-
-      context 'not on Windows' do
-        let(:windows?) { false }
-
-        its(:msbuild) { should == 'xbuild' }
+      it 'should use build tool finder' do
+        expect(subject.msbuild).to eq('build tool')
       end
     end
   end
@@ -37,182 +29,63 @@ describe MSBuild do
     context 'when msbuild executable is specified' do
       subject {
         described_class.new do |t|
-          t.msbuild = 'msbuild.exe'
+          t.msbuild = 'custom build tool.exe'
         end
       }
 
-      its(:msbuild) { should == 'msbuild.exe' }
+      its(:msbuild) { should == 'custom build tool.exe' }
     end
 
     context 'when project or solution is specified' do
+      before {
+        allow(MSBuildSupport::Solution).to receive(:new).and_call_original
+      }
+
       subject {
         described_class.new do |t|
           t.project_or_solution = 'project.sln'
         end
       }
 
-      its(:project_or_solution) { should == 'project.sln' }
+      its(:project_or_solution) { should be_instance_of(MSBuildSupport::Solution) }
+
+      it 'should set project or solution' do
+        expect(MSBuildSupport::Solution).to have_received(:new).with('project.sln', subject)
+      end
     end
   end
 
   describe 'execution' do
+    let(:args) { {} }
+
+    let(:mapper) { double(Support::Mapper).as_null_object }
+    let(:solution) { double(MSBuildSupport::Solution).as_null_object }
+
     before {
       allow(subject).to receive(:sh)
+
+      allow(Support::Mapper).to receive(:new).and_return(mapper)
+      allow(MSBuildSupport::Solution).to receive(:new).and_return(solution)
     }
 
-    describe 'solution finder' do
-      let(:generate) { [] }
+    before {
+      Rake::Task[subject.name].invoke
+    }
 
-      let!(:dir) {
-        tmp = Dir.mktmpdir
-
-        ([] << generate).flatten.each do |g|
-          file = "#{tmp}/#{g}"
-
-          FileUtils.mkdir_p(File.dirname(file))
-          FileUtils.touch(file)
-        end
-
-        tmp
-      }
-
-      after { FileUtils.rm_rf dir }
-
-      subject! {
-        described_class.new do |t|
-          t.search_pattern = %W(#{dir}/**/*.sln #{dir}/**/*.??proj)
-          t.args = nil
-        end
-      }
-
-      context 'no solution and project' do
-        it 'should fail' do
-          expect(lambda { Rake::Task[subject.name].invoke }).to raise_error(AmbiguousFileError)
-        end
-      end
-
-      context 'more than one solution' do
-        let(:generate) { %w(foo/project1.sln foo/project2.sln) }
-
-        it 'should fail' do
-          expect(lambda { Rake::Task[subject.name].invoke }).to raise_error(AmbiguousFileError)
-        end
-      end
-
-      context 'more than one project' do
-        let(:generate) { %w(foo/project.csproj foo/project.fsproj) }
-
-        it 'should fail' do
-          expect(lambda { Rake::Task[subject.name].invoke }).to raise_error(AmbiguousFileError)
-        end
-      end
-
-      context 'one solution' do
-        let(:generate) { 'foo/project.sln' }
-
-        it 'should build solution' do
-          Rake::Task[subject.name].invoke
-
-          expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution])
-        end
-      end
-
-      context 'one project' do
-        let(:generate) { 'foo/project.fsproj' }
-
-        it 'should build project' do
-          Rake::Task[subject.name].invoke
-
-          expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution])
-        end
-      end
+    it 'should use solution finder' do
+      expect(solution).to have_received(:find)
     end
 
-    describe 'arguments' do
-      let(:args) {}
+    it 'should use MSBuild mapper' do
+      expect(Support::Mapper).to have_received(:new).with(:MSBuild)
+    end
 
-      subject! {
-        described_class.new do |t|
-          t.args = args
-          t.project_or_solution = 'dummy value such that it runs'
-        end
-      }
+    it 'should map arguments' do
+      expect(mapper).to have_received(:map).with(args)
+    end
 
-      describe 'key-value' do
-        context 'value given' do
-          let(:args) { { target: 'Rebuild' } }
-
-          it 'should pass arg' do
-            Rake::Task[subject.name].invoke
-
-            expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution, '/target:Rebuild'])
-          end
-        end
-
-        context 'value nil' do
-          let(:args) { { target: nil } }
-
-          it 'should not pass arg' do
-            Rake::Task[subject.name].invoke
-
-            expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution, '/target'])
-          end
-        end
-      end
-
-      describe 'flags' do
-        context 'flag on' do
-          let(:args) { { node_reuse: true } }
-
-          it 'should pass arg' do
-            Rake::Task[subject.name].invoke
-
-            expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution, '/nodeReuse:true'])
-          end
-        end
-
-        context 'flag off' do
-          let(:args) { { node_reuse: false } }
-
-          it 'should not pass arg' do
-            Rake::Task[subject.name].invoke
-
-            expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution, '/nodeReuse:false'])
-          end
-        end
-
-        context 'flag nil' do
-          let(:args) { { nologo: nil } }
-
-          it 'should not pass arg' do
-            Rake::Task[subject.name].invoke
-
-            expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution, '/nologo'])
-          end
-        end
-      end
-
-      describe 'properties' do
-        context 'value given' do
-          let(:args) { { property: { Configuration: 'Debug' } } }
-
-          it 'should pass arg' do
-            Rake::Task[subject.name].invoke
-
-            expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution, '/property:Configuration=Debug'])
-          end
-        end
-
-        context 'value nil' do
-          let(:args) { { property: { Configuration: nil } } }
-
-          it 'should not pass arg' do
-            Rake::Task[subject.name].invoke
-
-            expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution, '/property:Configuration'])
-          end
-        end
-      end
+    it 'should run with sh' do
+      expect(subject).to have_received(:sh)
     end
   end
 end
