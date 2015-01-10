@@ -8,18 +8,9 @@ module Rake::Funnel::Support
           return exe_args
         end
 
-        exe_args.unshift('mono', which(exe_args.shift))
-      end
-
-      private
-      def which(executable)
-        return executable if File.exists?(executable)
-
-        ENV['PATH']
-          .split(File::PATH_SEPARATOR)
-          .map { |path| File.join(path, executable) }
-          .select { |path| File.exists?(path) }
-          .first || executable
+        executable = exe_args.shift
+        found = Which.which(executable) || executable
+        exe_args.unshift('mono', found)
       end
     end
   end
