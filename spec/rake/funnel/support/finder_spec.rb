@@ -107,7 +107,7 @@ describe Finder do
     context 'more than one matching file' do
       let(:generate) { %w(foo/project1.sln foo/project2.sln) }
 
-      it 'should yield all matchs' do
+      it 'should yield all matches' do
         expect(subject.all_or_default).to eq(generate.map { |file| File.join(dir, file) })
       end
     end
