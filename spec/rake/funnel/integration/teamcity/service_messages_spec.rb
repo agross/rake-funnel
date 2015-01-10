@@ -117,7 +117,7 @@ describe ServiceMessages do
 
       context 'when reporting a message with a named parameter' do
         it 'should print the service message' do
-          ServiceMessages.block_opened({ :name => 'block name' })
+          ServiceMessages.block_opened({ name: 'block name' })
 
           expect($stdout).to have_received(:puts).with("##teamcity[blockOpened name='block name']")
         end
@@ -125,7 +125,7 @@ describe ServiceMessages do
 
       context 'when reporting a message with multiple named parameters' do
         it 'should print the service message' do
-          ServiceMessages.test_started ({ :name => 'test name', :captureStandardOutput => true })
+          ServiceMessages.test_started ({ name: 'test name', captureStandardOutput: true })
 
           expect($stdout).to have_received(:puts).with("##teamcity[testStarted name='test name' captureStandardOutput='true']")
         end
@@ -133,7 +133,7 @@ describe ServiceMessages do
 
       context 'when reporting a message with Ruby-style named parameters' do
         it 'should print the service message' do
-          ServiceMessages.test_started ({ :capture_standard_output => true })
+          ServiceMessages.test_started ({ capture_standard_output: true })
 
           expect($stdout).to have_received(:puts).with("##teamcity[testStarted captureStandardOutput='true']")
         end

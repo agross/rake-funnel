@@ -36,7 +36,7 @@ describe Rake::Funnel::Tasks::TimingSupport::Report do
     end
 
     context 'when rake succeeded' do
-      let(:opts) { { :failed => false } }
+      let(:opts) { { failed: false } }
 
       it 'should print the successful build status' do
         expect($stdout).to have_received(:puts).with(/Status\s+OK/)
@@ -44,7 +44,7 @@ describe Rake::Funnel::Tasks::TimingSupport::Report do
     end
 
     context 'when rake failed' do
-      let(:opts) { { :failed => true } }
+      let(:opts) { { failed: true } }
 
       it 'should print the failed build status' do
         expect($stderr).to have_received(:puts).with(/Status\s+Failed/)
