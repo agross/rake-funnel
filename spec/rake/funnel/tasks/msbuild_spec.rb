@@ -57,7 +57,7 @@ describe MSBuild do
 
   describe 'execution' do
     before {
-      allow(subject).to receive(:shell)
+      allow(subject).to receive(:sh)
     }
 
     describe 'solution finder' do
@@ -113,7 +113,7 @@ describe MSBuild do
         it 'should build solution' do
           Rake::Task[subject.name].invoke
 
-          expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution])
+          expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution])
         end
       end
 
@@ -123,7 +123,7 @@ describe MSBuild do
         it 'should build project' do
           Rake::Task[subject.name].invoke
 
-          expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution])
+          expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution])
         end
       end
     end
@@ -145,7 +145,7 @@ describe MSBuild do
           it 'should pass arg' do
             Rake::Task[subject.name].invoke
 
-            expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution, '/target:Rebuild'])
+            expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution, '/target:Rebuild'])
           end
         end
 
@@ -155,7 +155,7 @@ describe MSBuild do
           it 'should not pass arg' do
             Rake::Task[subject.name].invoke
 
-            expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution, '/target'])
+            expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution, '/target'])
           end
         end
       end
@@ -167,7 +167,7 @@ describe MSBuild do
           it 'should pass arg' do
             Rake::Task[subject.name].invoke
 
-            expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution, '/nodeReuse:true'])
+            expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution, '/nodeReuse:true'])
           end
         end
 
@@ -177,7 +177,7 @@ describe MSBuild do
           it 'should not pass arg' do
             Rake::Task[subject.name].invoke
 
-            expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution, '/nodeReuse:false'])
+            expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution, '/nodeReuse:false'])
           end
         end
 
@@ -187,7 +187,7 @@ describe MSBuild do
           it 'should not pass arg' do
             Rake::Task[subject.name].invoke
 
-            expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution, '/nologo'])
+            expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution, '/nologo'])
           end
         end
       end
@@ -199,7 +199,7 @@ describe MSBuild do
           it 'should pass arg' do
             Rake::Task[subject.name].invoke
 
-            expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution, '/property:Configuration=Debug'])
+            expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution, '/property:Configuration=Debug'])
           end
         end
 
@@ -209,7 +209,7 @@ describe MSBuild do
           it 'should not pass arg' do
             Rake::Task[subject.name].invoke
 
-            expect(subject).to have_received(:shell).with([subject.msbuild, subject.project_or_solution, '/property:Configuration'])
+            expect(subject).to have_received(:sh).with([subject.msbuild, subject.project_or_solution, '/property:Configuration'])
           end
         end
       end

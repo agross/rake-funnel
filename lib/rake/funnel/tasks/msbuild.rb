@@ -47,7 +47,7 @@ module Rake::Funnel::Tasks
           *Rake::Funnel::Support::Mapper.new(:MSBuild).map(args)
         ]
 
-        shell(cmd)
+        sh(*cmd)
       end
 
       self
