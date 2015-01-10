@@ -84,7 +84,7 @@ describe Finder do
       let(:generate) { %w(foo/project1.sln foo/project2.sln) }
 
       it 'should yield all matches' do
-        expect(subject.all).to eq(generate.map { |file| File.join(dir, file) })
+        expect(subject.all).to match_array(generate.map { |file| File.join(dir, file) })
       end
     end
 
@@ -92,7 +92,7 @@ describe Finder do
       let(:generate) { 'foo/project.sln' }
 
       it 'should yield all matches' do
-        expect(subject.all).to eq([File.join(dir, generate)])
+        expect(subject.all).to match_array([File.join(dir, generate)])
       end
     end
   end
@@ -108,7 +108,7 @@ describe Finder do
       let(:generate) { %w(foo/project1.sln foo/project2.sln) }
 
       it 'should yield all matches' do
-        expect(subject.all_or_default).to eq(generate.map { |file| File.join(dir, file) })
+        expect(subject.all_or_default).to match_array(generate.map { |file| File.join(dir, file) })
       end
     end
 
@@ -116,7 +116,7 @@ describe Finder do
       let(:generate) { 'foo/project.sln' }
 
       it 'should yield all matches' do
-        expect(subject.all_or_default).to eq([File.join(dir, generate)])
+        expect(subject.all_or_default).to match_array([File.join(dir, generate)])
       end
     end
   end
