@@ -3,7 +3,7 @@ module Rake::Funnel::Support::MapperStyles
     attr_reader :prefix, :separator, :value_separator
 
     def initialize
-      @prefix = '/'
+      @prefix = Rake::Win32.windows? ? '/' : '-'
       @separator = '='
       @value_separator = ':'
     end

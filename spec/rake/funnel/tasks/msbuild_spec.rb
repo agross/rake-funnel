@@ -14,20 +14,22 @@ describe MSBuild do
     its(:args) { should == {} }
     its(:search_pattern) { should == %w(**/*.sln) }
 
-    context 'on Windows', platform: :win32 do
+    describe 'build tool' do
       before {
-        allow(Rake::Win32).to receive(:windows?).and_return(true)
+        allow(Rake::Win32).to receive(:windows?).and_return(windows?)
       }
 
-      its(:msbuild) { should =~ /msbuild\.exe$/ }
-    end
+      context 'on Windows', platform: :win32 do
+        let(:windows?) { true }
 
-    context 'not on Windows' do
-      before {
-        allow(Rake::Win32).to receive(:windows?).and_return(false)
-      }
+        its(:msbuild) { should =~ /msbuild\.exe$/ }
+      end
 
-      its(:msbuild) { should == 'xbuild' }
+      context 'not on Windows' do
+        let(:windows?) { false }
+
+        its(:msbuild) { should == 'xbuild' }
+      end
     end
   end
 
