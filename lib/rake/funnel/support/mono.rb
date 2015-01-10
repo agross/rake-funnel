@@ -2,10 +2,9 @@ module Rake::Funnel::Support
   class Mono
     class << self
       def invocation(executable, *args)
-        exe_args = ([executable] << args).flatten
+        exe_args = ([executable] << args).flatten.compact
 
         if Rake::Win32.windows?
-          return executable if exe_args.count == 1
           return exe_args
         end
 

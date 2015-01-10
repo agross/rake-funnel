@@ -10,7 +10,7 @@ describe Rake::Funnel::Support::Mono do
     let(:windows?) { true }
 
     it 'should return executable' do
-      expect(described_class.invocation('executable.exe')).to eq('executable.exe')
+      expect(described_class.invocation('executable.exe')).to eq(%w(executable.exe))
     end
 
     it 'should return executable with args' do
@@ -19,6 +19,14 @@ describe Rake::Funnel::Support::Mono do
 
     it 'should return array executable with args' do
       expect(described_class.invocation(%w(executable.exe arg1 arg2))).to eq(%w(executable.exe arg1 arg2))
+    end
+
+    it 'should reject nil in array' do
+      expect(described_class.invocation(%w(executable.exe arg1) << nil)).to eq(%w(executable.exe arg1))
+    end
+
+    it 'should reject nil as arg' do
+      expect(described_class.invocation('executable.exe', nil)).to eq(%w(executable.exe))
     end
   end
 
@@ -55,6 +63,14 @@ describe Rake::Funnel::Support::Mono do
 
       it 'should support args' do
         expect(described_class.invocation(%w(executable.exe arg1 arg2))).to include('arg1', 'arg2')
+      end
+
+      it 'should reject nil in array' do
+        expect(described_class.invocation(%w(executable.exe arg1 nil))).not_to include(nil)
+      end
+
+      it 'should reject nil as arg' do
+        expect(described_class.invocation('executable.exe', nil)).not_to include(nil)
       end
     end
 
