@@ -26,7 +26,7 @@ module Rake::Funnel::Tasks
     end
 
     def project_or_solution
-      MSBuildSupport::Solution.new(@_project_or_solution || search_pattern, self)
+      Rake::Funnel::Support::Finder.new(@_project_or_solution || search_pattern, self, 'No projects or more than one project found.')
     end
 
     def project_or_solution=(value)
@@ -35,11 +35,11 @@ module Rake::Funnel::Tasks
 
     private
     def define
-      desc "Compile #{project_or_solution.find_or_nil}"
+      desc "Compile #{project_or_solution.single_or_default}"
       task @name do
         cmd = [
           msbuild,
-          project_or_solution.find,
+          project_or_solution.single,
           *Rake::Funnel::Support::Mapper.new(:MSBuild).map(args)
         ]
 

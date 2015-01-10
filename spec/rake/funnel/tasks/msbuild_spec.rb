@@ -10,7 +10,7 @@ describe MSBuild do
 
   describe 'defaults' do
     its(:name) { should == :compile }
-    its(:project_or_solution) { should be_instance_of(MSBuildSupport::Solution) }
+    its(:project_or_solution) { should be_instance_of(Support::Finder) }
     its(:args) { should == {} }
     its(:search_pattern) { should == %w(**/*.sln) }
 
@@ -38,7 +38,7 @@ describe MSBuild do
 
     context 'when project or solution is specified' do
       before {
-        allow(MSBuildSupport::Solution).to receive(:new).and_call_original
+        allow(Support::Finder).to receive(:new).and_call_original
       }
 
       subject {
@@ -47,10 +47,10 @@ describe MSBuild do
         end
       }
 
-      its(:project_or_solution) { should be_instance_of(MSBuildSupport::Solution) }
+      its(:project_or_solution) { should be_instance_of(Support::Finder) }
 
       it 'should set project or solution' do
-        expect(MSBuildSupport::Solution).to have_received(:new).with('project.sln', subject)
+        expect(Support::Finder).to have_received(:new).with('project.sln', subject, 'No projects or more than one project found.')
       end
     end
   end
@@ -59,13 +59,13 @@ describe MSBuild do
     let(:args) { {} }
 
     let(:mapper) { double(Support::Mapper).as_null_object }
-    let(:solution) { double(MSBuildSupport::Solution).as_null_object }
+    let(:finder) { double(Support::Finder).as_null_object }
 
     before {
       allow(subject).to receive(:sh)
 
       allow(Support::Mapper).to receive(:new).and_return(mapper)
-      allow(MSBuildSupport::Solution).to receive(:new).and_return(solution)
+      allow(Support::Finder).to receive(:new).and_return(finder)
     }
 
     before {
@@ -73,7 +73,7 @@ describe MSBuild do
     }
 
     it 'should use solution finder' do
-      expect(solution).to have_received(:find)
+      expect(finder).to have_received(:single)
     end
 
     it 'should use MSBuild mapper' do
