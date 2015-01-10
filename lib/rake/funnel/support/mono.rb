@@ -20,7 +20,7 @@ module Rake::Funnel::Support
           .split(File::PATH_SEPARATOR)
           .map { |path| File.join(path, executable) }
           .select { |path| File.exists?(path) }
-          .first
+          .first || executable
       end
     end
   end
