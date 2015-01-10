@@ -16,7 +16,7 @@ module Rake::Funnel
       (msg << description << nil) if description
       (msg << 'Error executing:' << command << nil) if command
       (msg << "Exit code: #{exit_code}" << nil) if exit_code
-      (msg << 'Command output (last 10 lines):' << output.split("\n").last(10)) if output
+      (msg << 'Command output (last 10 lines):' << output.split("\n").last(10) << nil) if output
 
       msg = [super.to_s] if msg.empty?
 
