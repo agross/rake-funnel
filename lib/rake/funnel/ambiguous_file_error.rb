@@ -16,7 +16,7 @@ module Rake::Funnel
       msg = []
       (msg << description) if description
       (msg << "Search pattern used: #{@search_pattern}") if @search_pattern
-      if @candidates
+      unless (@candidates || []).empty?
         msg << 'Candidates:'
         msg << @candidates.map { |c| "  - #{c}" }
       end
