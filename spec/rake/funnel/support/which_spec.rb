@@ -4,10 +4,10 @@ require 'tmpdir'
 describe Rake::Funnel::Support::Which do
   let(:temp_dir) { Dir.mktmpdir }
   let(:executable_path) { File.join(temp_dir, 'executable.exe') }
-  let(:create_enty) { lambda { |p| FileUtils.touch(p) }}
+  let(:create_entry) { lambda { |p| FileUtils.touch(p) }}
 
   before {
-    create_enty.call(executable_path)
+    create_entry.call(executable_path)
 
     allow(ENV).to receive(:[]).with('PATH').and_return(temp_dir)
   }
@@ -30,7 +30,7 @@ describe Rake::Funnel::Support::Which do
     end
 
     context 'found as directory' do
-      let(:create_enty) { lambda { |p| FileUtils.mkdir_p(p) } }
+      let(:create_entry) { lambda { |p| FileUtils.mkdir_p(p) } }
 
       it 'should yield nil' do
         expect(described_class.which('executable.exe')).to be_nil
@@ -56,7 +56,7 @@ describe Rake::Funnel::Support::Which do
     end
 
     context 'found as directory' do
-      let(:create_enty) { lambda { |p| FileUtils.mkdir_p(p) } }
+      let(:create_entry) { lambda { |p| FileUtils.mkdir_p(p) } }
 
       it 'should yield nil' do
         expect(described_class.which('executable.exe')).to be_nil
