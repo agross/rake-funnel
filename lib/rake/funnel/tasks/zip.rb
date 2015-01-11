@@ -21,17 +21,21 @@ module Rake::Funnel::Tasks
     def define
       destination && CLEAN.include(destination)
 
-      desc "Zip #{files.join(', ')}"
+      desc "Zip #{files_to_zip.all_or_default.join(', ')}"
       task name do
         FileUtils.mkdir_p(File.dirname(destination))
 
         configure_zip
-        create_zip(files, destination)
+        create_zip(files_to_zip.all_or_default, destination)
 
         Rake.rake_output_message("Created #{destination}")
       end
 
       self
+    end
+
+    def files_to_zip
+      Rake::Funnel::Support::Finder.new(files, self, 'No files to zip.')
     end
 
     def configure_zip

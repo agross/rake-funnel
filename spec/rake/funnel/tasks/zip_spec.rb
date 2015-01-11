@@ -37,9 +37,12 @@ describe Rake::Funnel::Tasks::Zip do
     let(:destination) { 'some path/file.zip' }
     let(:zip_root) { nil }
 
+    let(:finder) { double(Rake::Funnel::Support::Finder) }
     let(:zip) { double(::Zip::File).as_null_object }
 
     before {
+      allow(finder).to receive(:all_or_default).and_return(files)
+      allow(Rake::Funnel::Support::Finder).to receive(:new).and_return(finder)
       allow(FileUtils).to receive(:mkdir_p)
       allow(Rake).to receive(:rake_output_message)
       allow(::Zip::File).to receive(:open).with(destination, ::Zip::File::CREATE).and_yield(zip)
