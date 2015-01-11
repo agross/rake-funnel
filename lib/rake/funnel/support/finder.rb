@@ -1,9 +1,16 @@
 module Rake::Funnel::Support
   class Finder
+    include Enumerable
+
     def initialize(search_pattern, task, message = nil)
       @search_pattern = search_pattern
       @task = task
       @message = message
+    end
+
+    def each
+      block_given? or return enum_for(__method__)
+      all_or_default.each { |x| yield x }
     end
 
     def single_or_default

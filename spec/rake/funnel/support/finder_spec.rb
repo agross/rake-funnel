@@ -25,6 +25,24 @@ describe Finder do
     described_class.new(pattern, OpenStruct.new(name: 'task name'), 'error message')
   }
 
+  describe 'enumerable' do
+    let(:generate) { %w(1 2 3 4) }
+    let(:pattern) { '**/*' }
+
+    it 'should be enumerable' do
+      expect(described_class < Enumerable).to eq(true)
+      expect(subject.respond_to?(:each)).to eq(true)
+      expect(subject.each).to be_kind_of(Enumerator)
+    end
+
+    it 'should support enumerable methods' do
+      Dir.chdir(temp_dir) do
+        items = subject.map { |x| x }
+        expect(subject.all_or_default).to match_array(items)
+      end
+    end
+  end
+
   describe 'patterns' do
     let(:generate) { %w(1 2 3 4) }
 
