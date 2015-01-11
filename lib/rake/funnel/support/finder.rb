@@ -38,7 +38,7 @@ module Rake::Funnel::Support
     end
 
     def candidates
-      Dir.glob(@search_pattern).select { |f| File.file?(f) }
+      Dir[*@search_pattern].select { |f| File.file?(f) }.uniq
     end
   end
 end
