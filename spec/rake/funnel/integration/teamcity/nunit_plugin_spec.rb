@@ -10,7 +10,7 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
     allow(Rake::Funnel::Support::Which).to receive(:which).and_return(which)
     allow(File).to receive(:read).with(which).and_return(nunit_exe_contents)
     allow(Dir).to receive(:glob).and_return([])
-    allow(FileUtils).to receive(:mkdir_p)
+    allow(RakeFileUtils).to receive(:mkdir_p)
     allow(Rake).to receive(:rake_output_message)
   }
 
@@ -27,7 +27,7 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
 
     before {
       allow(Dir).to receive(:glob).and_return(addin_dlls)
-      allow(FileUtils).to receive(:cp)
+      allow(RakeFileUtils).to receive(:cp)
     }
 
     before {
@@ -35,7 +35,7 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
     }
 
     it 'should create addin directory' do
-      expect(FileUtils).to have_received(:mkdir_p).with(File.join(File.dirname(which), 'addins'))
+      expect(RakeFileUtils).to have_received(:mkdir_p).with(File.join(File.dirname(which), 'addins'))
     end
 
     it 'should enumerate addin files' do
@@ -43,7 +43,7 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
     end
 
     it 'should copy the addin from TeamCity to NUnit' do
-      expect(FileUtils).to have_received(:cp).with(addin_dlls, File.join(File.dirname(which), 'addins'))
+      expect(RakeFileUtils).to have_received(:cp).with(addin_dlls, File.join(File.dirname(which), 'addins'))
     end
 
     it 'should report that the addin is installed' do
@@ -105,7 +105,7 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
       end
 
       it 'should skip' do
-        expect(FileUtils).not_to have_received(:mkdir_p)
+        expect(RakeFileUtils).not_to have_received(:mkdir_p)
       end
     end
   end

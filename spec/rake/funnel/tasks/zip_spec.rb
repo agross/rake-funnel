@@ -43,7 +43,7 @@ describe Rake::Funnel::Tasks::Zip do
     before {
       allow(finder).to receive(:all_or_default).and_return(files)
       allow(Rake::Funnel::Support::Finder).to receive(:new).and_return(finder)
-      allow(FileUtils).to receive(:mkdir_p)
+      allow(RakeFileUtils).to receive(:mkdir_p)
       allow(Rake).to receive(:rake_output_message)
       allow(::Zip::File).to receive(:open).with(destination, ::Zip::File::CREATE).and_yield(zip)
     }
@@ -61,7 +61,7 @@ describe Rake::Funnel::Tasks::Zip do
     }
 
     it 'should create the destination directory' do
-      expect(FileUtils).to have_received(:mkdir_p).with(File.dirname(destination))
+      expect(RakeFileUtils).to have_received(:mkdir_p).with(File.dirname(destination))
     end
 
     it 'should allow unicode names' do

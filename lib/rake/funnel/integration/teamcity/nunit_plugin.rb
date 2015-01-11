@@ -55,8 +55,8 @@ module Rake::Funnel::Integration::TeamCity
 
         destination = File.join(File.dirname(nunit), 'addins')
 
-        FileUtils.mkdir_p(destination)
-        FileUtils.cp(addin_files, destination)
+        RakeFileUtils.mkdir_p(destination)
+        RakeFileUtils.cp(addin_files, destination)
       end
     end
   end

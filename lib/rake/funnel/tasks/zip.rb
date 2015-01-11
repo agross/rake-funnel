@@ -23,7 +23,7 @@ module Rake::Funnel::Tasks
 
       desc "Zip #{files_to_zip.all_or_default.join(', ')}"
       task name do
-        FileUtils.mkdir_p(File.dirname(destination))
+        RakeFileUtils.mkdir_p(File.dirname(destination))
 
         configure_zip
         create_zip(files_to_zip.all_or_default, destination)
