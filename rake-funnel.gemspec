@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 2.0.0'
 
   s.add_dependency 'rake'
+  s.add_dependency 'rubyzip', '~> 1.0'
   s.add_dependency 'smart_colored'
 
   git = ENV['TEAMCITY_GIT_PATH'] || 'git'
