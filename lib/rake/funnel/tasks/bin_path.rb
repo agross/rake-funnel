@@ -25,7 +25,7 @@ module Rake::Funnel::Tasks
     end
 
     def add_pattern_to_path_environment
-      bin_paths = Dir[*@pattern].map { |path| File.expand_path(path) }
+      bin_paths = Dir[*@pattern].map { |path| File.expand_path(path) }.sort
 
       ENV['PATH'] = ([] << bin_paths << ENV['PATH']).flatten.join(File::PATH_SEPARATOR)
       bin_paths

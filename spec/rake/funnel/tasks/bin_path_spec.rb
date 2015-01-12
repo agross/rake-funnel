@@ -27,8 +27,8 @@ describe Rake::Funnel::Tasks::BinPath do
       Rake::Task[:bin_path].invoke
     }
 
-    it 'should prepend matching folders to the PATH environment variable' do
-      paths = subject.pattern.map { |path| File.expand_path(path) } << ENV['PATH']
+    it 'should prepend sorted matching folders to the PATH environment variable' do
+      paths = subject.pattern.sort.map { |path| File.expand_path(path) } << ENV['PATH']
 
       expect(ENV).to have_received(:[]=).with('PATH', paths.join(File::PATH_SEPARATOR))
     end
