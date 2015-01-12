@@ -16,3 +16,6 @@ notifications:
     recipients:
       - agross@therightstuff.de
     on_success: never
+addons:
+  code_climate:
+    repo_token: d8b15ab15f45f543f1ddd59b4224f83e6fcc9576f2fa4ba2817ae20d445f5f4f

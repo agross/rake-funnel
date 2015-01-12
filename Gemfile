@@ -25,4 +25,5 @@ group :development, :ci do
   gem 'rspec-its', require: false
   gem 'rspec-collection_matchers', require: false
   gem 'coveralls', require: false
+  gem 'codeclimate-test-reporter', require: false
 end
