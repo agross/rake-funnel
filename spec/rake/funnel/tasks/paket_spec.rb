@@ -34,7 +34,7 @@ describe Paket do
       }
 
       its(:bootstrapper_args) { should == %w(arg1 arg2) }
-      end
+    end
 
     context 'when paket executable is specified' do
       subject {
@@ -108,58 +108,75 @@ describe Paket do
     end
 
     describe 'optional download' do
-      let(:fail_bootstrapper) { false }
-
       before {
         allow(File).to receive(:exist?).with(subject.paket).and_return(paket_exists)
+        allow(subject).to receive(:sh).with(subject.bootstrapper)
       }
 
-      before {
-        allow(subject).to receive(:sh).with(subject.bootstrapper).and_raise if fail_bootstrapper
-      }
-
-      before {
-        begin
+      context 'success' do
+        before {
           Rake::Task[subject.name].invoke
-        rescue => e
-          @raised_error = e
-        end
-      }
+        }
 
-      context 'paket.exe exists' do
-        let(:paket_exists) { true }
+        context 'paket.exe exists' do
+          let(:paket_exists) { true }
 
-        it 'should not run bootstrapper' do
-          expect(subject).not_to have_received(:sh).with(subject.bootstrapper)
-        end
+          it 'should not run bootstrapper' do
+            expect(subject).not_to have_received(:sh).with(subject.bootstrapper)
+          end
 
-        it 'should run paket' do
-          expect(subject).to have_received(:sh).with(subject.paket, subject.paket_args)
-        end
-      end
-
-      context 'paket.exe does not exist' do
-        let(:paket_exists) { false }
-
-        it 'should run bootstrapper' do
-          expect(subject).to have_received(:sh).with(subject.bootstrapper)
-        end
-
-        context 'bootstrapper succeeded' do
           it 'should run paket' do
             expect(subject).to have_received(:sh).with(subject.paket, subject.paket_args)
           end
         end
 
-        context 'bootstrapper failed' do
-          let(:fail_bootstrapper) { true }
+        context 'paket.exe does not exist' do
+          let(:paket_exists) { false }
 
-          it 'should not run paket' do
-            expect(subject).not_to have_received(:sh).with(subject.paket, subject.paket_args)
+          it 'should run bootstrapper' do
+            expect(subject).to have_received(:sh).with(subject.bootstrapper)
           end
 
-          it 'should fail' do
-            expect(@raised_error).to be
+          it 'should run paket' do
+            expect(subject).to have_received(:sh).with(subject.paket, subject.paket_args)
+          end
+        end
+      end
+
+      context 'failure' do
+
+
+        context 'paket.exe exists' do
+          let(:paket_exists) { true }
+
+          context 'paket failed' do
+            before {
+              allow(subject).to receive(:sh).with(subject.paket, anything).and_raise
+            }
+
+            it 'should fail' do
+              expect(lambda { Rake::Task[subject.name].invoke }).to raise_error
+            end
+          end
+        end
+
+        context 'paket.exe does not exist' do
+          let(:paket_exists) { false }
+
+          context 'bootstrapper failed' do
+            before {
+              allow(subject).to receive(:sh).with(subject.bootstrapper).and_raise
+            }
+
+            it 'should not run paket' do
+              Rake::Task[subject.name].invoke rescue nil
+
+              expect(subject).not_to have_received(:sh).with(subject.paket, subject.paket_args)
+            end
+
+            it 'should fail' do
+              expect(lambda { Rake::Task[subject.name].invoke }).to raise_error
+            end
           end
         end
       end
