@@ -1,31 +1,25 @@
-require 'rake/funnel'
-
 describe Rake::Funnel::Integration::TeamCity do
-  let(:original_project) { ENV['TEAMCITY_PROJECT_NAME'] }
-
   before {
-    ENV.delete 'TEAMCITY_PROJECT_NAME'
-  }
-
-  after {
-    ENV['TEAMCITY_PROJECT_NAME'] = original_project
+    allow(ENV).to receive(:include?).with(described_class::ENV_VAR).and_return(teamcity_running?)
   }
 
   context 'when running outside TeamCity' do
+    let(:teamcity_running?) { false }
+
     it 'should not detect TeamCity' do
-      expect(Rake::Funnel::Integration::TeamCity.running?).to eq(false)
+      expect(described_class.running?).to eq(false)
     end
 
     it "should not detect TeamCity's rake runner" do
-      expect(Rake::Funnel::Integration::TeamCity.rake_runner?).to eq(false)
+      expect(described_class.rake_runner?).to eq(false)
     end
   end
 
   context 'when running inside TeamCity' do
-    before { ENV['TEAMCITY_PROJECT_NAME'] = 'foo' }
+    let(:teamcity_running?) { true }
 
     it 'should detect TeamCity' do
-      expect(Rake::Funnel::Integration::TeamCity.running?).to eq(true)
+      expect(described_class.running?).to eq(true)
     end
 
     it "should detect TeamCity's rake runner" do
@@ -34,7 +28,7 @@ describe Rake::Funnel::Integration::TeamCity do
         end
       end
 
-      expect(Rake::Funnel::Integration::TeamCity.rake_runner?).to eq(true)
+      expect(described_class.rake_runner?).to eq(true)
     end
   end
 end

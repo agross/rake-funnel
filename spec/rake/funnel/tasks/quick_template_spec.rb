@@ -1,12 +1,12 @@
-require 'rake'
-require 'rake/clean'
-require 'rake/funnel'
 require 'tmpdir'
+
+include Rake
+include Rake::Funnel::Support
 
 describe Rake::Funnel::Tasks::QuickTemplate do
   before {
     CLEAN.clear
-    Rake::Task.clear
+    Task.clear
   }
 
   describe 'defaults' do
@@ -16,11 +16,11 @@ describe Rake::Funnel::Tasks::QuickTemplate do
 
     describe 'target files are cleaned' do
       let(:templates) { [] }
-      let(:finder) { double(Rake::Funnel::Support::Finder).as_null_object }
+      let(:finder) { double(Finder).as_null_object }
 
       before {
         allow(finder).to receive(:all_or_default).and_return(templates)
-        allow(Rake::Funnel::Support::Finder).to receive(:new).and_return(finder)
+        allow(Finder).to receive(:new).and_return(finder)
       }
 
       subject! { described_class.new }
@@ -44,12 +44,12 @@ describe Rake::Funnel::Tasks::QuickTemplate do
   describe 'execution' do
     let(:templates) { %w(1.template two/2.template) }
 
-    let(:finder) { double(Rake::Funnel::Support::Finder).as_null_object }
-    let(:engine) { Rake::Funnel::Support::TemplateEngine }
+    let(:finder) { double(Finder).as_null_object }
+    let(:engine) { TemplateEngine }
 
     before {
       allow(finder).to receive(:all_or_default).and_return(templates)
-      allow(Rake::Funnel::Support::Finder).to receive(:new).and_return(finder)
+      allow(Finder).to receive(:new).and_return(finder)
       allow(engine).to receive(:render).and_return('file content')
       allow(Rake).to receive(:rake_output_message)
       allow(File).to receive(:read).and_return('template content')
@@ -59,7 +59,7 @@ describe Rake::Funnel::Tasks::QuickTemplate do
     subject! { described_class.new }
 
     before {
-      Rake::Task[subject.name].invoke
+      Task[subject.name].invoke
     }
 
     it 'should report created files' do

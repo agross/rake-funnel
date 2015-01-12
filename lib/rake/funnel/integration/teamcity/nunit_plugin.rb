@@ -1,8 +1,8 @@
 module Rake::Funnel::Integration::TeamCity
   class NUnitPlugin
-    class << self
-      ENV_VAR = 'teamcity.dotnet.nunitaddin'
+    ENV_VAR = 'teamcity.dotnet.nunitaddin'
 
+    class << self
       def setup(nunit_executable)
         addins = get_addin_dir(ENV[ENV_VAR]) || return
         nunit, version = read_version(nunit_executable) || return

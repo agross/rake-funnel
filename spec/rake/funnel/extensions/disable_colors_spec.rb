@@ -1,7 +1,3 @@
-require 'rake/funnel'
-require 'smart_colored'
-require 'smart_colored/extend'
-
 describe Rake::Funnel::Extensions::DisableColors do
   context 'when connected to a terminal' do
     before { allow($stdout).to receive(:tty?).and_return(true) }

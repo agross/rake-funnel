@@ -1,9 +1,8 @@
-require 'rake'
-require 'rake/funnel'
+include Rake
 
 describe Rake::Funnel::Tasks::BinPath do
   before {
-    Rake::Task.clear
+    Task.clear
     expect(subject).to be
   }
 
@@ -24,7 +23,7 @@ describe Rake::Funnel::Tasks::BinPath do
 
       allow(Dir).to receive(:[]).with(*subject.pattern).and_return(subject.pattern)
 
-      Rake::Task[:bin_path].invoke
+      Task[:bin_path].invoke
     }
 
     it 'should prepend sorted matching folders to the PATH environment variable' do

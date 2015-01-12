@@ -1,4 +1,4 @@
-require 'rake/funnel'
+include Rake::Funnel::Support
 
 describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
   let(:env_var) { nil }
@@ -6,8 +6,8 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
   let(:nunit_exe_contents) { nil }
 
   before {
-    allow(ENV).to receive(:[]).with('teamcity.dotnet.nunitaddin').and_return(env_var)
-    allow(Rake::Funnel::Support::Which).to receive(:which).and_return(which)
+    allow(ENV).to receive(:[]).with(described_class::ENV_VAR).and_return(env_var)
+    allow(Which).to receive(:which).and_return(which)
     allow(File).to receive(:read).with(which).and_return(nunit_exe_contents)
     allow(Dir).to receive(:glob).and_return([])
     allow(RakeFileUtils).to receive(:mkdir_p)

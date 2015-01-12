@@ -1,8 +1,8 @@
 module Rake::Funnel::Tasks::MSDeploySupport
   class RegistryPatch
-    Key = 'SOFTWARE\Microsoft\IIS Extensions\MSDeploy\3'
-    VersionValue = 'Version'
-    FakeVersion = '99.0.0.0'
+    KEY = 'SOFTWARE\Microsoft\IIS Extensions\MSDeploy\3'
+    VERSION_VALUE = 'Version'
+    FAKE_VERSION = '99.0.0.0'
 
     def initialize(&block)
       begin
@@ -30,13 +30,13 @@ module Rake::Funnel::Tasks::MSDeploySupport
         version_created = false
 
         p.setup do
-          Win32::Registry::HKEY_LOCAL_MACHINE.create(Key) do |r|
+          Win32::Registry::HKEY_LOCAL_MACHINE.create(KEY) do |r|
             key_created = r.created?
 
             begin
-              r[VersionValue]
+              r[VERSION_VALUE]
             rescue Win32::Registry::Error
-              r[VersionValue] = FakeVersion
+              r[VERSION_VALUE] = FAKE_VERSION
               version_created = true
             end
           end
@@ -44,12 +44,12 @@ module Rake::Funnel::Tasks::MSDeploySupport
 
         p.reset do
           if (key_created)
-            Win32::Registry::HKEY_LOCAL_MACHINE.create(File.dirname(Key)) do |r|
-              r.delete_key(File.basename(Key), true)
+            Win32::Registry::HKEY_LOCAL_MACHINE.create(File.dirname(KEY)) do |r|
+              r.delete_key(File.basename(KEY), true)
             end
           elsif (version_created)
-            Win32::Registry::HKEY_LOCAL_MACHINE.create(Key) do |r|
-              r.delete_value(VersionValue)
+            Win32::Registry::HKEY_LOCAL_MACHINE.create(KEY) do |r|
+              r.delete_value(VERSION_VALUE)
             end
           end
         end

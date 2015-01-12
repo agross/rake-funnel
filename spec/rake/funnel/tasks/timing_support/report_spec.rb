@@ -1,13 +1,11 @@
-require 'rake'
-require 'rake/funnel'
+include Rake
+include Rake::Funnel::Tasks::TimingSupport
 
 describe Rake::Funnel::Tasks::TimingSupport::Report do
 
-  include Rake::DSL
+  include DSL
 
-  subject do
-    Rake::Funnel::Tasks::TimingSupport::Report.new(stats, opts)
-  end
+  subject { described_class.new(stats, opts) }
 
   let(:opts) { {} }
 
@@ -20,7 +18,7 @@ describe Rake::Funnel::Tasks::TimingSupport::Report do
   shared_examples_for :report do
     it 'should separator lines' do
       expect($stdout).to have_received(:puts)
-        .with(Regexp.new('-' * Rake::Funnel::Tasks::TimingSupport::Report::HEADER_WIDTH)).exactly(4).times
+        .with(Regexp.new('-' * described_class::HEADER_WIDTH)).exactly(4).times
     end
 
     it 'should print the header' do
@@ -53,14 +51,14 @@ describe Rake::Funnel::Tasks::TimingSupport::Report do
   end
 
   describe 'empty report' do
-    let(:stats) { Rake::Funnel::Tasks::TimingSupport::Statistics.new }
+    let(:stats) { Statistics.new }
 
     it_should_behave_like :report
   end
 
   describe 'report for 2 tasks' do
     let(:stats) {
-      s = Rake::Funnel::Tasks::TimingSupport::Statistics.new
+      s = Statistics.new
       s.benchmark(task :foo) { }
       s.benchmark(task :bar) { }
       s
@@ -80,7 +78,7 @@ describe Rake::Funnel::Tasks::TimingSupport::Report do
 
   describe 'formatting' do
     let(:stats) {
-      s = Rake::Funnel::Tasks::TimingSupport::Statistics.new
+      s = Statistics.new
       s.benchmark(task task_name) { }
       s
     }
@@ -88,7 +86,7 @@ describe Rake::Funnel::Tasks::TimingSupport::Report do
     let(:header_space) {
       diff = task_name.to_s.length - subject.columns[0].header.length
       diff = 0 if diff < 0
-      diff + Rake::Funnel::Tasks::TimingSupport::Report::SPACE
+      diff + described_class::SPACE
     }
 
     let(:header_underline) {
@@ -98,7 +96,7 @@ describe Rake::Funnel::Tasks::TimingSupport::Report do
     let(:value_space) {
       diff = subject.columns.first.header.length - task_name.to_s.length
       diff = 0 if diff < 0
-      diff + Rake::Funnel::Tasks::TimingSupport::Report::SPACE
+      diff + described_class::SPACE
     }
 
     shared_examples_for :padding do

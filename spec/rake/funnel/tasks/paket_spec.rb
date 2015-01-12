@@ -1,10 +1,9 @@
-require 'rake/funnel'
+include Rake
+include Rake::Funnel::Support
 
-include Rake::Funnel::Tasks
-
-describe Paket do
+describe Rake::Funnel::Tasks::Paket do
   before {
-    Rake::Task.clear
+    Task.clear
   }
 
   describe 'defaults' do
@@ -60,7 +59,7 @@ describe Paket do
   describe 'execution' do
     before {
       allow(subject).to receive(:sh)
-      allow(Rake::Funnel::Support::Mono).to receive(:invocation).and_wrap_original do |original_method, *args, &block|
+      allow(Mono).to receive(:invocation).and_wrap_original do |original_method, *args, &block|
         args.compact
       end
     }
@@ -81,7 +80,7 @@ describe Paket do
       }
 
       before {
-        Rake::Task[subject.name].invoke
+        Task[subject.name].invoke
       }
 
       it 'should use custom bootstrapper' do
@@ -95,15 +94,15 @@ describe Paket do
 
     describe 'mono invocation' do
       before {
-        Rake::Task[subject.name].invoke
+        Task[subject.name].invoke
       }
 
       it 'should use mono invocation for bootstrapper' do
-        expect(Rake::Funnel::Support::Mono).to have_received(:invocation).with(subject.bootstrapper, subject.bootstrapper_args)
+        expect(Mono).to have_received(:invocation).with(subject.bootstrapper, subject.bootstrapper_args)
       end
 
       it 'should use mono invocation for paket' do
-        expect(Rake::Funnel::Support::Mono).to have_received(:invocation).with(subject.paket, subject.paket_args)
+        expect(Mono).to have_received(:invocation).with(subject.paket, subject.paket_args)
       end
     end
 
@@ -115,7 +114,7 @@ describe Paket do
 
       context 'success' do
         before {
-          Rake::Task[subject.name].invoke
+          Task[subject.name].invoke
         }
 
         context 'paket.exe exists' do
@@ -155,7 +154,7 @@ describe Paket do
             }
 
             it 'should fail' do
-              expect(lambda { Rake::Task[subject.name].invoke }).to raise_error
+              expect(lambda { Task[subject.name].invoke }).to raise_error
             end
           end
         end
@@ -169,13 +168,13 @@ describe Paket do
             }
 
             it 'should not run paket' do
-              Rake::Task[subject.name].invoke rescue nil
+              Task[subject.name].invoke rescue nil
 
               expect(subject).not_to have_received(:sh).with(subject.paket, subject.paket_args)
             end
 
             it 'should fail' do
-              expect(lambda { Rake::Task[subject.name].invoke }).to raise_error
+              expect(lambda { Task[subject.name].invoke }).to raise_error
             end
           end
         end

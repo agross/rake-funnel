@@ -2,7 +2,6 @@ require 'simplecov'
 require 'coveralls'
 require 'codeclimate-test-reporter'
 
-
 SimpleCov.start do
   if Coveralls.will_run?
     external_services = [

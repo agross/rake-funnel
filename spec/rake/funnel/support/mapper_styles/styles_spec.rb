@@ -1,12 +1,10 @@
-require 'rake/funnel'
-
 include Rake::Funnel::Support
 
 MapperStyles.constants.reject { |x| x == :MSDeploy }.each do |style|
   style_path = MapperStyles.const_get(style)
   describe style_path do
     subject {
-      Rake::Funnel::Support::Mapper.new(style)
+      Mapper.new(style)
     }
 
     let (:style) {

@@ -1,5 +1,3 @@
-require 'rake/funnel'
-
 describe Rake::Funnel::Integration::SyncOutput do
   before {
     allow($stdout).to receive(:sync=)

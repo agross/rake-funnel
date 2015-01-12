@@ -1,8 +1,10 @@
 module Rake::Funnel::Integration
   module TeamCity
+    ENV_VAR = 'TEAMCITY_PROJECT_NAME'
+
     class << self
       def running?
-        ENV.include?('TEAMCITY_PROJECT_NAME')
+        ENV.include?(ENV_VAR)
       end
 
       def rake_runner?

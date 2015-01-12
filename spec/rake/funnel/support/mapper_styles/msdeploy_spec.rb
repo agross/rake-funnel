@@ -1,9 +1,7 @@
-require 'rake/funnel'
-
 include Rake::Funnel::Support
 
 describe Rake::Funnel::Support::MapperStyles::MSDeploy do
-  subject { Rake::Funnel::Support::Mapper.new(:MSDeploy) }
+  subject { Mapper.new(:MSDeploy) }
 
   describe 'no arguments' do
     it 'should convert no args to []' do

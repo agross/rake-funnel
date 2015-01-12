@@ -1,5 +1,3 @@
-require 'rake/funnel'
-
 describe Rake::Funnel::Support::Patch do
   describe 'without definition' do
     it 'should be applicable' do
@@ -17,7 +15,7 @@ describe Rake::Funnel::Support::Patch do
 
   describe 'with definition' do
     subject {
-      Rake::Funnel::Support::Patch.new do |p|
+      described_class.new do |p|
         p.setup do
           output.puts 'setup'
           42
@@ -93,7 +91,7 @@ describe Rake::Funnel::Support::Patch do
       let(:context) { 42 }
 
       subject {
-        Rake::Funnel::Support::Patch.new(context) do |p|
+        described_class.new(context) do |p|
           p.setup do |context|
             output.puts context
           end

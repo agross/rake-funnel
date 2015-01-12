@@ -1,4 +1,3 @@
-require 'rake/funnel'
 require 'tmpdir'
 
 describe Rake::Funnel::Support::Which do

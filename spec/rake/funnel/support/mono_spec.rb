@@ -1,5 +1,6 @@
-require 'rake/funnel'
 require 'tmpdir'
+
+include Rake::Funnel::Support
 
 describe Rake::Funnel::Support::Mono do
   before {
@@ -34,7 +35,7 @@ describe Rake::Funnel::Support::Mono do
     let(:windows?) { false }
 
     before {
-      allow(Rake::Funnel::Support::Which).to receive(:which)
+      allow(Which).to receive(:which)
     }
 
     before {
@@ -46,7 +47,7 @@ describe Rake::Funnel::Support::Mono do
     end
 
     it 'should resolve executable through which' do
-      expect(Rake::Funnel::Support::Which).to have_received(:which).with('executable.exe')
+      expect(Which).to have_received(:which).with('executable.exe')
     end
 
     it 'should support args' do

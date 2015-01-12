@@ -1,12 +1,11 @@
-require 'rake/funnel'
-
+include Rake
 include Rake::Funnel
-include Rake::Funnel::Integration
-include Rake::Funnel::Tasks
+include Rake::Funnel::Integration::TeamCity
+include Rake::Funnel::Support
 
-describe NUnit do
+describe Rake::Funnel::Tasks::NUnit do
   before {
-    Rake::Task.clear
+    Task.clear
   }
 
   describe 'defaults' do
@@ -31,23 +30,23 @@ describe NUnit do
   describe 'execution' do
     let(:args) { {} }
 
-    let(:mapper) { double(Support::Mapper).as_null_object }
-    let(:finder) { double(Support::Finder).as_null_object }
+    let(:mapper) { double(Mapper).as_null_object }
+    let(:finder) { double(Finder).as_null_object }
 
     before {
       allow(subject).to receive(:sh)
 
-      allow(Support::Mapper).to receive(:new).and_return(mapper)
-      allow(Support::Finder).to receive(:new).and_return(finder)
-      allow(TeamCity::NUnitPlugin).to receive(:setup)
+      allow(Mapper).to receive(:new).and_return(mapper)
+      allow(Finder).to receive(:new).and_return(finder)
+      allow(NUnitPlugin).to receive(:setup)
 
-      allow(Support::Mono).to receive(:invocation).and_wrap_original do |original_method, *args, &block|
+      allow(Mono).to receive(:invocation).and_wrap_original do |original_method, *args, &block|
         args.compact
       end
     }
 
     before {
-      Rake::Task[subject.name].invoke
+      Task[subject.name].invoke
     }
 
     it 'should use test assembly finder' do
@@ -55,11 +54,11 @@ describe NUnit do
     end
 
     it 'should set up TeamCity plugin' do
-      expect(TeamCity::NUnitPlugin).to have_received(:setup).with(subject.nunit)
+      expect(NUnitPlugin).to have_received(:setup).with(subject.nunit)
     end
 
     it 'should use NUnit mapper' do
-      expect(Support::Mapper).to have_received(:new).with(:NUnit)
+      expect(Mapper).to have_received(:new).with(:NUnit)
     end
 
     it 'should map arguments' do
@@ -67,7 +66,7 @@ describe NUnit do
     end
 
     it 'should use mono invocation' do
-      expect(Support::Mono).to have_received(:invocation).with(subject.nunit)
+      expect(Mono).to have_received(:invocation).with(subject.nunit)
     end
 
     it 'should run with sh' do

@@ -1,11 +1,9 @@
-require 'rake'
-require 'rake/funnel'
-
+include Rake
 include Rake::Funnel::Integration
 include Rake::Funnel::Integration::TeamCity
 
-describe ProgressReport do
-  include Rake::DSL
+describe Rake::Funnel::Integration::TeamCity::ProgressReport do
+  include DSL
 
   let(:teamcity_running?) { false }
   let(:teamcity_rake_runner?) { false }
@@ -19,7 +17,7 @@ describe ProgressReport do
     allow(ServiceMessages).to receive(:progress_finish)
     allow(ServiceMessages).to receive(:build_problem)
 
-    Rake::Task.clear
+    Task.clear
   }
 
   subject! {
@@ -54,7 +52,7 @@ describe ProgressReport do
     before {
       task :task
 
-      Rake::Task[:task].invoke
+      Task[:task].invoke
     }
 
     it 'should not report build problems' do
@@ -103,8 +101,8 @@ describe ProgressReport do
       end
 
       begin
-        Rake::Task[:task].invoke
-      rescue Rake::ApplicationAbortedException => e
+        Task[:task].invoke
+      rescue ApplicationAbortedException => e
       rescue SpecificError => e
         @raised_error = e
       end
@@ -146,7 +144,7 @@ describe ProgressReport do
       context 'with rake runner' do
         let(:teamcity_rake_runner?) { true }
         let(:error) {
-          Rake::ApplicationAbortedException.new(SpecificError.new('inner message'))
+          ApplicationAbortedException.new(SpecificError.new('inner message'))
         }
 
         it 'should report the inner error as a build problem (as it will be wrapped in a ApplicationAbortedException)' do
@@ -166,7 +164,7 @@ describe ProgressReport do
 
       task :task
 
-      Rake::Task[:task].invoke
+      Task[:task].invoke
     }
 
     it 'should not write' do

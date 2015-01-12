@@ -1,9 +1,5 @@
-require 'rake/funnel'
-
-include Rake::Funnel::Support
-
 describe Rake::Funnel::Support::MapperStyles::NUnit do
-  subject { Rake::Funnel::Support::Mapper.new(:NUnit) }
+  subject { Mapper.new(:NUnit) }
 
   describe 'prefix' do
     before {

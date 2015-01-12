@@ -1,10 +1,8 @@
-require 'rake'
-require 'rake/funnel'
-
+include Rake
 include Rake::Funnel::Integration
 
-describe ProgressReport do
-  include Rake::DSL
+describe Rake::Funnel::Integration::ProgressReport do
+  include DSL
 
   let(:teamcity_running?) { false }
 
@@ -12,7 +10,7 @@ describe ProgressReport do
     allow($stdout).to receive(:puts)
     allow(TeamCity).to receive(:running?).and_return(teamcity_running?)
 
-    Rake::Task.clear
+    Task.clear
   }
 
   after {
@@ -27,7 +25,7 @@ describe ProgressReport do
     before {
       task :task
 
-      Rake::Task[:task].invoke
+      Task[:task].invoke
     }
 
     context 'not on TeamCity' do
@@ -45,7 +43,6 @@ describe ProgressReport do
     end
   end
 
-
   context 'when progess report was disabled' do
     subject! {
       described_class.new
@@ -56,7 +53,7 @@ describe ProgressReport do
 
       task :task
 
-      Rake::Task[:task].invoke
+      Task[:task].invoke
     }
 
     it 'should not write' do
@@ -90,7 +87,7 @@ describe ProgressReport do
       before {
         task :task
 
-        Rake::Task[:task].invoke
+        Task[:task].invoke
       }
 
       describe 'starting handler' do
@@ -99,11 +96,11 @@ describe ProgressReport do
         end
 
         it 'should receive task' do
-          expect(receiver).to have_received(:starting).with(hash_including({ task: kind_of(Rake::Task) }))
+          expect(receiver).to have_received(:starting).with(hash_including({ task: kind_of(Task) }))
         end
 
         it 'should receive task arguments' do
-          expect(receiver).to have_received(:starting).with(hash_including({ args: kind_of(Rake::TaskArguments) }))
+          expect(receiver).to have_received(:starting).with(hash_including({ args: kind_of(TaskArguments) }))
         end
       end
 
@@ -113,11 +110,11 @@ describe ProgressReport do
         end
 
         it 'should receive task' do
-          expect(receiver).to have_received(:finished).with(hash_including({ task: kind_of(Rake::Task) }))
+          expect(receiver).to have_received(:finished).with(hash_including({ task: kind_of(Task) }))
         end
 
         it 'should receive task arguments' do
-          expect(receiver).to have_received(:finished).with(hash_including({ args: kind_of(Rake::TaskArguments) }))
+          expect(receiver).to have_received(:finished).with(hash_including({ args: kind_of(TaskArguments) }))
         end
 
         it 'should not receive error' do
@@ -137,7 +134,7 @@ describe ProgressReport do
         end
 
         begin
-          Rake::Task[:task].invoke
+          Task[:task].invoke
         rescue SpecificError
         end
       }

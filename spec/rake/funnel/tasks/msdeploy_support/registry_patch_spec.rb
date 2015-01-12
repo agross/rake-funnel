@@ -1,6 +1,4 @@
-include Rake::Funnel::Tasks::MSDeploySupport
-
-describe RegistryPatch do
+describe Rake::Funnel::Tasks::MSDeploySupport::RegistryPatch do
   describe 'execution' do
     it 'should yield block' do
       result = 0
@@ -52,11 +50,11 @@ describe RegistryPatch do
         }
 
         it 'should create the key' do
-          expect(Win32::Registry::HKEY_LOCAL_MACHINE).to have_received(:create).with(RegistryPatch::Key)
+          expect(Win32::Registry::HKEY_LOCAL_MACHINE).to have_received(:create).with(described_class::KEY)
         end
 
         it 'should create the version' do
-          expect(key).to have_received(:[]=).with('Version', RegistryPatch::FakeVersion)
+          expect(key).to have_received(:[]=).with('Version', described_class::FAKE_VERSION)
         end
 
         it 'should delete the key' do
@@ -84,11 +82,11 @@ describe RegistryPatch do
           }
 
           it 'should create the version' do
-            expect(key).to have_received(:[]=).with('Version', RegistryPatch::FakeVersion)
+            expect(key).to have_received(:[]=).with('Version', described_class::FAKE_VERSION)
           end
 
           it 'should delete the version' do
-            expect(key).to have_received(:delete_value).with(RegistryPatch::VersionValue)
+            expect(key).to have_received(:delete_value).with(described_class::VERSION_VALUE)
           end
         end
 

@@ -1,9 +1,6 @@
-require 'rake/funnel'
-
 include Rake::Funnel
-include Rake::Funnel::Support
 
-describe Finder do
+describe Rake::Funnel::Support::Finder do
   let(:pattern) { %W(**/*.sln **/*.??proj) }
   let(:generate) { [] }
   let(:temp_dir) { Dir.mktmpdir }

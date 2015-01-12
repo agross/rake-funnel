@@ -1,12 +1,12 @@
-require 'rake'
-require 'rake/clean'
-require 'rake/funnel'
 require 'tmpdir'
+
+include Rake
+include Rake::Funnel::Support
 
 describe Rake::Funnel::Tasks::Copy do
   before {
     CLEAN.clear
-    Rake::Task.clear
+    Task.clear
   }
 
   describe 'defaults' do
@@ -47,17 +47,17 @@ describe Rake::Funnel::Tasks::Copy do
         let(:target) { nil }
 
         it 'should fail' do
-          expect(lambda { Rake::Task[subject.name].invoke }).to raise_error(/Target not defined/)
+          expect(lambda { Task[subject.name].invoke }).to raise_error(/Target not defined/)
         end
       end
     end
 
     context 'success' do
-      let(:finder) { double(Rake::Funnel::Support::Finder).as_null_object }
+      let(:finder) { double(Finder).as_null_object }
 
       before {
         allow(finder).to receive(:all_or_default).and_return(source)
-        allow(Rake::Funnel::Support::Finder).to receive(:new).and_return(finder)
+        allow(Finder).to receive(:new).and_return(finder)
 
         allow(File).to receive(:directory?).and_return(false)
         source.last(2).each do |dir|
@@ -69,7 +69,7 @@ describe Rake::Funnel::Tasks::Copy do
       }
 
       before {
-        Rake::Task[subject.name].invoke
+        Task[subject.name].invoke
       }
 
       def no_prefix(file)

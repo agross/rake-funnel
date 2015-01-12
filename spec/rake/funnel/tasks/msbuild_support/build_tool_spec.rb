@@ -1,8 +1,4 @@
-require 'rake/funnel'
-
-include Rake::Funnel::Tasks::MSBuildSupport
-
-describe BuildTool do
+describe Rake::Funnel::Tasks::MSBuildSupport::BuildTool do
   before {
     allow(Rake::Win32).to receive(:windows?).and_return(windows?)
   }

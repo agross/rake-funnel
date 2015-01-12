@@ -1,7 +1,3 @@
-require 'rake/funnel'
-
-include Rake::Funnel::Support
-
 describe Rake::Funnel::Support::Mapper do
   describe 'Manual debugging test case' do
     it 'should work' do

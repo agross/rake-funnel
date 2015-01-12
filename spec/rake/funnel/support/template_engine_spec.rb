@@ -1,8 +1,4 @@
-require 'rake/funnel'
-
-include Rake::Funnel::Support
-
-describe TemplateEngine do
+describe Rake::Funnel::Support::TemplateEngine do
   it 'should render nil' do
     expect(described_class.render(nil)).to eq('')
   end

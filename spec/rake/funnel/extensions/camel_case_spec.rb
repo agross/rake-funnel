@@ -1,5 +1,3 @@
-require 'rake/funnel'
-
 describe Rake::Funnel::Extensions::CamelCase do
   it 'should not touch values without underscores' do
     expect('foo'.camelize).to eq('foo')

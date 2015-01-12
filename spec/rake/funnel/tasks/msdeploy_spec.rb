@@ -1,15 +1,12 @@
-require 'rake'
-require 'rake/clean'
-require 'rake/funnel'
-
+include Rake
 include Rake::Funnel
-include Rake::Funnel::Tasks
+include Rake::Funnel::Support
 include Rake::Funnel::Tasks::MSDeploySupport
 
-describe MSDeploy do
+describe Rake::Funnel::Tasks::MSDeploy do
   before {
     CLEAN.clear
-    Rake::Task.clear
+    Task.clear
   }
 
   describe 'defaults' do
@@ -65,18 +62,18 @@ describe MSDeploy do
     }
 
     describe 'argument mapping and invocation' do
-      let(:mapper) { double(Support::Mapper).as_null_object }
+      let(:mapper) { double(Mapper).as_null_object }
 
       before {
-        allow(Support::Mapper).to receive(:new).and_return(mapper)
+        allow(Mapper).to receive(:new).and_return(mapper)
       }
 
       before {
-        Rake::Task[subject.name].invoke
+        Task[subject.name].invoke
       }
 
       it 'should use MSDeploy mapper' do
-        expect(Support::Mapper).to have_received(:new).with(:MSDeploy)
+        expect(Mapper).to have_received(:new).with(:MSDeploy)
       end
 
       it 'should map arguments' do
@@ -94,7 +91,7 @@ describe MSDeploy do
 
     describe 'arg examples' do
       before {
-        Rake::Task[subject.name].invoke
+        Task[subject.name].invoke
       }
 
       context 'skip actions' do
@@ -203,7 +200,7 @@ describe MSDeploy do
 
     describe "MSDeploy's idiocy" do
       before {
-        Rake::Task[subject.name].invoke
+        Task[subject.name].invoke
       }
 
       describe 'version registry value that is required to exist' do

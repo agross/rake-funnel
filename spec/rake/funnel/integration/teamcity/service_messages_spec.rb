@@ -1,35 +1,28 @@
-require 'rake/funnel'
+include Rake::Funnel::Integration
 
-include Rake::Funnel::Integration::TeamCity
-
-describe ServiceMessages do
-  let(:original_project) { ENV['TEAMCITY_PROJECT_NAME'] }
-
+describe Rake::Funnel::Integration::TeamCity::ServiceMessages do
   before {
-    ENV.delete 'TEAMCITY_PROJECT_NAME'
-
+    allow(TeamCity).to receive(:running?).and_return(teamcity_running?)
     allow($stdout).to receive(:puts)
   }
 
-  after {
-    ENV['TEAMCITY_PROJECT_NAME'] = original_project
-  }
-
   context 'when running outside TeamCity' do
+    let(:teamcity_running?) { false }
+
     it 'should not publish messages' do
-      ServiceMessages.progress_start 'foo'
+      described_class.progress_start 'foo'
 
       expect($stdout).not_to have_received(:puts)
     end
   end
 
   context 'when running inside TeamCity' do
-    before { ENV['TEAMCITY_PROJECT_NAME'] = 'foo' }
+    let(:teamcity_running?) { true }
 
     describe 'escaping' do
       context 'when publishing messages without special characters' do
         it 'should not escape' do
-          ServiceMessages.progress_start "the message"
+          described_class.progress_start "the message"
 
           expect($stdout).to have_received(:puts).with("##teamcity[progressStart 'the message']")
         end
@@ -37,61 +30,61 @@ describe ServiceMessages do
 
       context 'when publishing messages with special characters' do
         it 'should escape apostrophes' do
-          ServiceMessages.progress_start "'"
+          described_class.progress_start "'"
 
           expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|'']")
         end
 
         it 'should escape line feeds' do
-          ServiceMessages.progress_start "\n"
+          described_class.progress_start "\n"
 
           expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|n']")
         end
 
         it 'should escape carriage returns' do
-          ServiceMessages.progress_start "\r"
+          described_class.progress_start "\r"
 
           expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|r']")
         end
 
         it 'should escape next lines' do
-          ServiceMessages.progress_start "\u0085"
+          described_class.progress_start "\u0085"
 
           expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|x']")
         end
 
         it 'should escape line separators' do
-          ServiceMessages.progress_start "\u2028"
+          described_class.progress_start "\u2028"
 
           expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|l']")
         end
 
         it 'should escape paragraph separators' do
-          ServiceMessages.progress_start "\u2029"
+          described_class.progress_start "\u2029"
 
           expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|p']")
         end
 
         it 'should escape vertical bars' do
-          ServiceMessages.progress_start '|'
+          described_class.progress_start '|'
 
           expect($stdout).to have_received(:puts).with("##teamcity[progressStart '||']")
         end
 
         it 'should escape opening brackets' do
-          ServiceMessages.progress_start '['
+          described_class.progress_start '['
 
           expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|[']")
         end
 
         it 'should escape closing brackets' do
-          ServiceMessages.progress_start ']'
+          described_class.progress_start ']'
 
           expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|]']")
         end
 
         it 'should escape all special characters in a string' do
-          ServiceMessages.progress_start "[\r|\n]"
+          described_class.progress_start "[\r|\n]"
 
           expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|[|r|||n|]']")
         end
@@ -101,7 +94,7 @@ describe ServiceMessages do
     describe 'parameters' do
       context 'when reporting a message without parameters' do
         it 'should print the service message' do
-          ServiceMessages.enable_service_messages
+          described_class.enable_service_messages
 
           expect($stdout).to have_received(:puts).with('##teamcity[enableServiceMessages]')
         end
@@ -109,7 +102,7 @@ describe ServiceMessages do
 
       context 'when reporting a message with an unnamed parameter' do
         it 'should print the service message' do
-          ServiceMessages.progress_message 'the message'
+          described_class.progress_message 'the message'
 
           expect($stdout).to have_received(:puts).with("##teamcity[progressMessage 'the message']")
         end
@@ -117,7 +110,7 @@ describe ServiceMessages do
 
       context 'when reporting a message with a named parameter' do
         it 'should print the service message' do
-          ServiceMessages.block_opened({ name: 'block name' })
+          described_class.block_opened({ name: 'block name' })
 
           expect($stdout).to have_received(:puts).with("##teamcity[blockOpened name='block name']")
         end
@@ -125,7 +118,7 @@ describe ServiceMessages do
 
       context 'when reporting a message with multiple named parameters' do
         it 'should print the service message' do
-          ServiceMessages.test_started ({ name: 'test name', captureStandardOutput: true })
+          described_class.test_started ({ name: 'test name', captureStandardOutput: true })
 
           expect($stdout).to have_received(:puts).with("##teamcity[testStarted name='test name' captureStandardOutput='true']")
         end
@@ -133,7 +126,7 @@ describe ServiceMessages do
 
       context 'when reporting a message with Ruby-style named parameters' do
         it 'should print the service message' do
-          ServiceMessages.test_started ({ capture_standard_output: true })
+          described_class.test_started ({ capture_standard_output: true })
 
           expect($stdout).to have_received(:puts).with("##teamcity[testStarted captureStandardOutput='true']")
         end

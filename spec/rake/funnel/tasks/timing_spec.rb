@@ -1,13 +1,11 @@
-require 'rake'
-require 'rake/funnel'
+include Rake
 
 describe Rake::Funnel::Tasks::Timing do
-
-  include Rake::DSL
+  include DSL
 
   before {
     Rake.application = nil
-    Rake::Task.clear
+    Task.clear
 
     expect(define_tasks).to be
     expect(subject).to be
@@ -31,7 +29,7 @@ describe Rake::Funnel::Tasks::Timing do
       allow(Rake.application).to receive(:handle_options).and_return([])
       Rake.application.init
 
-      Rake::Funnel::Tasks::Timing.new
+      described_class.new
 
       expect(Rake.application.top_level_tasks).to have_at_least(2).items
       expect(Rake.application.top_level_tasks.last).to eq(:timing)

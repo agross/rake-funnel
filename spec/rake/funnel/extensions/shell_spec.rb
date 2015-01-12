@@ -1,6 +1,6 @@
-require 'rake/funnel'
 require 'open3'
-require 'smart_colored/extend'
+
+include Rake::Funnel
 
 describe Rake::Funnel::Extensions::Shell do
   before {
@@ -15,7 +15,7 @@ describe Rake::Funnel::Extensions::Shell do
 
   let(:stdout_and_stderr) { StringIO.new("output 1\noutput 2\n") }
 
-  subject { Object.new.extend(Rake::Funnel::Extensions::Shell) }
+  subject { Object.new.extend(described_class) }
 
   after { stdout_and_stderr.close }
 
@@ -126,7 +126,7 @@ describe Rake::Funnel::Extensions::Shell do
     before {
       begin
         subject.shell('foo', error_lines: error_lines)
-      rescue Rake::Funnel::ExecutionError
+      rescue ExecutionError
       end
     }
 
@@ -187,7 +187,7 @@ describe Rake::Funnel::Extensions::Shell do
     context 'error lines logged' do
       context 'without block' do
         it 'should fail' do
-          expect { subject.shell('foo', error_lines: /.*/) }.to raise_error(Rake::Funnel::ExecutionError)
+          expect { subject.shell('foo', error_lines: /.*/) }.to raise_error(ExecutionError)
         end
       end
 
@@ -207,7 +207,7 @@ describe Rake::Funnel::Extensions::Shell do
 
       context 'without block' do
         it 'should fail' do
-          expect { subject.shell('foo') }.to raise_error(Rake::Funnel::ExecutionError)
+          expect { subject.shell('foo') }.to raise_error(ExecutionError)
         end
 
         it 'should report the exit code' do
