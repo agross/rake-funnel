@@ -16,11 +16,7 @@ module Rake::Funnel::Integration::TeamCity
       def get_addin_dir(source)
         return nil unless source
 
-        if File::ALT_SEPARATOR
-          source.gsub(File::ALT_SEPARATOR, File::SEPARATOR)
-        else
-          source
-        end
+        File.expand_path(source)
       end
 
       def read_version(executable)
