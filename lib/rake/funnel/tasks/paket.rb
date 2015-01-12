@@ -19,7 +19,7 @@ module Rake::Funnel::Tasks
 
     private
     def define
-      desc "#{paket_cmd.join(' ')} (optionally #{bootstrapper_cmd.join(' ')}"
+      desc "#{paket_cmd.join(' ')} (optionally #{bootstrapper_cmd.join(' ')})"
       task name do
         sh(*bootstrapper_cmd) unless File.exist?(paket)
         sh(*paket_cmd)
