@@ -12,6 +12,9 @@ task default: :spec
 
 RSpec::Core::RakeTask.new(:spec) do |t|
   t.rspec_opts = '--order random'
+  if ENV.include?('TEAMCITY_PROJECT_NAME')
+    t.rspec_opts += ' --format progress --format html --out build/spec/rspec.html'
+  end
 end
 
 spec = Gem::Specification.load('rake-funnel.gemspec')
