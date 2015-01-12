@@ -4,13 +4,13 @@ require 'zip'
 
 module Rake::Funnel::Tasks
   class Zip < Rake::TaskLib
-    attr_accessor :name, :files, :destination, :zip_root
+    attr_accessor :name, :source, :target, :zip_root
 
     def initialize(name = :package)
       @name = name
 
-      @files = []
-      @destination = nil
+      @source = []
+      @target = nil
       @zip_root = nil
 
       yield self if block_given?
@@ -19,23 +19,25 @@ module Rake::Funnel::Tasks
 
     private
     def define
-      destination && CLEAN.include(destination)
+      target && CLEAN.include(target)
 
-      desc "Zip #{files_to_zip.all_or_default.join(', ')}"
+      desc "Zip #{files.join(', ')} to #{target}"
       task name do
-        RakeFileUtils.mkdir_p(File.dirname(destination))
+        raise 'Target not defined' unless target
+
+        RakeFileUtils.mkdir_p(File.dirname(target))
 
         configure_zip
-        create_zip(files_to_zip.all_or_default, destination)
+        create_zip(files, target)
 
-        Rake.rake_output_message("Created #{destination}")
+        Rake.rake_output_message("Created #{target}")
       end
 
       self
     end
 
-    def files_to_zip
-      Rake::Funnel::Support::Finder.new(files, self, 'No files to zip.')
+    def files
+      Rake::Funnel::Support::Finder.new(source, self, 'No files to zip.').all_or_default
     end
 
     def configure_zip

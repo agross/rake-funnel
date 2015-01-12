@@ -13,7 +13,7 @@ describe NUnit do
     its(:name) { should == :test }
     its(:args) { should == {} }
     its(:nunit) { should == 'nunit-console.exe' }
-    its(:search_pattern) { should == %w(build/specs/**/*.dll build/specs/**/*.exe) }
+    its(:files) { should == %w(build/specs/**/*.dll build/specs/**/*.exe) }
   end
 
   describe 'overriding defaults' do

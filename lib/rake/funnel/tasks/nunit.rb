@@ -2,12 +2,12 @@ require 'rake/tasklib'
 
 module Rake::Funnel::Tasks
   class NUnit < Rake::TaskLib
-    attr_accessor :name, :search_pattern, :args
+    attr_accessor :name, :files, :args
 
     def initialize(name = :test)
       @name = name
       @args = {}
-      @search_pattern = %w(build/specs/**/*.dll build/specs/**/*.exe)
+      @files = %w(build/specs/**/*.dll build/specs/**/*.exe)
 
       yield self if block_given?
       define
@@ -40,7 +40,7 @@ module Rake::Funnel::Tasks
     end
 
     def test_assemblies
-      Rake::Funnel::Support::Finder.new(search_pattern, self, 'No test assemblies found.')
+      Rake::Funnel::Support::Finder.new(files, self, 'No test assemblies found.')
     end
   end
 end
