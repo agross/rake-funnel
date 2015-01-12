@@ -2,6 +2,7 @@ require 'simplecov'
 require 'coveralls'
 require 'codeclimate-test-reporter'
 
+
 SimpleCov.start do
   if Coveralls.will_run?
     external_services = [
@@ -14,6 +15,8 @@ SimpleCov.start do
       SimpleCov::Formatter::HTMLFormatter,
       *external_services
     ]
+
+  coverage_dir('build/coverage')
 end
 
 require 'rspec/its'
