@@ -7,7 +7,7 @@ module Rake::Funnel::Tasks::MSDeploySupport
     def initialize(&block)
       begin
         patch.apply!
-        yield block
+        yield block if block_given?
       ensure
         patch.revert!
       end
