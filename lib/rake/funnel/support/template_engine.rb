@@ -14,7 +14,7 @@ module Rake::Funnel::Support
         tags = /(@\w[\w\.]+\w@)/
 
         (template || '').gsub(tags) do |match|
-          "<%= #{match[1..-2]} %>"
+          "<%= #{match[1...-1]} %>"
         end
       end
 
