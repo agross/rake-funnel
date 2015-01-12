@@ -37,17 +37,6 @@ describe Rake::Funnel::Tasks::Zip do
     let(:target) { 'some path/file.zip' }
     let(:zip_root) { nil }
 
-    let(:finder) { double(Rake::Funnel::Support::Finder).as_null_object }
-    let(:zip) { double(::Zip::File).as_null_object }
-
-    before {
-      allow(finder).to receive(:all_or_default).and_return(source)
-      allow(Rake::Funnel::Support::Finder).to receive(:new).and_return(finder)
-      allow(RakeFileUtils).to receive(:mkdir_p)
-      allow(Rake).to receive(:rake_output_message)
-      allow(::Zip::File).to receive(:open).with(target, ::Zip::File::CREATE).and_yield(zip)
-    }
-
     subject! {
       described_class.new do |t|
         t.source = source
@@ -67,6 +56,17 @@ describe Rake::Funnel::Tasks::Zip do
     end
 
     context 'success' do
+      let(:finder) { double(Rake::Funnel::Support::Finder).as_null_object }
+      let(:zip) { double(::Zip::File).as_null_object }
+
+      before {
+        allow(finder).to receive(:all_or_default).and_return(source)
+        allow(Rake::Funnel::Support::Finder).to receive(:new).and_return(finder)
+        allow(RakeFileUtils).to receive(:mkdir_p)
+        allow(Rake).to receive(:rake_output_message)
+        allow(::Zip::File).to receive(:open).with(target, ::Zip::File::CREATE).and_yield(zip)
+      }
+
       before {
         Rake::Task[subject.name].invoke
       }
