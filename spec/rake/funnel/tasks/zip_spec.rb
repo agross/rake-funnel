@@ -15,7 +15,7 @@ describe Rake::Funnel::Tasks::Zip do
     its(:target) { should be_nil }
     its(:zip_root) { should be_nil }
 
-    it 'should not add the destination file to the files to be cleaned' do
+    it 'should not add the target file to the files to be cleaned' do
       expect(CLEAN).to be_empty
     end
 
@@ -26,7 +26,7 @@ describe Rake::Funnel::Tasks::Zip do
         end
       }
 
-      it 'should add the destination file to the files to be cleaned' do
+      it 'should add the target file to the files to be cleaned' do
         expect(CLEAN).to include(subject.target)
       end
     end
@@ -85,10 +85,6 @@ describe Rake::Funnel::Tasks::Zip do
 
       it 'should report the created zip file' do
         expect(Rake).to have_received(:rake_output_message).with("Created #{target}")
-      end
-
-      it 'should succeed' do
-        expect(@raised_error).not_to be
       end
 
       [nil, '', 'some path/inside the zip file'].each do |root|

@@ -45,8 +45,8 @@ module Rake::Funnel::Tasks
       ::Zip.default_compression = Zlib::BEST_COMPRESSION
     end
 
-    def create_zip(files, destination)
-      ::Zip::File.open(destination, ::Zip::File::CREATE) do |zip|
+    def create_zip(files, target)
+      ::Zip::File.open(target, ::Zip::File::CREATE) do |zip|
         common_path = files.common_path
 
         files.each do |file|
