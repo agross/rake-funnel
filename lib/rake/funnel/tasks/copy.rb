@@ -42,10 +42,6 @@ module Rake::Funnel::Tasks
       Rake::Funnel::Support::Finder.new(source, self, 'No files found.').all_or_default
     end
 
-    def result_filename(template)
-      template.ext
-    end
-
     def target_path(file)
       target_relative = Pathname.new(file).relative_path_from(Pathname.new(common_path)).to_s
       File.join(target, target_relative)
