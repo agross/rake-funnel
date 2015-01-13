@@ -30,39 +30,47 @@ module Rake::Funnel::Tasks::TimingSupport
     SPACE = 3
     HEADER_WIDTH = 70
 
-    def initialize(stats , opts = {})
+    def initialize(stats, opts = {})
       @stats = stats
       @opts = opts
     end
 
     def render
+      header
+      rows
+      footer
+    end
+
+    def columns
+      @columns ||= ([
+        Column.new(stats: @stats, header: 'Target', accessor: -> (timing) { timing[:task].name }),
+        Column.new(stats: @stats, header: 'Duration', accessor: -> (timing) { format(timing[:time]) })
+      ])
+    end
+
+    private
+    def header
       puts '-' * HEADER_WIDTH
       puts 'Build time report'
       puts '-' * HEADER_WIDTH
 
       puts columns.map { |c| c.format_header }.join(' ' * SPACE)
       puts columns.map { |c| c.format_header.gsub(/./, '-') }.join(' ' * SPACE)
+    end
 
+    def rows
       @stats.each do |timing|
         puts columns.map { |c| c.format_value(timing) }.join(' ' * SPACE)
       end
+    end
 
+    def footer
       puts '-' * HEADER_WIDTH
       puts 'Total'.ljust(columns[0].width) + ' ' * SPACE + format(Time.now - @stats.started_at)
       status_message
       puts '-' * HEADER_WIDTH
     end
 
-    def columns
-      @columns ||= (
-        [
-          Column.new(stats: @stats, header: 'Target',   accessor: -> (timing) { timing[:task].name }),
-          Column.new(stats: @stats, header: 'Duration', accessor: -> (timing) { format(timing[:time]) })
-        ]
-      )
-    end
-
-    private
     def format(seconds)
       Time.at(seconds).utc.strftime('%H:%M:%S')
     end
