@@ -1,7 +1,7 @@
 include Rake::Funnel
 
 describe Rake::Funnel::Support::Finder do
-  let(:pattern) { %W(**/*.sln **/*.??proj) }
+  let(:pattern) { %W(#{temp_dir}/**/*.sln #{temp_dir}/**/*.??proj) }
   let(:generate) { [] }
   let(:temp_dir) { Dir.mktmpdir }
 
@@ -21,6 +21,12 @@ describe Rake::Funnel::Support::Finder do
   subject {
     described_class.new(pattern, OpenStruct.new(name: 'task name'), 'error message')
   }
+
+  def map_temp(*files)
+    mapped = files.map { |f| File.join(temp_dir, f) }
+    return mapped.first if mapped.one?
+    mapped
+  end
 
   describe 'enumerable' do
     let(:generate) { %w(1 2 3 4) }
@@ -108,7 +114,7 @@ describe Rake::Funnel::Support::Finder do
 
       it 'should yield match' do
         Dir.chdir(temp_dir) do
-          expect(subject.single).to eq(generate)
+          expect(subject.single).to eq(map_temp(generate))
         end
       end
     end
@@ -138,7 +144,7 @@ describe Rake::Funnel::Support::Finder do
 
       it 'should yield match' do
         Dir.chdir(temp_dir) do
-          expect(subject.single_or_default).to eq(generate)
+          expect(subject.single_or_default).to eq(map_temp(generate))
         end
       end
     end
@@ -156,7 +162,7 @@ describe Rake::Funnel::Support::Finder do
 
       it 'should yield all matches' do
         Dir.chdir(temp_dir) do
-          expect(subject.all).to match_array(generate)
+          expect(subject.all).to match_array(map_temp(*generate))
         end
       end
     end
@@ -166,7 +172,7 @@ describe Rake::Funnel::Support::Finder do
 
       it 'should yield all matches' do
         Dir.chdir(temp_dir) do
-          expect(subject.all).to match_array(generate)
+          expect(subject.all).to match_array(map_temp(generate))
         end
       end
     end
@@ -186,7 +192,7 @@ describe Rake::Funnel::Support::Finder do
 
       it 'should yield all matches' do
         Dir.chdir(temp_dir) do
-          expect(subject.all_or_default).to match_array(generate)
+          expect(subject.all_or_default).to match_array(map_temp(*generate))
         end
       end
     end
@@ -196,7 +202,7 @@ describe Rake::Funnel::Support::Finder do
 
       it 'should yield all matches' do
         Dir.chdir(temp_dir) do
-          expect(subject.all_or_default).to match_array(generate)
+          expect(subject.all_or_default).to match_array(map_temp(generate))
         end
       end
     end

@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Reference Include="Sample-Ref-1">
+      <HintPath>somewhere\Sample-Ref-1.dll</HintPath>
+    </Reference>
+    <Reference Include="Sample-Ref-2" />
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Specs.cs" />
+    <Compile Include="FooCode.cs" />
+    <Compile Include="FooSpecs.cs" />
+    <Compile Include="subdir\BarCode.cs" />
+    <Compile Include="subdir\BarSpecs.cs" />
+  </ItemGroup>
+  <Choose>
+    <When Condition="ignored">
+      <ItemGroup>
+        <Reference Include="Sample-Ref-3">
+          <HintPath>packages\sample\sample.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+</Project>
