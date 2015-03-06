@@ -2,17 +2,19 @@ require 'rake/funnel'
 require 'rubygems/package_task'
 require 'rspec/core/rake_task'
 
-Rake::Funnel::Tasks::Timing.new
-Rake::Funnel::Tasks::BinPath.new
-Rake::Funnel::Integration::SyncOutput.new
-Rake::Funnel::Integration::ProgressReport.new
-Rake::Funnel::Integration::TeamCity::ProgressReport.new
+include Rake::Funnel
+
+Tasks::Timing.new
+Tasks::BinPath.new
+Integration::SyncOutput.new
+Integration::ProgressReport.new
+Integration::TeamCity::ProgressReport.new
 
 task default: :spec
 
 RSpec::Core::RakeTask.new(:spec) do |t|
   t.rspec_opts = '--order random'
-  if Rake::Funnel::Integration::TeamCity.running?
+  if Integration::TeamCity.running?
     t.rspec_opts += ' --format progress --format html --out build/spec/rspec.html'
   end
   t.rspec_opts += ' --tag ~platform:win32' unless Rake::Win32.windows?
@@ -28,11 +30,11 @@ gem = Gem::PackageTask.new(spec) do |t|
 end
 
 task gem: :spec do
-  Rake::Funnel::Integration::TeamCity::ServiceMessages.build_number(spec.version.to_s)
+  Integration::TeamCity::ServiceMessages.build_number(spec.version.to_s)
 end
 
 desc "Publish the gem file #{gem.gem_spec.file_name}"
-Rake::Funnel::Tasks::MSDeploy.new :push => [:bin_path, :gem] do |t|
+Tasks::MSDeploy.new :push => [:bin_path, :gem] do |t|
   remote_dir = 'C:/GROSSWEBER/gems'
   gem = File.join(File.expand_path(gem.package_dir), gem.gem_spec.file_name)
 
