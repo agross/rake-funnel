@@ -15,6 +15,7 @@ RSpec::Core::RakeTask.new(:spec) do |t|
   if ENV.include?('TEAMCITY_PROJECT_NAME')
     t.rspec_opts += ' --format progress --format html --out build/spec/rspec.html'
   end
+  t.rspec_opts += ' --tag ~platform:win32' unless Rake::Win32.windows?
 end
 
 spec = Gem::Specification.load('rake-funnel.gemspec')
