@@ -28,16 +28,18 @@ module Rake::Funnel::Tasks::MSDeploySupport
     def delete_key(key)
       return nil unless key.created?
 
+      keyname = key.keyname
       Proc.new {
-        root.create(File.dirname(key.keyname)) do |r|
-          r.delete_key(File.basename(key.keyname), true)
+        root.create(File.dirname(keyname)) do |r|
+          r.delete_key(File.basename(keyname), true)
         end
       }
     end
 
     def delete_value(key, value)
+      keyname = key.keyname
       Proc.new {
-        root.create(key.keyname) do |r|
+        root.create(keyname) do |r|
           r.delete_value(value)
         end
       }
