@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'rake'
   s.add_dependency 'rubyzip', '~> 1.0'
   s.add_dependency 'smart_colored'
+  s.add_dependency 'configatron', '~> 4.5'
 
   git = ENV['TEAMCITY_GIT_PATH'] || 'git'
   s.files         = `"#{git}" ls-files -z`.split("\x0")
