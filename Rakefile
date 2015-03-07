@@ -10,6 +10,12 @@ Integration::SyncOutput.new
 Integration::ProgressReport.new
 Integration::TeamCity::ProgressReport.new
 
+namespace :env do
+  Tasks::Environments.new do |t|
+    t.default_env = :dev
+  end
+end
+
 task default: :spec
 
 RSpec::Core::RakeTask.new(:spec) do |t|
@@ -33,28 +39,30 @@ task gem: :spec do
   Integration::TeamCity::ServiceMessages.build_number(spec.version.to_s)
 end
 
-desc "Publish the gem file #{gem.gem_spec.file_name}"
 Tasks::MSDeploy.new :push => [:bin_path, :gem] do |t|
-  remote_dir = 'C:/GROSSWEBER/gems'
   gem = File.join(File.expand_path(gem.package_dir), gem.gem_spec.file_name)
 
   t.log_file = 'deploy/msdeploy.log'
   t.args = {
     verb: :sync,
-    post_sync: {
-      run_command: "gem generate_index -V --directory=#{remote_dir} & icacls C:/GROSSWEBER/gems /reset /t /c /q",
+    pre_sync: {
+      run_command: "mkdir #{configatron.deployment.remote_dir}\\gems",
       wait_interval: 60 * 1000
     },
     source: {
       file_path: gem
     },
     dest: {
-      computer_name: 'gems.grossweber.com',
-      username: ENV['DEPLOY_USER'],
-      password: ENV['DEPLOY_PASSWORD'],
-      file_path: File.join(remote_dir, 'gems', File.basename(gem))
+      computer_name: configatron.deployment.computer_name,
+      username: configatron.deployment.username,
+      password: configatron.deployment.password,
+      file_path: File.join(configatron.deployment.remote_dir, 'gems', File.basename(gem))
     },
     skip: [{ skip_action: :delete }],
+    post_sync_on_success: {
+      run_command: "gem generate_index -V --directory=#{configatron.deployment.remote_dir} & icacls #{configatron.deployment.remote_dir} /reset /t /c /q",
+      wait_interval: 60 * 1000
+    },
     use_check_sum: nil,
     allow_untrusted: nil
   }

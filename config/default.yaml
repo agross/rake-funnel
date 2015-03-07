@@ -1,0 +1,5 @@
+deployment:
+  computer_name: localhost
+  username:  <%= ENV['DEPLOY_USER'] || ENV['COMPUTERNAME'] + '\Administrator' %>
+  password: <%= ENV['DEPLOY_PASSWORD'] %>
+  remote_dir: <%= (ENV['TEMP'] + '/_gems').gsub(%r|/|, '\\') %>
