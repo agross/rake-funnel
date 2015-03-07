@@ -31,7 +31,8 @@ module Rake::Funnel::Tasks
         TimingSupport::Report.new(@stats, args).render
       end
 
-      Rake.application.top_level_tasks.push(@name)
+      timing_task = Rake.application.current_scope.path_with_task_name(@name)
+      Rake.application.top_level_tasks.push(timing_task)
 
       self
     end

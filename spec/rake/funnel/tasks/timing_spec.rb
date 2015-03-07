@@ -20,7 +20,9 @@ describe Rake::Funnel::Tasks::Timing do
   describe 'defaults' do
     its(:name) { should == :timing }
     its(:stats) { should have(0).items }
+  end
 
+  describe 'task is automatically executed' do
     it 'should add itself to the top level tasks' do
       expect(Rake.application.top_level_tasks).to include(:timing)
     end
@@ -33,6 +35,19 @@ describe Rake::Funnel::Tasks::Timing do
 
       expect(Rake.application.top_level_tasks).to have_at_least(2).items
       expect(Rake.application.top_level_tasks.last).to eq(:timing)
+    end
+
+    context 'task defined in namespace' do
+      it 'should add namespaced top level task' do
+        allow(Rake.application).to receive(:handle_options).and_return([])
+        Rake.application.init
+
+        namespace :namespace do
+          described_class.new
+        end
+
+        expect(Rake.application.top_level_tasks).to include('namespace:timing')
+      end
     end
   end
 
