@@ -97,5 +97,27 @@ describe Rake::Funnel::Tasks::Copy do
         end
       end
     end
+
+    describe 'source is evaluated lazily' do
+      let(:source) { FileList.new('*.example') }
+
+      before {
+        allow(Finder).to receive(:new).and_return(double(Finder).as_null_object)
+      }
+
+      before {
+        Dir.mktmpdir do |tmp|
+          Dir.chdir(tmp) do
+            FileUtils.touch('new file.example')
+
+            Task[subject.name].invoke
+          end
+        end
+      }
+
+      it 'should detect new files' do
+        expect(Finder).to have_received(:new).with(['new file.example'], any_args)
+      end
+    end
   end
 end
