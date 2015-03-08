@@ -1,29 +1,29 @@
 describe Rake::Funnel::Tasks::EnvironmentsSupport::Loader do
-  describe 'loading configuration' do
-    let(:config) {
-      {
-        name: 'environment name',
-        config_files: config_files.keys.map(&:to_s)
-      }
-    }
+  let(:store) {
+    double(Configatron::Store).as_null_object
+  }
 
+  let(:config) {
+    {
+      name: 'environment name',
+      config_files: config_files.keys.map(&:to_s)
+    }
+  }
+
+  before {
+    config_files.each do |file, content|
+      allow(File).to receive(:read).with(file.to_s).and_return(content)
+    end
+
+    allow(Rake).to receive(:rake_output_message)
+  }
+
+  describe 'loading configuration' do
     let(:config_files) {
       {
         one: 'one: 23',
         two: 'two: 42'
       }
-    }
-
-    let(:store) {
-      double(Configatron::Store).as_null_object
-    }
-
-    before {
-      config_files.each do |file, content|
-        allow(File).to receive(:read).with(file.to_s).and_return(content)
-      end
-
-      allow(Rake).to receive(:rake_output_message)
     }
 
     before {
@@ -98,16 +98,35 @@ describe Rake::Funnel::Tasks::EnvironmentsSupport::Loader do
         expect(store).to have_received(:configure_from_hash).with({})
       end
     end
+  end
 
-    context 'config file with ERb' do
+  describe 'config file with ERb' do
+    context 'ERb success' do
       let(:config_files) {
         {
           with_erb: 'foo: <%= 40 + 2 %>'
         }
       }
 
+      before {
+        described_class.load_configuration(config, store)
+      }
+
       it 'should evaluate ERb' do
         expect(store).to have_received(:configure_from_hash).with({ 'foo' => 42 })
+      end
+    end
+
+    context 'ERb failure' do
+      let(:config_files) {
+        {
+          with_erb: 'bogus: <%= 42 + "a" %>'
+        }
+      }
+
+      it 'should report file name' do
+        expect(lambda { described_class.load_configuration(config, store) })
+          .to raise_error { |ex| expect(ex.backtrace.join("\n")).to match(/with_erb/) }
       end
     end
   end

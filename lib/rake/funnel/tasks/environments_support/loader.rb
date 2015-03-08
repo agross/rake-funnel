@@ -17,7 +17,7 @@ module Rake::Funnel::Tasks::EnvironmentsSupport
           operation = 'Merging'
 
           yaml = File.read(file)
-          yaml = ERB.new(yaml).result
+          yaml = evaluate_erb(yaml, file)
           yaml = YAML.load(yaml) || {}
           store.configure_from_hash(yaml)
         end
@@ -26,6 +26,12 @@ module Rake::Funnel::Tasks::EnvironmentsSupport
 
         log('')
         log(store.inspect)
+      end
+
+      def evaluate_erb(yaml, filename)
+        render = ERB.new(yaml)
+        render.filename = filename
+        render.result
       end
 
       private
