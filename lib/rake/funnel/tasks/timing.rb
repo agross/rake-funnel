@@ -38,11 +38,11 @@ module Rake::Funnel::Tasks
     end
 
     def patches
-      @patches ||= create_patches
+      @patches ||= [report, benchmark]
     end
 
-    def create_patches
-      report = Rake::Funnel::Support::Patch.new do |p|
+    def report
+      Rake::Funnel::Support::Patch.new do |p|
         report_invoker = -> (opts) { TimingSupport::Report.new(@stats, opts).render }
 
         p.setup do
@@ -67,8 +67,10 @@ module Rake::Funnel::Tasks
           end
         end
       end
+    end
 
-      benchmark = Rake::Funnel::Support::Patch.new do |p|
+    def benchmark
+      Rake::Funnel::Support::Patch.new do |p|
         benchmark_invoker = -> (task, &block) { @stats.benchmark(task, &block) }
 
         p.setup do
@@ -93,8 +95,6 @@ module Rake::Funnel::Tasks
           end
         end
       end
-
-      [report, benchmark]
     end
   end
 end
