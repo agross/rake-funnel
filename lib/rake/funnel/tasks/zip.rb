@@ -53,9 +53,16 @@ module Rake::Funnel::Tasks
         files.each do |file|
           zipped_file = get_zipped_path(common_path, file)
 
-          zip.add(zipped_file, file)
+          entry = zip.add(zipped_file, file)
+          set_mtime(entry, file)
         end
       end
+    end
+
+    # To work around this bug: https://github.com/rubyzip/rubyzip/issues/176
+    def set_mtime(entry, file)
+      entry.time = ::Zip::DOSTime.at(File.mtime(file))
+      entry.extra.delete('UniversalTime')
     end
 
     def get_zipped_path(common_path, file)

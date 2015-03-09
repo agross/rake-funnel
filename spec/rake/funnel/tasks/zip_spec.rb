@@ -58,6 +58,8 @@ describe Rake::Funnel::Tasks::Zip do
     context 'success' do
       let(:finder) { double(Finder).as_null_object }
       let(:zip) { double(::Zip::File).as_null_object }
+      let(:mtime) { Time.new(2015, 3, 9) }
+      let(:zip_entry) { double(::Zip::Entry).as_null_object }
 
       before {
         allow(finder).to receive(:all_or_default).and_return(source)
@@ -65,6 +67,11 @@ describe Rake::Funnel::Tasks::Zip do
         allow(RakeFileUtils).to receive(:mkdir_p)
         allow(Rake).to receive(:rake_output_message)
         allow(::Zip::File).to receive(:open).with(target, ::Zip::File::CREATE).and_yield(zip)
+      }
+
+      before {
+        allow(zip).to receive(:add).and_return(zip_entry)
+        allow(File).to receive(:mtime).and_return(mtime)
       }
 
       before {
@@ -111,6 +118,10 @@ describe Rake::Funnel::Tasks::Zip do
             files.each do |file_args|
               expect(zip).to have_received(:add).with(*file_args)
             end
+          end
+
+          it 'should explicitly set the file mtime to work around https://github.com/rubyzip/rubyzip/issues/176' do
+            expect(zip_entry).to have_received(:time=).with(mtime).exactly(build_args.length).times
           end
         end
       end
