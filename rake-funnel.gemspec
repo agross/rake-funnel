@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'configatron', '~> 4.5'
 
   git = ENV['TEAMCITY_GIT_PATH'] || 'git'
-  s.files         = `"#{git}" ls-files -z`.split("\x0")
+  s.files         = `"#{git}" ls-files -z`.split("\x0").reject { |file| file =~ %r{^(config/|tools/|lib/tasks|\.gitignore|\.travis|\w*file)} || File.extname(file) == '.cmd' }
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.test_files    = s.files.grep(%r{^(test|spec|features)/})
   s.require_paths = ['lib']
