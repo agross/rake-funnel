@@ -15,13 +15,13 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 2.0.0'
 
-  s.add_dependency 'rake'
+  s.add_dependency 'rake', '~> 10.4'
   s.add_dependency 'rubyzip', '~> 1.0'
   s.add_dependency 'smart_colored'
   s.add_dependency 'configatron', '~> 4.5'
 
   git = ENV['TEAMCITY_GIT_PATH'] || 'git'
-  s.files         = `"#{git}" ls-files -z`.split("\x0").reject { |file| file =~ %r{^(config/|tools/|lib/tasks|\.gitignore|\.travis|\w*file)} || File.extname(file) == '.cmd' }
+  s.files         = `"#{git}" ls-files -z`.split("\x0").reject { |file| file =~ %r{^(config/|tools/|lib/tasks|\.gitignore|\.travis)} || file =~ %r{(Guard|Rake)file} || File.extname(file) == '.cmd' }
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.test_files    = s.files.grep(%r{^(test|spec|features)/})
   s.require_paths = ['lib']

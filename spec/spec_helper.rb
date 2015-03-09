@@ -1,6 +1,7 @@
 require 'simplecov'
 require 'coveralls'
 require 'codeclimate-test-reporter'
+require 'bundler/setup'
 
 SimpleCov.start do
   if Coveralls.will_run?
