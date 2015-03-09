@@ -91,7 +91,7 @@ describe Rake::Funnel::Tasks::Copy do
         source
           .select { |src| !File.directory?(src) }
           .each do |src|
-          expect(RakeFileUtils).to have_received(:cp).with(src, File.join(subject.target, no_prefix(src)))
+          expect(RakeFileUtils).to have_received(:cp).with(src, File.join(subject.target, no_prefix(src)), { preserve: true })
         end
       end
     end

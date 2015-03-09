@@ -43,7 +43,7 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
     end
 
     it 'should copy the addin from TeamCity to NUnit' do
-      expect(RakeFileUtils).to have_received(:cp).with(addin_dlls, File.join(File.dirname(which), 'addins'))
+      expect(RakeFileUtils).to have_received(:cp).with(addin_dlls, File.join(File.dirname(which), 'addins'), { preserve: true })
     end
 
     it 'should report that the addin is installed' do

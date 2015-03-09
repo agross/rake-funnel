@@ -31,7 +31,7 @@ module Rake::Funnel::Tasks
           dir = File.dirname(target)
           RakeFileUtils.mkdir_p(dir) unless File.directory?(dir)
 
-          RakeFileUtils.cp(source, target)
+          RakeFileUtils.cp(source, target, { preserve: true})
         end
       end
 
