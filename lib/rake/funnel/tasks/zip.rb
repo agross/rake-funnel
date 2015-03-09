@@ -25,7 +25,8 @@ module Rake::Funnel::Tasks
       task name do
         raise 'Target not defined' unless target
 
-        RakeFileUtils.mkdir_p(File.dirname(target))
+        target_dir = File.dirname(target)
+        RakeFileUtils.mkdir_p(target_dir) unless File.directory?(target_dir)
 
         configure_zip
         create_zip(files, target)
