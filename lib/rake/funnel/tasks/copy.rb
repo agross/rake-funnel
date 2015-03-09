@@ -39,7 +39,7 @@ module Rake::Funnel::Tasks
     end
 
     def files
-      Rake::Funnel::Support::Finder.new(source.dup, self, 'No files found.').all_or_default
+      Rake::Funnel::Support::Finder.new(source, self, 'No files found.').all_or_default
     end
 
     def target_path(file)

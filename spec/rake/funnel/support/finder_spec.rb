@@ -1,3 +1,5 @@
+require 'tmpdir'
+
 include Rake::Funnel
 
 describe Rake::Funnel::Support::Finder do
@@ -85,6 +87,22 @@ describe Rake::Funnel::Support::Finder do
       it 'should remove duplicates' do
         Dir.chdir(temp_dir) do
           expect(subject.all_or_default).to match_array(generate)
+        end
+      end
+    end
+  end
+
+  describe 'source is evaluated lazily' do
+    let(:pattern) { FileList['*.example'] }
+
+    it 'should detect new files' do
+      expect(subject.all_or_default).to be_empty
+
+      Dir.mktmpdir do |tmp|
+        Dir.chdir(tmp) do
+          FileUtils.touch('new file.example')
+
+          expect(subject.all).to include('new file.example')
         end
       end
     end
