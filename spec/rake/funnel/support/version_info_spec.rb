@@ -1,4 +1,4 @@
-describe Rake::Funnel::Support::Version do
+describe Rake::Funnel::Support::VersionInfo do
   [
     {
       context: {
@@ -93,6 +93,30 @@ describe Rake::Funnel::Support::Version do
         assembly_version: '1.2',
         assembly_file_version: '1.2.42',
         assembly_informational_version: '1.2.42'
+      }
+    },
+    {
+      context: {
+        version: 1,
+        build_number: '42',
+        sha: 'sha'
+      },
+      expected: {
+        assembly_version: '1',
+        assembly_file_version: '1.42',
+        assembly_informational_version: '1.42-sha'
+      }
+    },
+    {
+      context: {
+        version: '1.2',
+        build_number: 42,
+        sha: 'sha'
+      },
+      expected: {
+        assembly_version: '1.2',
+        assembly_file_version: '1.2.42',
+        assembly_informational_version: '1.2.42-sha'
       }
     },
     {

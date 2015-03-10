@@ -1,5 +1,5 @@
 module Rake::Funnel::Support
-  class Version
+  class VersionInfo
     class << self
       def parse(context)
         {
@@ -40,12 +40,12 @@ module Rake::Funnel::Support
 
       def strip_trailing_non_numeric(str)
         return nil if str.nil?
-        str.gsub(/[^\d\.].*/, '')
+        str.to_s.gsub(/[^\d\.].*/, '')
       end
 
       def strip_leading_non_numeric(str)
         return nil if str.nil?
-        str = str.gsub(/[^\d\.]/, '')
+        str = str.to_s.gsub(/[^\d\.]/, '')
 
         return nil if str.empty?
         str
