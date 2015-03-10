@@ -8,7 +8,7 @@ describe Rake::Funnel::Tasks::BinPath do
 
   describe 'defaults' do
     its(:name) { should == :bin_path }
-    its(:search_pattern) { is_expected.to match_array(%w(tools/* tools/*/bin packages/**/tools)) }
+    its(:search_pattern) { should eq(%w(tools/* tools/*/bin packages/**/tools)) }
   end
 
   describe 'execution' do
