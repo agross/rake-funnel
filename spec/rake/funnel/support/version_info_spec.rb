@@ -1,3 +1,5 @@
+require 'tmpdir'
+
 describe Rake::Funnel::Support::VersionInfo do
   [
     {
@@ -163,6 +165,25 @@ describe Rake::Funnel::Support::VersionInfo do
 
       it "should generate assembly informational version #{spec[:expected][:assembly_informational_version]}" do
         expect(parsed[:assembly_informational_version]).to eq(spec[:expected][:assembly_informational_version])
+      end
+    end
+  end
+
+  context 'reading version from file' do
+    let(:file) { 'file with version info' }
+    let(:contents) { <<-EOF
+  first line with expected version number
+other crap
+      EOF
+    }
+
+    it 'should read the first line with whitespace removed' do
+      Dir.mktmpdir do |tmp|
+        Dir.chdir(tmp) do
+
+          File.write(file, contents)
+          expect(described_class.read_version_from(file)).to eq('first line with expected version number')
+        end
       end
     end
   end
