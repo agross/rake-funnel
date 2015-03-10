@@ -8,7 +8,7 @@ module Rake::Funnel::Tasks
     def initialize(name = :template)
       @name = name
 
-      @search_pattern = %w(**/*.template)
+      @search_pattern = %w(**/*.erb)
       @context = binding
 
       yield self if block_given?
