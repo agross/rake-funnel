@@ -2,11 +2,11 @@ require 'rake/tasklib'
 
 module Rake::Funnel::Tasks
   class BinPath < Rake::TaskLib
-    attr_accessor :name, :pattern
+    attr_accessor :name, :search_pattern
 
     def initialize(name = :bin_path)
       @name = name
-      @pattern = %w(tools/* tools/*/bin packages/**/tools)
+      @search_pattern = %w(tools/* tools/*/bin packages/**/tools)
 
       yield self if block_given?
       define
@@ -25,7 +25,7 @@ module Rake::Funnel::Tasks
     end
 
     def add_pattern_to_path_environment
-      bin_paths = Dir[*@pattern].map { |path| File.expand_path(path) }.sort
+      bin_paths = Dir[*@search_pattern].map { |path| File.expand_path(path) }.sort
 
       ENV['PATH'] = ([] << bin_paths << ENV['PATH']).flatten.join(File::PATH_SEPARATOR)
       bin_paths
