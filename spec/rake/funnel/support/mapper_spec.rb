@@ -46,13 +46,13 @@ describe Rake::Funnel::Support::Mapper do
 
     context 'unknown mapper' do
       it 'should fail' do
-        expect { described_class.new(:unknown) }.to raise_error(/^Something went wrong while creating the 'unknown' mapper/)
+        expect { described_class.new(:unknown) }.to raise_error(NameError)
       end
     end
 
     context 'nil mapper' do
       it 'should fail' do
-        expect { described_class.new(nil) }.to raise_error(/You cannot use a 'nil' mapper. Available mappers are: \w+/)
+        expect { described_class.new(nil) }.to raise_error(/You cannot use the 'nil' mapper style. Available mappers are:/)
       end
     end
 

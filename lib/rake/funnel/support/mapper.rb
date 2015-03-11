@@ -5,16 +5,13 @@ end
 module Rake::Funnel::Support
   class Mapper
     include Rake::Funnel::Support::ArgumentMapper
+    include InstantiateSymbol
+    instantiate Styles
 
     def initialize(style = :Default)
-      raise "You cannot use a 'nil' mapper. Available mappers are: #{Styles.constants.sort.join(', ')}" if style.nil?
+      raise "You cannot use the 'nil' mapper style. Available mappers are: #{available.inspect}" if style.nil?
 
-      @style = style
-      begin
-        @style = Styles.const_get(style).new if style.kind_of?(Symbol)
-      rescue => ex
-        raise "Something went wrong while creating the '#{style}' mapper: #{ex}"
-      end
+      @style = create(style)
     end
 
     def map(args = {})
