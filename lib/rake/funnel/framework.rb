@@ -6,6 +6,7 @@ module Rake::Funnel::Tasks; end
 [
   "#{File.dirname(__FILE__)}/*.rb",
   "#{File.dirname(__FILE__)}/extensions/*.rb",
+  "#{File.dirname(__FILE__)}/support/internal/*.rb",
   "#{File.dirname(__FILE__)}/support/*.rb",
   "#{File.dirname(__FILE__)}/*/*.rb",
 ].each do |path|
