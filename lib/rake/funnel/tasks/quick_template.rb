@@ -3,6 +3,8 @@ require 'rake/tasklib'
 
 module Rake::Funnel::Tasks
   class QuickTemplate < Rake::TaskLib
+    include Rake::Funnel::Support
+
     attr_accessor :name, :search_pattern, :context
 
     def initialize(name = :template)
@@ -35,7 +37,7 @@ module Rake::Funnel::Tasks
     end
 
     def templates
-      Rake::Funnel::Support::Finder.new(search_pattern, self, 'No templates found.')
+      Finder.new(search_pattern, self, 'No templates found.')
     end
 
     def result_filename(template)

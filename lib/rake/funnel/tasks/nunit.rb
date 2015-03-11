@@ -2,6 +2,8 @@ require 'rake/tasklib'
 
 module Rake::Funnel::Tasks
   class NUnit < Rake::TaskLib
+    include Rake::Funnel::Support
+
     attr_accessor :name, :files, :args
 
     def initialize(name = :test)
@@ -28,9 +30,9 @@ module Rake::Funnel::Tasks
         Rake::Funnel::Integration::TeamCity::NUnitPlugin.setup(nunit)
 
         cmd = [
-          *Rake::Funnel::Support::Mono.invocation(nunit),
+          *Mono.invocation(nunit),
           *test_assemblies.all,
-          *Rake::Funnel::Support::Mapper.new(:NUnit).map(args)
+          *Mapper.new(:NUnit).map(args)
         ]
 
         sh(*cmd)
@@ -40,7 +42,7 @@ module Rake::Funnel::Tasks
     end
 
     def test_assemblies
-      Rake::Funnel::Support::Finder.new(files, self, 'No test assemblies found.')
+      Finder.new(files, self, 'No test assemblies found.')
     end
   end
 end

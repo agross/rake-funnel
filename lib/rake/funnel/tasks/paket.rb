@@ -2,6 +2,8 @@ require 'rake/tasklib'
 
 module Rake::Funnel::Tasks
   class Paket < Rake::TaskLib
+    include Rake::Funnel::Support
+
     attr_accessor :name, :paket, :paket_args, :bootstrapper, :bootstrapper_args
 
     def initialize(name = :paket)
@@ -29,11 +31,11 @@ module Rake::Funnel::Tasks
     end
 
     def bootstrapper_cmd
-      Rake::Funnel::Support::Mono.invocation(bootstrapper, bootstrapper_args)
+      Mono.invocation(bootstrapper, bootstrapper_args)
     end
 
     def paket_cmd
-      Rake::Funnel::Support::Mono.invocation(paket, paket_args)
+      Mono.invocation(paket, paket_args)
     end
   end
 end

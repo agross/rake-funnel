@@ -1,42 +1,17 @@
-Dir["#{File.dirname(__FILE__)}/mapper_styles/*.rb"].each do |path|
+Dir[File.join(File.dirname(__FILE__), 'argument_mapper', '*.rb')].each do |path|
   require path
 end
 
 module Rake::Funnel::Support
-  class Switch
-    attr_reader :switch, :values
-
-    def initialize(switch, values)
-      @values = values
-      @switch = switch
-    end
-  end
-
-  class Value
-    attr_reader :key, :value
-
-    def initialize(value)
-      @key = nil
-      @value = value
-    end
-  end
-
-  class KeyValuePair
-    attr_reader :key, :value
-
-    def initialize(key, value)
-      @key = key
-      @value = value
-    end
-  end
-
   class Mapper
+    include Rake::Funnel::Support::ArgumentMapper
+
     def initialize(style = :Default)
-      raise "You cannot use a 'nil' mapper. Available mappers are: #{MapperStyles.constants.sort.join(', ')}" if style.nil?
+      raise "You cannot use a 'nil' mapper. Available mappers are: #{Styles.constants.sort.join(', ')}" if style.nil?
 
       @style = style
       begin
-        @style = MapperStyles.const_get(style).new if style.kind_of?(Symbol)
+        @style = Styles.const_get(style).new if style.kind_of?(Symbol)
       rescue => ex
         raise "Something went wrong while creating the '#{style}' mapper: #{ex}"
       end

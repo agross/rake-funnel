@@ -3,6 +3,8 @@ require 'rake/tasklib'
 
 module Rake::Funnel::Tasks
   class Copy < Rake::TaskLib
+    include Rake::Funnel::Support
+
     attr_accessor :name, :source, :target
 
     def initialize(name = :copy)
@@ -39,7 +41,7 @@ module Rake::Funnel::Tasks
     end
 
     def files
-      Rake::Funnel::Support::Finder.new(source, self, 'No files found.').all_or_default
+      Finder.new(source, self, 'No files found.').all_or_default
     end
 
     def target_path(file)

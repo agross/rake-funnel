@@ -4,6 +4,8 @@ require 'zip'
 
 module Rake::Funnel::Tasks
   class Zip < Rake::TaskLib
+    include Rake::Funnel::Support
+
     attr_accessor :name, :source, :target, :zip_root
 
     def initialize(name = :package)
@@ -38,7 +40,7 @@ module Rake::Funnel::Tasks
     end
 
     def files
-      Rake::Funnel::Support::Finder.new(source, self, 'No files to zip.').all_or_default
+      Finder.new(source, self, 'No files to zip.').all_or_default
     end
 
     def configure_zip

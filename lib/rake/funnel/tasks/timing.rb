@@ -1,18 +1,15 @@
-require 'rake'
 require 'rake/tasklib'
-
-Dir["#{File.dirname(__FILE__)}/timing_support/*.rb"].each do |path|
-  require path
-end
 
 module Rake::Funnel::Tasks
   class Timing < Rake::TaskLib
+    include Rake::Funnel::Support::Timing
+
     attr_accessor :name
     attr_reader :stats
 
     def initialize(name = :timing)
       @name = name
-      @stats = TimingSupport::Statistics.new
+      @stats = Statistics.new
 
       yield self if block_given?
 
@@ -28,7 +25,7 @@ module Rake::Funnel::Tasks
       patches.each { |p| p.apply! }
 
       task @name, :failed do |task, args|
-        TimingSupport::Report.new(@stats, args).render
+        Report.new(@stats, args).render
       end
 
       timing_task = Rake.application.current_scope.path_with_task_name(@name)
@@ -43,7 +40,7 @@ module Rake::Funnel::Tasks
 
     def report
       Rake::Funnel::Support::Patch.new do |p|
-        report_invoker = -> (opts) { TimingSupport::Report.new(@stats, opts).render }
+        report_invoker = -> (opts) { Report.new(@stats, opts).render }
 
         p.setup do
           Rake::Application.class_eval do

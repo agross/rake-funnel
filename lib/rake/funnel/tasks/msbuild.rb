@@ -1,11 +1,10 @@
 require 'rake/tasklib'
 
-Dir["#{File.dirname(__FILE__)}/msbuild_support/*.rb"].each do |path|
-  require path
-end
-
 module Rake::Funnel::Tasks
   class MSBuild < Rake::TaskLib
+    include Rake::Funnel::Support
+    include Rake::Funnel::Support::MSBuild
+
     attr_accessor :name, :project_or_solution, :args, :search_pattern
 
     def initialize(name = :compile)
@@ -18,7 +17,7 @@ module Rake::Funnel::Tasks
     end
 
     def msbuild
-      @_msbuild || MSBuildSupport::BuildTool.find
+      @_msbuild || BuildTool.find
     end
 
     def msbuild=(value)
@@ -26,7 +25,7 @@ module Rake::Funnel::Tasks
     end
 
     def project_or_solution
-      Rake::Funnel::Support::Finder.new(@_project_or_solution || search_pattern, self, 'No projects or more than one project found.')
+      Finder.new(@_project_or_solution || search_pattern, self, 'No projects or more than one project found.')
     end
 
     def project_or_solution=(value)
@@ -40,7 +39,7 @@ module Rake::Funnel::Tasks
         cmd = [
           msbuild,
           project_or_solution.single,
-          *Rake::Funnel::Support::Mapper.new(:MSBuild).map(args)
+          *Mapper.new(:MSBuild).map(args)
         ]
 
         sh(*cmd)

@@ -1,7 +1,7 @@
 include Rake
 include Rake::Funnel
 include Rake::Funnel::Support
-include Rake::Funnel::Tasks::MSBuildSupport
+include Rake::Funnel::Support::MSBuild
 
 describe Rake::Funnel::Tasks::MSBuild do
   before {

@@ -1,12 +1,11 @@
 require 'rake/clean'
 require 'rake/tasklib'
 
-Dir["#{File.dirname(__FILE__)}/msdeploy_support/*.rb"].each do |path|
-  require path
-end
-
 module Rake::Funnel::Tasks
   class MSDeploy < Rake::TaskLib
+    include Rake::Funnel::Support
+    include Rake::Funnel::Support::MSDeploy
+
     attr_accessor :name, :msdeploy, :log_file, :args
 
     def initialize(name = :msdeploy)
@@ -28,12 +27,12 @@ module Rake::Funnel::Tasks
 
       desc "Deploy #{deploy_source(args)}"
       task @name do
-        mapper = Rake::Funnel::Support::Mapper.new(:MSDeploy)
+        mapper = Mapper.new(:MSDeploy)
         cmd = [quote(msdeploy), mapper.map(args)]
           .flatten
           .join(' ')
 
-        MSDeploySupport::RegistryPatch.new do
+        RegistryPatch.new do
           shell(cmd, log_file: log_file, error_lines: /^(error|[\w\.]*exception)/i)
         end
       end

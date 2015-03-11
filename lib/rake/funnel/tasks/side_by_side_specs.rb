@@ -1,11 +1,9 @@
 require 'rake/tasklib'
 
-Dir["#{File.dirname(__FILE__)}/side_by_side_specs_support/*.rb"].each do |path|
-  require path
-end
-
 module Rake::Funnel::Tasks
   class SideBySideSpecs < Rake::TaskLib
+    include Rake::Funnel::Support::SideBySideSpecs
+
     attr_accessor :name, :projects, :references, :specs, :enabled
 
     def initialize(name = :compile)
@@ -24,7 +22,7 @@ module Rake::Funnel::Tasks
     def define
       task name do
         next unless enabled
-        SideBySideSpecsSupport::Remover.remove({ projects: projects, references: references, specs: specs })
+        Remover.remove({ projects: projects, references: references, specs: specs })
       end
 
       self
