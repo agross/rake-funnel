@@ -17,6 +17,10 @@ module Rake::Funnel::Support
         })
       end
 
+      def read_version_from(file)
+        File.open(file, &:readline).strip
+      end
+
       private
       def default_version(context)
         context[:version] || '0'
