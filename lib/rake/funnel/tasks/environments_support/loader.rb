@@ -4,8 +4,8 @@ require 'yaml'
 module Rake::Funnel::Tasks::EnvironmentsSupport
   class Loader
     class << self
-      def load_configuration(config, store = configatron)
-        log("Configuring for #{config[:name]}")
+      def load_configuration(config, store = configatron, customizer = nil)
+        Rake.rake_output_message("Configuring for #{config[:name]}")
         store.unlock!
         store.reset!
 
@@ -13,7 +13,7 @@ module Rake::Funnel::Tasks::EnvironmentsSupport
 
         operation = 'Loading'
         config.fetch(:config_files, []).each do |file|
-          log("#{operation} #{file}")
+          Rake.rake_output_message("#{operation} #{file}")
           operation = 'Merging'
 
           yaml = File.read(file)
@@ -22,21 +22,18 @@ module Rake::Funnel::Tasks::EnvironmentsSupport
           store.configure_from_hash(yaml)
         end
 
+        customizer.call(store) if customizer && customizer.respond_to?(:call)
+
         store.lock!
 
-        log('')
-        log(store.inspect)
+        Rake.rake_output_message('')
+        Rake.rake_output_message(store.inspect)
       end
 
       def evaluate_erb(yaml, filename)
         render = ERB.new(yaml)
         render.filename = filename
         render.result
-      end
-
-      private
-      def log(message)
-        Rake.rake_output_message(message)
       end
     end
   end

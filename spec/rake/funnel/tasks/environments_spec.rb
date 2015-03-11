@@ -9,6 +9,14 @@ describe Rake::Funnel::Tasks::Environments do
     Task.clear
   }
 
+  before {
+    module Kernel
+      def configatron
+        OpenStruct.new(name: 'fake configatron singleton')
+      end
+    end
+  }
+
   let(:files) { [] }
 
   before {
@@ -28,6 +36,7 @@ describe Rake::Funnel::Tasks::Environments do
     its(:default_env) { should be_nil }
     its(:default_config) { should == 'default' }
     its(:local_config) { should == 'local' }
+    its(:customizer) { should be_nil }
 
     describe 'overriding defaults' do
       subject {
@@ -36,6 +45,7 @@ describe Rake::Funnel::Tasks::Environments do
           t.default_env = 'custom default_env'
           t.default_config = 'custom default_config'
           t.local_config = 'custom local_config'
+          t.customizer = Proc.new {}
         end
       }
 
@@ -43,6 +53,7 @@ describe Rake::Funnel::Tasks::Environments do
       its(:default_env) { should == subject.default_env }
       its(:default_config) { should == subject.default_config }
       its(:local_config) { should == subject.local_config }
+      its(:customizer) { should be_instance_of(Proc) }
     end
   end
 
@@ -102,7 +113,7 @@ describe Rake::Funnel::Tasks::Environments do
 
       it 'should load all files' do
         expect(EnvironmentsSupport::Loader)
-          .to have_received(:load_configuration).with(hash_including({ config_files: %w(config/default.yaml config/dev.yaml config/local.yaml) }))
+          .to have_received(:load_configuration).with(hash_including({ config_files: %w(config/default.yaml config/dev.yaml config/local.yaml) }), any_args)
       end
     end
 
@@ -111,7 +122,7 @@ describe Rake::Funnel::Tasks::Environments do
 
       it 'should load environment file and local file' do
         expect(EnvironmentsSupport::Loader)
-          .to have_received(:load_configuration).with(hash_including({ config_files: %w(config/dev.yaml config/local.yaml) }))
+          .to have_received(:load_configuration).with(hash_including({ config_files: %w(config/dev.yaml config/local.yaml) }), any_args)
       end
     end
 
@@ -120,8 +131,53 @@ describe Rake::Funnel::Tasks::Environments do
 
       it 'should load default file and environment file' do
         expect(EnvironmentsSupport::Loader)
-          .to have_received(:load_configuration).with(hash_including({ config_files: %w(config/default.yaml config/dev.yaml) }))
+          .to have_received(:load_configuration).with(hash_including({ config_files: %w(config/default.yaml config/dev.yaml) }), any_args)
       end
+    end
+  end
+
+  describe 'store' do
+    let(:files) {
+      %w(config/dev.yaml)
+    }
+
+    before {
+      allow(EnvironmentsSupport::Loader).to receive(:load_configuration)
+    }
+
+    before {
+      expect(subject).to be
+      Task['dev'].invoke
+    }
+
+    it 'should store configuration in configatron singleton' do
+      expect(EnvironmentsSupport::Loader).to have_received(:load_configuration).with(anything, configatron, any_args)
+    end
+  end
+
+  describe 'customization' do
+    let(:customizer) { Proc.new {} }
+    let(:files) {
+      %w(config/dev.yaml)
+    }
+
+    subject {
+      described_class.new do |t|
+        t.customizer = customizer
+      end
+    }
+
+    before {
+      allow(EnvironmentsSupport::Loader).to receive(:load_configuration)
+    }
+
+    before {
+      expect(subject).to be
+      Task['dev'].invoke
+    }
+
+    it 'should pass customizer to loader' do
+      expect(EnvironmentsSupport::Loader).to have_received(:load_configuration).with(anything, anything, customizer)
     end
   end
 
@@ -164,12 +220,12 @@ describe Rake::Funnel::Tasks::Environments do
 
         it 'should invoke default environment task' do
           expect(EnvironmentsSupport::Loader)
-            .to have_received(:load_configuration).with(hash_including({ name: 'dev' }))
+            .to have_received(:load_configuration).with(hash_including({ name: 'dev' }), any_args)
         end
 
         it 'should not invoke other environment tasks' do
           expect(EnvironmentsSupport::Loader)
-            .not_to have_received(:load_configuration).with(hash_including({ name: 'production' }))
+            .not_to have_received(:load_configuration).with(hash_including({ name: 'production' }), any_args)
         end
       end
 
@@ -178,12 +234,12 @@ describe Rake::Funnel::Tasks::Environments do
 
         it 'should invoke user-defined environment task' do
           expect(EnvironmentsSupport::Loader)
-            .to have_received(:load_configuration).with(hash_including({ name: 'production' }))
+            .to have_received(:load_configuration).with(hash_including({ name: 'production' }), any_args)
         end
 
         it 'should not invoke other environment tasks' do
           expect(EnvironmentsSupport::Loader)
-            .not_to have_received(:load_configuration).with(hash_including({ name: 'dev' }))
+            .not_to have_received(:load_configuration).with(hash_including({ name: 'dev' }), any_args)
         end
       end
 
@@ -208,12 +264,12 @@ describe Rake::Funnel::Tasks::Environments do
 
             it 'should invoke default environment task' do
               expect(EnvironmentsSupport::Loader)
-                .to have_received(:load_configuration).with(hash_including({ name: 'dev' }))
+                .to have_received(:load_configuration).with(hash_including({ name: 'dev' }), any_args)
             end
 
             it 'should not invoke other environment tasks' do
               expect(EnvironmentsSupport::Loader)
-                .not_to have_received(:load_configuration).with(hash_including({ name: 'production' }))
+                .not_to have_received(:load_configuration).with(hash_including({ name: 'production' }), any_args)
             end
           end
 
@@ -222,12 +278,12 @@ describe Rake::Funnel::Tasks::Environments do
 
             it 'should invoke user-defined environment task' do
               expect(EnvironmentsSupport::Loader)
-                .to have_received(:load_configuration).with(hash_including({ name: 'production' }))
+                .to have_received(:load_configuration).with(hash_including({ name: 'production' }), any_args)
             end
 
             it 'should not invoke other environment tasks' do
               expect(EnvironmentsSupport::Loader)
-                .not_to have_received(:load_configuration).with(hash_including({ name: 'dev' }))
+                .not_to have_received(:load_configuration).with(hash_including({ name: 'dev' }), any_args)
             end
           end
         end

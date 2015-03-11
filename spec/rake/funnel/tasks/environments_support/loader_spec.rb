@@ -3,6 +3,8 @@ describe Rake::Funnel::Tasks::EnvironmentsSupport::Loader do
     double(Configatron::Store).as_null_object
   }
 
+  let(:customizer) { nil }
+
   let(:config) {
     {
       name: 'environment name',
@@ -27,7 +29,7 @@ describe Rake::Funnel::Tasks::EnvironmentsSupport::Loader do
     }
 
     before {
-      described_class.load_configuration(config, store)
+      described_class.load_configuration(config, store, customizer)
     }
 
     it 'should reinitialize the configatron store' do
@@ -52,6 +54,14 @@ describe Rake::Funnel::Tasks::EnvironmentsSupport::Loader do
 
     it 'should lock the store' do
       expect(store).to have_received(:lock!)
+    end
+
+    describe 'customization' do
+      let(:customizer) { double(Proc).as_null_object }
+
+      it 'should run the customizer' do
+        expect(customizer).to have_received(:call).with(store)
+      end
     end
 
     context 'config file with overriding values' do

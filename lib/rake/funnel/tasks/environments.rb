@@ -6,7 +6,7 @@ end
 
 module Rake::Funnel::Tasks
   class Environments < Rake::TaskLib
-    attr_accessor :base_dir, :default_env, :default_config, :local_config
+    attr_accessor :base_dir, :default_env, :default_config, :local_config, :customizer
 
     def initialize
       @default_env = nil
@@ -26,7 +26,7 @@ module Rake::Funnel::Tasks
       environments.each do |env|
         desc "Configure for the #{env[:name]} environment"
         task env[:name] do
-          EnvironmentsSupport::Loader.load_configuration(env)
+          EnvironmentsSupport::Loader.load_configuration(env, configatron, customizer)
         end
       end
     end
