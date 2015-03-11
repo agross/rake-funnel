@@ -66,7 +66,7 @@ describe Rake::Funnel::Support::InstantiateSymbol do
     end
 
     context 'multiple uses' do
-     subject {
+      subject {
         [
           ExplicitModuleDefinition.new,
           ImplicitModuleDefinition.new
@@ -131,6 +131,52 @@ describe Rake::Funnel::Support::InstantiateSymbol do
     context 'instantiation succeeds' do
       it 'should return instance' do
         expect(subject.send(:create, :One)).to be_an_instance_of(Creatable::One)
+      end
+    end
+
+    describe 'args' do
+      module CreatableWithArgs
+        class None
+          def initialize
+          end
+        end
+
+        class Single
+          def initialize(arg)
+          end
+        end
+
+        class Multiple
+          def initialize(arg1, arg2)
+          end
+        end
+      end
+
+      class WithArgs
+        include Rake::Funnel::Support::InstantiateSymbol
+        instantiate CreatableWithArgs
+      end
+
+      subject {
+        WithArgs.new
+      }
+
+      context 'no argument' do
+        it 'should not pass arg' do
+          expect(subject.send(:create, :None)).to be_an_instance_of(CreatableWithArgs::None)
+        end
+      end
+
+      context 'single argument' do
+        it 'should pass arg' do
+          expect(subject.send(:create, :Single, 1)).to be_an_instance_of(CreatableWithArgs::Single)
+        end
+      end
+
+      context 'multiple argument' do
+        it 'should pass args' do
+          expect(subject.send(:create, :Multiple, 1, 2)).to be_an_instance_of(CreatableWithArgs::Multiple)
+        end
       end
     end
   end

@@ -15,7 +15,7 @@ module Rake::Funnel::Support
     end
 
     private
-    def create(sym)
+    def create(sym, *args)
       return sym unless sym.kind_of?(Symbol)
 
       begin
@@ -24,7 +24,7 @@ module Rake::Funnel::Support
         raise NameError, "Unknown type to instantiate: #{sym.inspect}. Available types are: #{available.inspect}"
       end
 
-      type.new
+      type.new(*args)
     end
 
     def available
