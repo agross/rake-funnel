@@ -156,34 +156,15 @@ describe Rake::Funnel::Support::VersionInfo do
       let(:parsed) { described_class.parse(spec[:context]) }
 
       it "should generate assembly version #{spec[:expected][:assembly_version]}" do
-        expect(parsed[:assembly_version]).to eq(spec[:expected][:assembly_version])
+        expect(parsed.assembly_version).to eq(spec[:expected][:assembly_version])
       end
 
       it "should generate assembly file version #{spec[:expected][:assembly_file_version]}" do
-        expect(parsed[:assembly_file_version]).to eq(spec[:expected][:assembly_file_version])
+        expect(parsed.assembly_file_version).to eq(spec[:expected][:assembly_file_version])
       end
 
       it "should generate assembly informational version #{spec[:expected][:assembly_informational_version]}" do
-        expect(parsed[:assembly_informational_version]).to eq(spec[:expected][:assembly_informational_version])
-      end
-    end
-  end
-
-  context 'reading version from file' do
-    let(:file) { 'file with version info' }
-    let(:contents) { <<-EOF
-  first line with expected version number
-other crap
-      EOF
-    }
-
-    it 'should read the first line with whitespace removed' do
-      Dir.mktmpdir do |tmp|
-        Dir.chdir(tmp) do
-
-          File.write(file, contents)
-          expect(described_class.read_version_from(file)).to eq('first line with expected version number')
-        end
+        expect(parsed.assembly_informational_version).to eq(spec[:expected][:assembly_informational_version])
       end
     end
   end

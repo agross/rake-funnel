@@ -1,16 +1,20 @@
 module Rake::Funnel::Support
   class VersionInfo
+    attr_reader :assembly_version, :assembly_file_version, :assembly_informational_version
+
+    def initialize(args = {})
+      @assembly_version = args[:assembly_version]
+      @assembly_file_version = args[:assembly_file_version]
+      @assembly_informational_version = args[:assembly_informational_version]
+    end
+
     class << self
       def parse(context)
-        {
+        VersionInfo.new({
           assembly_version: assembly_version(context),
           assembly_file_version: assembly_file_version(context),
           assembly_informational_version: assembly_informational_version(context)
-        }
-      end
-
-      def read_version_from(file)
-        File.open(file, &:readline).strip
+        })
       end
 
       private
