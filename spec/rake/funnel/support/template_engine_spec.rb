@@ -41,7 +41,7 @@ describe Rake::Funnel::Support::TemplateEngine do
         var = 42
         template = '<%= var %>'
 
-        expect(lambda { described_class.render(template) }).to raise_error
+        expect { described_class.render(template) }.to raise_error
       end
     end
 
@@ -59,7 +59,7 @@ describe Rake::Funnel::Support::TemplateEngine do
   end
 
   it 'should report errors with file name' do
-    expect(lambda { described_class.render('<%= undefined %>', 'file.template') })
+    expect { described_class.render('<%= undefined %>', 'file.template') }
       .to raise_error { |ex| expect(ex.backtrace.join("\n")).to match(/file\.template/) }
   end
 end

@@ -50,7 +50,7 @@ describe Rake::Funnel::Tasks::Zip do
         let(:target) { nil }
 
         it 'should fail' do
-          expect(lambda { Task[subject.name].invoke }).to raise_error(/Target not defined/)
+          expect { Task[subject.name].invoke }.to raise_error(/Target not defined/)
         end
       end
     end

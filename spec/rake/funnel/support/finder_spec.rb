@@ -112,7 +112,7 @@ describe Rake::Funnel::Support::Finder do
     context 'no matching files' do
       it 'should fail' do
         Dir.chdir(temp_dir) do
-          expect(lambda { subject.single }).to raise_error(AmbiguousFileError, /error message/)
+          expect { subject.single }.to raise_error(AmbiguousFileError, /error message/)
         end
       end
     end
@@ -122,7 +122,7 @@ describe Rake::Funnel::Support::Finder do
 
       it 'should fail' do
         Dir.chdir(temp_dir) do
-          expect(lambda { subject.single }).to raise_error(AmbiguousFileError, /error message/)
+          expect { subject.single }.to raise_error(AmbiguousFileError, /error message/)
         end
       end
     end
@@ -171,7 +171,7 @@ describe Rake::Funnel::Support::Finder do
   describe '#all' do
     context 'no matching files' do
       it 'should fail' do
-        expect(lambda { subject.all }).to raise_error(AmbiguousFileError, /error message/)
+        expect { subject.all }.to raise_error(AmbiguousFileError, /error message/)
       end
     end
 

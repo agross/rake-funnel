@@ -11,7 +11,7 @@ describe Rake::Funnel::Support::MSDeploy::RegistryPatch do
     end
 
     it 'should work without block' do
-      expect(lambda { described_class.new }).not_to raise_error
+      expect { described_class.new }.not_to raise_error
     end
   end
 
@@ -22,7 +22,7 @@ describe Rake::Funnel::Support::MSDeploy::RegistryPatch do
       }
 
       it 'should succeed' do
-        expect(lambda { described_class.new }).not_to raise_error
+        expect { described_class.new }.not_to raise_error
       end
     end
 

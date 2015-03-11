@@ -154,7 +154,7 @@ describe Rake::Funnel::Tasks::Paket do
             }
 
             it 'should fail' do
-              expect(lambda { Task[subject.name].invoke }).to raise_error
+              expect { Task[subject.name].invoke }.to raise_error
             end
           end
         end
@@ -174,7 +174,7 @@ describe Rake::Funnel::Tasks::Paket do
             end
 
             it 'should fail' do
-              expect(lambda { Task[subject.name].invoke }).to raise_error
+              expect { Task[subject.name].invoke }.to raise_error
             end
           end
         end

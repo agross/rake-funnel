@@ -135,7 +135,7 @@ describe Rake::Funnel::Support::Environments::Loader do
       }
 
       it 'should report file name' do
-        expect(lambda { described_class.load_configuration(config, store) })
+        expect { described_class.load_configuration(config, store) }
           .to raise_error { |ex| expect(ex.backtrace.join("\n")).to match(/with_erb/) }
       end
     end
