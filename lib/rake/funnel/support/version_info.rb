@@ -10,7 +10,7 @@ module Rake::Funnel::Support
     end
 
     def each(&block)
-      to_h.each(&block)
+      each_pair(&block)
     end
 
     class << self
