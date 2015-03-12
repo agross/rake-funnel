@@ -15,9 +15,9 @@ Tasks::MSDeploy.new :push => [:bin_path, :gem] do |t|
       file_path: gem
     },
     dest: {
-      computer_name: configatron.deployment.computer_name,
-      username: configatron.deployment.username,
-      password: configatron.deployment.password,
+      computer_name: configatron.deployment.connection.computer_name,
+      username: configatron.deployment.connection.username,
+      password: configatron.deployment.connection.password,
       file_path: File.join(configatron.deployment.remote_dir, 'gems', File.basename(gem))
     },
     skip: [{ skip_action: :delete }],
