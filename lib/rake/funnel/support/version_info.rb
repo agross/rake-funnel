@@ -1,20 +1,25 @@
-module Rake::Funnel::Support
-  class VersionInfo
-    attr_reader :assembly_version, :assembly_file_version, :assembly_informational_version
+require 'ostruct'
 
-    def initialize(args = {})
-      @assembly_version = args[:assembly_version]
-      @assembly_file_version = args[:assembly_file_version]
-      @assembly_informational_version = args[:assembly_informational_version]
+module Rake::Funnel::Support
+  class VersionInfo < OpenStruct
+    include Enumerable
+
+    def initialize(hash = nil)
+      super(hash)
+      freeze
+    end
+
+    def each(&block)
+      to_h.each(&block)
     end
 
     class << self
       def parse(context)
         VersionInfo.new({
-          assembly_version: assembly_version(context),
-          assembly_file_version: assembly_file_version(context),
-          assembly_informational_version: assembly_informational_version(context)
-        })
+            assembly_version: assembly_version(context),
+            assembly_file_version: assembly_file_version(context),
+            assembly_informational_version: assembly_informational_version(context)
+          })
       end
 
       def read_version_from(file)
