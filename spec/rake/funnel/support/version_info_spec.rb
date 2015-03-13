@@ -173,9 +173,10 @@ describe Rake::Funnel::Support::VersionInfo do
   end
 
   describe 'enumerable' do
-    it 'should be enumerable' do
-      expect(described_class < Enumerable).to eq(true)
-      expect(subject.respond_to?(:each)).to eq(true)
+    it { is_expected.to be_kind_of(Enumerable) }
+    it { is_expected.to respond_to(:each) }
+
+    it 'should yield enumerator' do
       expect(subject.each).to be_kind_of(Enumerator)
     end
 
