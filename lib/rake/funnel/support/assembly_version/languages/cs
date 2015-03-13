@@ -1,0 +1,5 @@
+using System.Reflection;
+
+<% version_info.each do |key, value| %>
+[assembly: <%= key.pascalize %>("<%= value %>")]
+<% end %>

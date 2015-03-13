@@ -1,0 +1,12 @@
+namespace System
+open System.Reflection
+
+<% version_info.each do |key, value| %>
+[<assembly: <%= key.pascalize %>("<%= value %>")>]
+<% end %>
+do ()
+
+<% if version_info.assembly_file_version %>
+module internal AssemblyVersionInformation =
+  let [<Literal>] Version = "<%= version_info.assembly_file_version %>"
+<% end %>
