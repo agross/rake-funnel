@@ -21,18 +21,14 @@ module Rake::Funnel::Integration::TeamCity
 
       def read_version(executable)
         nunit = Rake::Funnel::Support::Which.which(executable) || return
-        binary = File.read(nunit)
+        version = BinaryVersionReader.read_from(nunit)
 
-        version = binary.match(/F\0i\0l\0e\0V\0e\0r\0s\0i\0o\0n\0*(.*?)\0\0\0/)
-        if version.nil?
+        unless version.file_version
           Rake.rake_output_message("Could read version from NUnit executable in #{nunit}")
           return
         end
 
-        [
-          nunit,
-          version[1].gsub(/\0/, '').split('.').take(3).join('.')
-        ]
+        [nunit, version.file_version.split('.').take(3).join('.')]
       end
 
       def find_teamcity_addins(addins, version)

@@ -1,29 +1,24 @@
 include Rake::Funnel::Support
 
 describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
-  let(:env_var) { nil }
-  let(:which) { nil }
-  let(:nunit_exe_contents) { nil }
-
   before {
     allow(ENV).to receive(:[]).with(described_class::ENV_VAR).and_return(env_var)
     allow(Which).to receive(:which).and_return(which)
-    allow(File).to receive(:read).with(which).and_return(nunit_exe_contents)
     allow(Dir).to receive(:glob).and_return([])
     allow(RakeFileUtils).to receive(:mkdir_p)
     allow(Rake).to receive(:rake_output_message)
   }
 
-  def binary_version(*version_parts)
-    version = version_parts.map { |p| p.to_s + "\0" }.join(".\0")
-    "F\0i\0l\0e\0V\0e\0r\0s\0i\0o\0n" + "\0" * 3 + version + "\0" * 3
-  end
+  before {
+    allow(BinaryVersionReader).to receive(:read_from).with(which).and_return(nunit_version)
+  }
 
   describe 'success' do
     let(:env_var) { '/path/to/nunit plugins/nunit' }
     let(:addin_dlls) { [env_var + 'addin.dll'] }
     let(:which) { 'path/to/nunit-console.exe' }
-    let(:nunit_exe_contents) { "binary #{binary_version(1, 2, 3, 4)} binary" }
+    let(:nunit_version) { VersionInfo.new({ file_version: '1.2.3.4' }) }
+    let(:plugin_version) { nunit_version.file_version.split('.').take(3).join('.') }
 
     before {
       allow(Dir).to receive(:glob).and_return(addin_dlls)
@@ -39,7 +34,7 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
     end
 
     it 'should enumerate addin files' do
-      expect(Dir).to have_received(:glob).with(/#{Regexp.escape(env_var + '-1.2.3.*')}$/)
+      expect(Dir).to have_received(:glob).with(/#{Regexp.escape("#{env_var}-#{plugin_version}\.*")}$/)
     end
 
     it 'should copy the addin from TeamCity to NUnit' do
@@ -47,7 +42,7 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
     end
 
     it 'should report that the addin is installed' do
-      expect(Rake).to have_received(:rake_output_message).with("Installing TeamCity NUnit addin for version 1.2.3 in #{which}")
+      expect(Rake).to have_received(:rake_output_message).with("Installing TeamCity NUnit addin for version #{plugin_version} in #{which}")
     end
 
     context 'Windows-style path in environment variable', platform: :win32 do
@@ -60,6 +55,10 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
   end
 
   describe 'failures' do
+    let(:env_var) { nil }
+    let(:which) { nil }
+    let(:nunit_version) { VersionInfo.new }
+
     before {
       described_class.setup('nunit-console.exe')
     }
@@ -67,8 +66,8 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
     context 'TeamCity plugin path not in environment' do
       let(:env_var) { nil }
 
-      it 'should skip' do
-        expect(File).to_not have_received(:read)
+      it 'should skip reading the version' do
+        expect(BinaryVersionReader).to_not have_received(:read_from)
       end
     end
 
@@ -76,15 +75,14 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
       let(:env_var) { '/path/to/nunit plugins/nunit' }
       let(:which) { nil }
 
-      it 'should skip' do
-        expect(File).to_not have_received(:read)
+      it 'should skip reading the version' do
+        expect(BinaryVersionReader).to_not have_received(:read_from)
       end
     end
 
     context 'NUnit executable without version' do
       let(:env_var) { '/path/to/nunit plugins/nunit' }
       let(:which) { 'path/to/nunit-console.exe' }
-      let(:nunit_exe_contents) { 'version number not available ' }
 
       it 'should report that the version could not be read' do
         expect(Rake).to have_received(:rake_output_message).with("Could read version from NUnit executable in #{which}")
@@ -98,7 +96,7 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
     context 'plugin for NUnit version not available' do
       let(:env_var) { '/path/to/nunit plugins/nunit' }
       let(:which) { 'path/to/nunit-console.exe' }
-      let(:nunit_exe_contents) { binary_version(1, 2, 3, 4) }
+      let(:nunit_version) { VersionInfo.new({ file_version: '1.2.3.4' }) }
 
       it 'should report that the addin version is not available' do
         expect(Rake).to have_received(:rake_output_message).with(/Could not find TeamCity NUnit addin for version 1\.2\.3 in .*#{env_var}$/)
