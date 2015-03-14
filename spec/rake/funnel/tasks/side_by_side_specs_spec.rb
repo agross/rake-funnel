@@ -2,7 +2,6 @@ require 'tmpdir'
 
 include Rake
 include Rake::Funnel::Support
-include Rake::Funnel::Support::SideBySideSpecs
 
 describe Rake::Funnel::Tasks::SideBySideSpecs do
   before {
@@ -28,7 +27,7 @@ describe Rake::Funnel::Tasks::SideBySideSpecs do
     }
 
     before {
-      allow(Remover).to receive(:remove)
+      allow(SpecsRemover).to receive(:remove)
     }
 
     before {
@@ -39,7 +38,7 @@ describe Rake::Funnel::Tasks::SideBySideSpecs do
       let(:enabled) { true }
 
       it 'should use remover' do
-        expect(Remover).to have_received(:remove)
+        expect(SpecsRemover).to have_received(:remove)
             .with({
                 projects: subject.projects,
                 references: subject.references,
@@ -52,7 +51,7 @@ describe Rake::Funnel::Tasks::SideBySideSpecs do
       let(:enabled) { false }
 
       it 'should do nothing' do
-        expect(Remover).not_to have_received(:remove)
+        expect(SpecsRemover).not_to have_received(:remove)
       end
     end
   end

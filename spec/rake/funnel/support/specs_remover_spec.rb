@@ -1,4 +1,4 @@
-describe Rake::Funnel::Support::SideBySideSpecs::Remover do
+describe Rake::Funnel::Support::SpecsRemover do
   describe 'removal' do
     let(:projects) { [] }
     let(:references) { [] }
@@ -66,7 +66,7 @@ describe Rake::Funnel::Support::SideBySideSpecs::Remover do
     let(:temp_dir) { Dir.mktmpdir }
 
     before {
-      FileUtils.cp_r(File.join(File.dirname(__FILE__), 'example/.'), temp_dir)
+      FileUtils.cp_r(File.join(File.dirname(__FILE__), 'specs_remover/.'), temp_dir)
     }
 
     before {

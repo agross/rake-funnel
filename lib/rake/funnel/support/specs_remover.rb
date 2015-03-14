@@ -1,7 +1,7 @@
 require 'rexml/document'
 
-module Rake::Funnel::Support::SideBySideSpecs
-  class Remover
+module Rake::Funnel::Support
+  class SpecsRemover
     class << self
       DEFAULTS = {
         projects: [],
