@@ -4,17 +4,24 @@ module Rake::Funnel::Tasks
   class BinPath < Rake::TaskLib
     attr_accessor :name, :search_pattern
 
-    def initialize(name = :bin_path)
-      @name = name
-      @search_pattern = %w(tools/* tools/*/bin packages/**/tools)
+    def initialize(*args, &task_block)
+      setup_ivars(args)
 
-      yield self if block_given?
-      define
+      define(args, &task_block)
     end
 
     private
-    def define
-      task @name do
+    def setup_ivars(args)
+      @name = args.shift || :bin_path
+      @search_pattern = %w(tools/* tools/*/bin packages/**/tools)
+    end
+
+    def define(args, &task_block)
+      desc 'Add local binaries to PATH environment variable' unless Rake.application.last_description
+
+      task(name, *args) do |_, task_args|
+        task_block.call(*[self, task_args].slice(0, task_block.arity)) if task_block
+
         Rake.rake_output_message 'Added the following paths to the PATH environment variable:'
         add_pattern_to_path_environment.each do |p|
           Rake.rake_output_message "  - #{p}"
@@ -25,10 +32,10 @@ module Rake::Funnel::Tasks
     end
 
     def add_pattern_to_path_environment
-      bin_paths = Dir[*@search_pattern].map { |path| File.expand_path(path) }.sort
+      paths = Dir[*search_pattern].map { |path| File.expand_path(path) }.sort
 
-      ENV['PATH'] = ([] << bin_paths << ENV['PATH']).flatten.join(File::PATH_SEPARATOR)
-      bin_paths
+      ENV['PATH'] = ([] << paths << ENV['PATH']).flatten.join(File::PATH_SEPARATOR)
+      paths
     end
   end
 end

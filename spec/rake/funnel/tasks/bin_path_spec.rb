@@ -3,7 +3,6 @@ include Rake
 describe Rake::Funnel::Tasks::BinPath do
   before {
     Task.clear
-    expect(subject).to be
   }
 
   describe 'defaults' do
@@ -12,24 +11,37 @@ describe Rake::Funnel::Tasks::BinPath do
   end
 
   describe 'execution' do
+    let(:default_path) { 'default PATH contents' }
+    let(:search_pattern) { %w(foo bar) }
+
     before {
-      allow(ENV).to receive(:[]).with('PATH').and_return('default PATH contents')
+      allow(ENV).to receive(:[]).with('PATH').and_return(default_path)
       allow(ENV).to receive(:[]=)
       allow(Rake).to receive(:rake_output_message)
     }
 
     before {
-      subject.search_pattern = %w(foo bar)
+      allow(Dir).to receive(:[]).with(*search_pattern).and_return(search_pattern)
+    }
 
-      allow(Dir).to receive(:[]).with(*subject.search_pattern).and_return(subject.search_pattern)
+    subject {
+      described_class.new do |t|
+        t.search_pattern = search_pattern
+      end
+    }
 
-      Task[:bin_path].invoke
+    before {
+      Task[subject.name].invoke
     }
 
     it 'should prepend sorted matching folders to the PATH environment variable' do
-      paths = subject.search_pattern.sort.map { |path| File.expand_path(path) } << ENV['PATH']
+      paths = search_pattern.map { |path| File.expand_path(path) }.sort.join(File::PATH_SEPARATOR)
 
-      expect(ENV).to have_received(:[]=).with('PATH', paths.join(File::PATH_SEPARATOR))
+      expect(ENV).to have_received(:[]=).with('PATH',/^#{paths}/)
+    end
+
+    it 'should append original PATH environment variable' do
+      expect(ENV).to have_received(:[]=).with('PATH', /#{default_path}$/)
     end
 
     it 'should report added paths' do
