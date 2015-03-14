@@ -15,18 +15,6 @@ describe Rake::Funnel::Tasks::NUnit do
     its(:files) { should == %w(build/specs/**/*.dll build/specs/**/*.exe) }
   end
 
-  describe 'overriding defaults' do
-    context 'when NUnit executable is specified' do
-      subject {
-        described_class.new do |t|
-          t.nunit = 'custom nunit.exe'
-        end
-      }
-
-      its(:nunit) { should == 'custom nunit.exe' }
-    end
-  end
-
   describe 'execution' do
     let(:args) { {} }
 
@@ -40,7 +28,7 @@ describe Rake::Funnel::Tasks::NUnit do
       allow(Finder).to receive(:new).and_return(finder)
       allow(NUnitPlugin).to receive(:setup)
 
-      allow(Mono).to receive(:invocation).and_wrap_original do |original_method, *args, &block|
+      allow(Mono).to receive(:invocation).and_wrap_original do |_original_method, *args, &_block|
         args.compact
       end
     }
@@ -71,6 +59,16 @@ describe Rake::Funnel::Tasks::NUnit do
 
     it 'should run with sh' do
       expect(subject).to have_received(:sh)
+    end
+
+    context 'with custom NUnit executable' do
+      subject {
+        described_class.new do |t|
+          t.nunit = 'custom nunit.exe'
+        end
+      }
+
+      its(:nunit) { should == 'custom nunit.exe' }
     end
   end
 end
