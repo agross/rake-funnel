@@ -5,41 +5,41 @@ module Rake::Funnel::Tasks
     include Rake::Funnel::Support
     include Rake::Funnel::Support::MSBuild
 
-    attr_accessor :name, :project_or_solution, :args, :search_pattern
+    attr_accessor :name, :msbuild, :project_or_solution, :args, :search_pattern
 
-    def initialize(name = :compile)
-      @name = name
-      @args = {}
-      @search_pattern = %w(**/*.sln)
+    def initialize(*args, &task_block)
+      setup_ivars(args)
 
-      yield self if block_given?
-      define
-    end
-
-    def msbuild
-      @_msbuild || BuildTool.find
-    end
-
-    def msbuild=(value)
-      @_msbuild = value
+      define(args, &task_block)
     end
 
     def project_or_solution
-      Finder.new(@_project_or_solution || search_pattern, self, 'No projects or more than one project found.')
+      Finder.new(@project_or_solution || search_pattern, self, 'No projects or more than one project found.')
     end
 
     def project_or_solution=(value)
-      @_project_or_solution = value
+      @project_or_solution = value
     end
 
     private
-    def define
-      desc "Compile #{project_or_solution.single_or_default}"
-      task @name do
+    def setup_ivars(args)
+      @name = args.shift || :compile
+
+      @msbuild = BuildTool.find
+      @args = {}
+      @search_pattern = %w(**/*.sln)
+    end
+
+    def define(args, &task_block)
+      desc 'Compile MSBuild projects' unless Rake.application.last_description
+
+      task(name, *args) do |_, task_args|
+        task_block.call(*[self, task_args].slice(0, task_block.arity)) if task_block
+
         cmd = [
           msbuild,
           project_or_solution.single,
-          *Mapper.new(:MSBuild).map(args)
+          *Mapper.new(:MSBuild).map(@args)
         ]
 
         sh(*cmd)

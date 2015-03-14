@@ -25,36 +25,6 @@ describe Rake::Funnel::Tasks::MSBuild do
     end
   end
 
-  describe 'overriding defaults' do
-    context 'when msbuild executable is specified' do
-      subject {
-        described_class.new do |t|
-          t.msbuild = 'custom build tool.exe'
-        end
-      }
-
-      its(:msbuild) { should == 'custom build tool.exe' }
-    end
-
-    context 'when project or solution is specified' do
-      before {
-        allow(Finder).to receive(:new).and_call_original
-      }
-
-      subject {
-        described_class.new do |t|
-          t.project_or_solution = 'project.sln'
-        end
-      }
-
-      its(:project_or_solution) { should be_instance_of(Finder) }
-
-      it 'should set project or solution' do
-        expect(Finder).to have_received(:new).with('project.sln', subject, 'No projects or more than one project found.')
-      end
-    end
-  end
-
   describe 'execution' do
     let(:args) { {} }
 
@@ -86,6 +56,36 @@ describe Rake::Funnel::Tasks::MSBuild do
 
     it 'should run with sh' do
       expect(subject).to have_received(:sh)
+    end
+
+    describe 'overriding defaults' do
+      context 'when msbuild executable is specified' do
+        subject {
+          described_class.new do |t|
+            t.msbuild = 'custom build tool.exe'
+          end
+        }
+
+        its(:msbuild) { should == 'custom build tool.exe' }
+      end
+
+      context 'when project or solution is specified' do
+        before {
+          allow(Finder).to receive(:new).and_call_original
+        }
+
+        subject {
+          described_class.new do |t|
+            t.project_or_solution = 'project.sln'
+          end
+        }
+
+        its(:project_or_solution) { should be_instance_of(Finder) }
+
+        it 'should set project or solution' do
+          expect(Finder).to have_received(:new).with('project.sln', subject, 'No projects or more than one project found.')
+        end
+      end
     end
   end
 end
