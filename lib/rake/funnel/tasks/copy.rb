@@ -1,4 +1,3 @@
-require 'rake/clean'
 require 'rake/tasklib'
 
 module Rake::Funnel::Tasks
@@ -7,34 +6,27 @@ module Rake::Funnel::Tasks
 
     attr_accessor :name, :source, :target
 
-    def initialize(name = :copy)
-      @name = name
+    def initialize(*args, &task_block)
+      setup_ivars(args)
 
-      @source = []
-      @target = nil
-
-      yield self if block_given?
-      define
+      define(args, &task_block)
     end
 
     private
-    def define
-      target && CLEAN.include(target)
+    def setup_ivars(args)
+      @name = args.shift || :copy
 
-      desc "Copy #{files.join(', ')} to #{target}"
-      task name do
-        raise 'Target not defined' unless target
+      @source = []
+      @target = nil
+    end
 
-        files.each do |source|
-          next if File.directory?(source)
+    def define(args, &task_block)
+      desc 'Copy files' unless Rake.application.last_description
 
-          target = target_path(source)
+      task(name, *args) do |_, task_args|
+        task_block.call(*[self, task_args].slice(0, task_block.arity)) if task_block
 
-          dir = File.dirname(target)
-          RakeFileUtils.mkdir_p(dir) unless File.directory?(dir)
-
-          RakeFileUtils.cp(source, target, { preserve: true})
-        end
+        Copier.copy(files, target)
       end
 
       self
@@ -42,15 +34,6 @@ module Rake::Funnel::Tasks
 
     def files
       Finder.new(source, self, 'No files found.').all_or_default
-    end
-
-    def target_path(file)
-      target_relative = Pathname.new(file).relative_path_from(Pathname.new(common_path)).to_s
-      File.join(target, target_relative)
-    end
-
-    def common_path
-      @common_path ||= files.common_path
     end
   end
 end
