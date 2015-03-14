@@ -3,7 +3,6 @@ include Rake::Funnel::Support
 
 describe Rake::Funnel::Tasks::AssemblyVersion do
   before {
-    CLEAN.clear
     Task.clear
   }
 
@@ -13,30 +12,22 @@ describe Rake::Funnel::Tasks::AssemblyVersion do
     its(:source) { should == :FromVersionFiles }
     its(:source_args) { should == {} }
     its(:target_path) { should be_an_instance_of(Proc) }
-
-    describe 'overriding defaults' do
-      subject {
-        described_class.new(:name) do |t|
-          t.language = [:cs, :vb]
-          t.source = []
-          t.source_args = { foo: 42 }
-          t.target_path = 'will not work'
-        end
-      }
-
-      its(:name) { should == :name }
-      its(:language) { should == [:cs, :vb] }
-      its(:source) { should == [] }
-      its(:source_args) { should == { foo: 42 } }
-      its(:target_path) { should == 'will not work' }
-    end
   end
 
   describe 'execution' do
-    let(:writer) { double(AssemblyVersionWriter).as_null_object }
+    let(:writer) { instance_double(AssemblyVersionWriter).as_null_object }
 
     before {
       allow(AssemblyVersionWriter).to receive(:new).and_return(writer)
+    }
+
+    subject {
+      described_class.new(:name) do |t|
+        t.language = [:cs, :vb]
+        t.source = %w(one two)
+        t.source_args = { foo: 42 }
+        t.target_path = 'will not work'
+      end
     }
 
     before {
