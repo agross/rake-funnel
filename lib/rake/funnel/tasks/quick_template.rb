@@ -7,28 +7,30 @@ module Rake::Funnel::Tasks
 
     attr_accessor :name, :search_pattern, :context
 
-    def initialize(name = :template)
-      @name = name
+    def initialize(*args, &task_block)
+      setup_ivars(args)
 
-      @search_pattern = %w(**/*.erb)
-      @context = binding
-
-      yield self if block_given?
-      define
+      define(args, &task_block)
     end
 
     private
-    def define
-      results = templates.all_or_default.map { |t| result_filename(t) }
-      CLEAN.include(*results)
+    def setup_ivars(args)
+      @name = args.shift || :template
 
-      desc "Generate #{templates.all_or_default.join(', ')}"
-      task name do
+      @search_pattern = %w(**/*.erb)
+      @context = binding
+    end
+
+    def define(args, &task_block)
+      desc 'Generate templates' unless Rake.application.last_description
+      task(name, *args) do |_, task_args|
+        task_block.call(*[self, task_args].slice(0, task_block.arity)) if task_block
+
         templates.all_or_default.each do |template|
           target = result_filename(template)
           Rake.rake_output_message "Creating file #{target}"
 
-          content = Rake::Funnel::Support::TemplateEngine.render(File.read(template), template, context)
+          content = TemplateEngine.render(File.read(template), template, context)
           File.write(target, content)
         end
       end

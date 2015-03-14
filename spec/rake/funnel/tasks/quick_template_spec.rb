@@ -5,7 +5,6 @@ include Rake::Funnel::Support
 
 describe Rake::Funnel::Tasks::QuickTemplate do
   before {
-    CLEAN.clear
     Task.clear
   }
 
@@ -13,32 +12,6 @@ describe Rake::Funnel::Tasks::QuickTemplate do
     its(:name) { should == :template }
     its(:search_pattern) { should eq(%w(**/*.erb)) }
     its(:context) { should kind_of?(Binding) }
-
-    describe 'target files are cleaned' do
-      let(:templates) { [] }
-      let(:finder) { double(Finder).as_null_object }
-
-      before {
-        allow(finder).to receive(:all_or_default).and_return(templates)
-        allow(Finder).to receive(:new).and_return(finder)
-      }
-
-      subject! { described_class.new }
-
-      context 'no templates found' do
-        it 'should not add the target files' do
-          expect(CLEAN).to be_empty
-        end
-      end
-
-      context 'templates found' do
-        let(:templates) { %w(1.template foo/2.template bar/3.some_other_extension) }
-
-        it 'should add the target files' do
-          expect(CLEAN).to match_array(%w(1 foo/2 bar/3))
-        end
-      end
-    end
   end
 
   describe 'execution' do
