@@ -14,57 +14,15 @@ describe Rake::Funnel::Tasks::Paket do
     its(:bootstrapper_args) { should == nil }
   end
 
-  describe 'overriding defaults' do
-    context 'when bootstrapper executable is specified' do
-      subject {
-        described_class.new do |t|
-          t.bootstrapper = 'custom bootstrapper.exe'
-        end
-      }
-
-      its(:bootstrapper) { should == 'custom bootstrapper.exe' }
-    end
-
-    context 'when bootstrapper args are specified' do
-      subject {
-        described_class.new do |t|
-          t.bootstrapper_args = %w(arg1 arg2)
-        end
-      }
-
-      its(:bootstrapper_args) { should == %w(arg1 arg2) }
-    end
-
-    context 'when paket executable is specified' do
-      subject {
-        described_class.new do |t|
-          t.paket = 'custom paket.exe'
-        end
-      }
-
-      its(:paket) { should == 'custom paket.exe' }
-    end
-
-    context 'when paket args are specified' do
-      subject {
-        described_class.new do |t|
-          t.paket_args = %w(arg1 arg2)
-        end
-      }
-
-      its(:paket_args) { should == %w(arg1 arg2) }
-    end
-  end
-
   describe 'execution' do
     before {
       allow(subject).to receive(:sh)
-      allow(Mono).to receive(:invocation).and_wrap_original do |original_method, *args, &block|
+      allow(Mono).to receive(:invocation).and_wrap_original do |_original_method, *args, &_block|
         args.compact
       end
     }
 
-    context 'with overridden defaults' do
+    context 'overriding defaults' do
       subject {
         described_class.new do |t|
           t.bootstrapper = 'custom bootstrapper.exe'
@@ -75,7 +33,7 @@ describe Rake::Funnel::Tasks::Paket do
       }
 
       before {
-        allow(File).to receive(:exist?).with(subject.paket).and_return(false)
+        allow(File).to receive(:exist?).and_return(false)
         allow(subject).to receive(:sh)
       }
 

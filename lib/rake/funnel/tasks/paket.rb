@@ -6,23 +6,29 @@ module Rake::Funnel::Tasks
 
     attr_accessor :name, :paket, :paket_args, :bootstrapper, :bootstrapper_args
 
-    def initialize(name = :paket)
-      @name = name
+    def initialize(*args, &task_block)
+      setup_ivars(args)
+
+      define(args, &task_block)
+    end
+
+    private
+    def setup_ivars(args)
+      @name = args.shift || :paket
 
       @paket = File.join('.paket', 'paket.exe')
       @paket_args = 'restore'
 
       @bootstrapper = File.join('.paket', 'paket.bootstrapper.exe')
       @bootstrapper_args = nil
-
-      yield self if block_given?
-      define
     end
 
-    private
-    def define
-      desc "#{paket_cmd.join(' ')} (optionally #{bootstrapper_cmd.join(' ')})"
-      task name do
+    def define(args, &task_block)
+      desc 'Restore packages' unless Rake.application.last_description
+
+      task(name, *args) do |_, task_args|
+        task_block.call(*[self, task_args].slice(0, task_block.arity)) if task_block
+
         sh(*bootstrapper_cmd) unless File.exist?(paket)
         sh(*paket_cmd)
       end
