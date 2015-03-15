@@ -2,6 +2,7 @@ require 'simplecov'
 require 'coveralls'
 require 'codeclimate-test-reporter'
 require 'bundler/setup'
+require 'simplecov-teamcity-summary'
 
 SimpleCov.start do
   if Coveralls.will_run?
@@ -17,6 +18,16 @@ SimpleCov.start do
     ]
 
   coverage_dir('build/coverage')
+
+  at_exit do
+    result = SimpleCov.result
+    result.format!
+
+    next unless Integration::TeamCity.running?
+
+    SimpleCov::Formatter::TeamcitySummaryFormatter.new.format(result)
+    Integration::TeamCity::ServiceMessages.build_status(text: "{build.status.text}, Code Coverage #{result.covered_percent.round(2)}%")
+  end
 end
 
 require 'rspec/its'

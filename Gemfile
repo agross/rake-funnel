@@ -29,4 +29,5 @@ group :development, :ci do
   gem 'codeclimate-test-reporter', require: false
   gem 'rubocop', require: false
   gem 'rubocop-rspec', require: false
+  gem 'simplecov-teamcity-summary', require: false
 end
