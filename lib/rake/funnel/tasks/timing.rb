@@ -7,13 +7,10 @@ module Rake::Funnel::Tasks
     attr_accessor :name
     attr_reader :stats
 
-    def initialize(name = :timing)
-      @name = name
-      @stats = Statistics.new
+    def initialize(*args, &task_block)
+      setup_ivars(args)
 
-      yield self if block_given?
-
-      define
+      define(args, &task_block)
     end
 
     def reset!
@@ -21,11 +18,21 @@ module Rake::Funnel::Tasks
     end
 
     private
-    def define
+    def setup_ivars(args)
+      @name = args.shift || :timing
+
+      @stats = Statistics.new
+    end
+
+    def define(args, &task_block)
       patches.each { |p| p.apply! }
 
-      task @name, :failed do |task, args|
-        Report.new(@stats, args).render
+      desc 'Output task timing information' unless Rake.application.last_description
+
+      task name, :failed do |_, task_args|
+        task_block.call(*[self, task_args].slice(0, task_block.arity)) if task_block
+
+        Report.new(@stats, task_args).render
       end
 
       timing_task = Rake.application.current_scope.path_with_task_name(@name)
