@@ -1,0 +1,22 @@
+AllCops:
+  DisplayCopNames: true
+
+require: rubocop-rspec
+
+Metrics/LineLength:
+  Enabled: false
+
+Style/Blocks:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/RegexpLiteral:
+  Enabled: false
+
+Style/MultilineOperationIndentation:
+  Enabled: false
+
+RSpec/ExampleWording:
+  Enabled: false

@@ -7,6 +7,7 @@ gemspec
 group :development do
   gem 'guard-bundler', require: false
   gem 'guard-rspec', require: false
+  gem 'guard-rubocop', require: false
 
   case RbConfig::CONFIG['target_os']
   when /windows|bccwin|cygwin|djgpp|mingw|mswin|wince/i
@@ -26,4 +27,6 @@ group :development, :ci do
   gem 'rspec-collection_matchers', require: false
   gem 'coveralls', require: false
   gem 'codeclimate-test-reporter', require: false
+  gem 'rubocop', require: false
+  gem 'rubocop-rspec', require: false
 end
