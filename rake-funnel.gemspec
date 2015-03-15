@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
   files = `"#{git}" ls-files -z`
     .split("\x0")
     .reject do |file|
-      file =~ %r{^(config/|tools/|lib/tasks|\.gitignore|\.travis)} ||
+      file =~ %r{^(config/|tools/|lib/tasks|\.gitignore|\.travis\.ruby-version)} ||
         file =~ %r{(Guard|Rake)file} ||
         File.extname(file) == '.cmd'
     end
