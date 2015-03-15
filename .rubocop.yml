@@ -12,10 +12,13 @@ Style/Blocks:
 Style/Documentation:
   Enabled: false
 
-Style/RegexpLiteral:
+Style/EmptyLinesAroundAccessModifier:
   Enabled: false
 
 Style/MultilineOperationIndentation:
+  Enabled: false
+
+Style/RegexpLiteral:
   Enabled: false
 
 RSpec/ExampleWording:
