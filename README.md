@@ -1,6 +1,6 @@
 # rake-funnel
 
-[![Gem Version](https://badge.fury.io/rb/rake-funnel.png)](http://badge.fury.io/rb/rake-funnel) [![Build Status](https://travis-ci.org/agross/rake-funnel.png?branch=master)](https://travis-ci.org/agross/rake-funnel) [![Dependency Status](https://gemnasium.com/agross/rake-funnel.png)](https://gemnasium.com/agross/rake-funnel) [![Code Climate](https://codeclimate.com/github/agross/rake-funnel.png)](https://codeclimate.com/github/agross/rake-funnel) [![Coverage Status](https://coveralls.io/repos/agross/rake-funnel/badge.png)](https://coveralls.io/r/agross/rake-funnel)
+[![Gem Version](https://badge.fury.io/rb/rake-funnel.svg)](http://badge.fury.io/rb/rake-funnel) [![Build Status](https://travis-ci.org/agross/rake-funnel.png?branch=master)](https://travis-ci.org/agross/rake-funnel) [![Dependency Status](https://gemnasium.com/agross/rake-funnel.svg)](https://gemnasium.com/agross/rake-funnel) [![Code Climate](https://codeclimate.com/github/agross/rake-funnel.png)](https://codeclimate.com/github/agross/rake-funnel) [![Coverage Status](https://coveralls.io/repos/agross/rake-funnel/badge.svg)](https://coveralls.io/r/agross/rake-funnel)
 
 rake-funnel is my set of rake tasks, mostly targeted at .NET development.
 
