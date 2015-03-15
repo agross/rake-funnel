@@ -1,3 +1,5 @@
+require 'configatron'
+
 include Rake
 include Rake::Funnel::Support::Environments
 include Rake::Funnel::Tasks
@@ -7,14 +9,6 @@ describe Rake::Funnel::Tasks::Environments do
 
   before {
     Task.clear
-  }
-
-  before {
-    module Kernel
-      def configatron
-        OpenStruct.new(name: 'fake configatron singleton')
-      end
-    end
   }
 
   let(:files) { [] }
@@ -32,6 +26,7 @@ describe Rake::Funnel::Tasks::Environments do
       disable_default_env_setup
     }
 
+    its(:store) { should == configatron }
     its(:base_dir) { should == 'config' }
     its(:default_env) { should be_nil }
     its(:default_config) { should == 'default' }
@@ -39,8 +34,11 @@ describe Rake::Funnel::Tasks::Environments do
     its(:customizer) { should be_nil }
 
     describe 'overriding defaults' do
+      let(:store) { OpenStruct.new }
+
       subject {
         described_class.new do |t|
+          t.store = store
           t.base_dir = 'custom base_dir'
           t.default_env = 'custom default_env'
           t.default_config = 'custom default_config'
@@ -49,6 +47,7 @@ describe Rake::Funnel::Tasks::Environments do
         end
       }
 
+      its(:store) { should == store }
       its(:base_dir) { should == subject.base_dir }
       its(:default_env) { should == subject.default_env }
       its(:default_config) { should == subject.default_config }
@@ -85,6 +84,7 @@ describe Rake::Funnel::Tasks::Environments do
   end
 
   describe 'config files to load' do
+    let(:optional) { nil }
     let(:files) {
       %w(config/dev.yaml)
     }
@@ -98,15 +98,19 @@ describe Rake::Funnel::Tasks::Environments do
       allow(File).to receive(:exists?).with(optional).and_return(false)
     }
 
-    subject {
+    subject! {
       described_class.new do |t|
         t.default_env = 'dev'
       end
     }
 
     before {
-      expect(subject).to be
+      Task['dev'].invoke
     }
+
+    it 'should store configuration in configatron singleton' do
+      expect(Loader).to have_received(:load_configuration).with(anything, configatron, any_args)
+    end
 
     context 'default and local config files exist' do
       let(:optional) { nil }
@@ -136,32 +140,13 @@ describe Rake::Funnel::Tasks::Environments do
     end
   end
 
-  describe 'store' do
-    let(:files) {
-      %w(config/dev.yaml)
-    }
-
-    before {
-      allow(Loader).to receive(:load_configuration)
-    }
-
-    before {
-      expect(subject).to be
-      Task['dev'].invoke
-    }
-
-    it 'should store configuration in configatron singleton' do
-      expect(Loader).to have_received(:load_configuration).with(anything, configatron, any_args)
-    end
-  end
-
   describe 'customization' do
     let(:customizer) { Proc.new {} }
     let(:files) {
       %w(config/dev.yaml)
     }
 
-    subject {
+    subject! {
       described_class.new do |t|
         t.customizer = customizer
       end
@@ -172,7 +157,6 @@ describe Rake::Funnel::Tasks::Environments do
     }
 
     before {
-      expect(subject).to be
       Task['dev'].invoke
     }
 
@@ -187,104 +171,74 @@ describe Rake::Funnel::Tasks::Environments do
     }
 
     before {
-      allow(Loader).to receive(:load_configuration)
+      Rake.application.top_level_tasks.clear
+      Rake.application.top_level_tasks.push(*top_level_tasks)
     }
 
-    context 'no default environment configured' do
-      before {
-        expect(subject).to be
+    context 'environment task defined in top-level Rake namespace' do
+      subject! {
+        described_class.new do |t|
+          t.default_env = default_env
+        end
       }
 
-      it 'should not invoke environment tasks' do
-        expect(Loader).not_to have_received(:load_configuration)
+      context 'no default environment configured' do
+        let(:default_env) { nil }
+        let(:top_level_tasks) { [] }
+
+        it 'should not add top-level environment tasks' do
+          expect(Rake.application.top_level_tasks).to be_empty
+        end
+      end
+
+      context 'default environment configured' do
+        let(:default_env) { 'dev' }
+
+        context 'no top-level environment task' do
+          let(:top_level_tasks) { %w(foo) }
+
+          it 'should prepend default top-level environment task' do
+            expect(Rake.application.top_level_tasks).to eq([default_env] + top_level_tasks)
+          end
+        end
+
+        context 'top-level environment task' do
+          let(:top_level_tasks) { %w(foo production) }
+
+          it 'should move top-level environment task to front' do
+            expect(Rake.application.top_level_tasks).to eq(top_level_tasks.reverse)
+          end
+        end
       end
     end
 
-    context 'default environment configured' do
-      subject {
-        described_class.new do |t|
-          t.default_env = 'dev'
-        end
-      }
-
-      before {
-        allow(Rake.application).to receive(:top_level_tasks).and_return(user_defined_task)
-      }
-
-      before {
-        expect(subject).to be
-      }
-
-      context 'no user-defined environment' do
-        let(:user_defined_task) { %w(foo) }
-
-        it 'should invoke default environment task' do
-          expect(Loader)
-            .to have_received(:load_configuration).with(hash_including({ name: 'dev' }), any_args)
-        end
-
-        it 'should not invoke other environment tasks' do
-          expect(Loader)
-            .not_to have_received(:load_configuration).with(hash_including({ name: 'production' }), any_args)
-        end
-      end
-
-      context 'user-defined environment' do
-        let(:user_defined_task) { %w(foo production) }
-
-        it 'should invoke user-defined environment task' do
-          expect(Loader)
-            .to have_received(:load_configuration).with(hash_including({ name: 'production' }), any_args)
-        end
-
-        it 'should not invoke other environment tasks' do
-          expect(Loader)
-            .not_to have_received(:load_configuration).with(hash_including({ name: 'dev' }), any_args)
-        end
-      end
-
-      context 'environment task defined in Rake namespace' do
-        subject {
-          namespace :foo do
-            namespace :bar do
-              described_class.new do |t|
-                t.default_env = 'dev'
-              end
+    context 'environment task defined in Rake namespace' do
+      subject! {
+        namespace :foo do
+          namespace :bar do
+            described_class.new do |t|
+              t.default_env = default_env
             end
           end
-        }
+        end
+      }
 
-        context 'default environment configured' do
-          before {
-            expect(subject).to be
-          }
+      context 'default environment configured' do
+        let(:default_env) { 'dev' }
 
-          context 'no user-defined environment' do
-            let(:user_defined_task) { %w(foo) }
+        context 'no top-level environment task' do
+          let(:top_level_tasks) { %w(foo) }
 
-            it 'should invoke default environment task' do
-              expect(Loader)
-                .to have_received(:load_configuration).with(hash_including({ name: 'dev' }), any_args)
-            end
-
-            it 'should not invoke other environment tasks' do
-              expect(Loader)
-                .not_to have_received(:load_configuration).with(hash_including({ name: 'production' }), any_args)
-            end
+          it 'should prepend default top-level environment task' do
+            expect(Rake.application.top_level_tasks).to eq(["foo:bar:#{default_env}"] + top_level_tasks)
           end
+        end
 
-          context 'user-defined environment' do
-            let(:user_defined_task) { %w(foo foo:bar:production) }
+        context 'top-level environment task' do
+          let(:top_level_tasks) { %w(foo foo:bar:production) }
 
-            it 'should invoke user-defined environment task' do
-              expect(Loader)
-                .to have_received(:load_configuration).with(hash_including({ name: 'production' }), any_args)
-            end
-
-            it 'should not invoke other environment tasks' do
-              expect(Loader)
-                .not_to have_received(:load_configuration).with(hash_including({ name: 'dev' }), any_args)
-            end
+          it 'should move top-level environment task to front' do
+            expect(Rake.application.top_level_tasks).to eq(top_level_tasks.reverse)
           end
         end
       end
