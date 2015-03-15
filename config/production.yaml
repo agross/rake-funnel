@@ -1,3 +1,4 @@
 deployment:
-  computer_name: gems.grossweber.com
-  remote_dir: <%= 'C:/GROSSWEBER/gems'.gsub(%r|/|, '\\') %>
+  connection:
+    computer_name: gems.grossweber.com
+  remote_path: C:/GROSSWEBER/gems

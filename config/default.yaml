@@ -3,4 +3,4 @@ deployment:
     computer_name: localhost
     username:  <%= ENV['DEPLOY_USER'] %>
     password: <%= ENV['DEPLOY_PASSWORD'] %>
-  remote_dir: <%= (File.expand_path(ENV['TEMP'] || '', '_gems')) %>
+  remote_path: <%= File.expand_path(File.join(ENV['TEMP'] || '', '_gems')) %>
