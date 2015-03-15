@@ -21,7 +21,7 @@ module Rake::Funnel::Integration::TeamCity
 
       def read_version(executable)
         nunit = Rake::Funnel::Support::Which.which(executable) || return
-        version = BinaryVersionReader.read_from(nunit)
+        version = Rake::Funnel::Support::BinaryVersionReader.read_from(nunit)
 
         unless version.file_version
           Rake.rake_output_message("Could read version from NUnit executable in #{nunit}")
