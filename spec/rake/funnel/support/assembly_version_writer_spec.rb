@@ -51,7 +51,7 @@ describe Rake::Funnel::Support::AssemblyVersionWriter do
       }
 
       it 'should succeed' do
-        expect(true).to eq(true)
+        expect(subject).to be
       end
     end
   end

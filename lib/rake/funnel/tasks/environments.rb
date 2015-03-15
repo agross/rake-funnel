@@ -1,10 +1,6 @@
 require 'configatron'
 require 'rake/tasklib'
 
-Dir["#{File.dirname(__FILE__)}/environments_support/*.rb"].each do |path|
-  require path
-end
-
 module Rake::Funnel::Tasks
   class Environments < Rake::TaskLib
     include Rake::Funnel::Support::Environments
