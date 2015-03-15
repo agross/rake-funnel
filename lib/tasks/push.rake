@@ -1,10 +1,10 @@
-Tasks::MSDeploy.new :push => [:bin_path, :gem] do |t|
+Tasks::MSDeploy.new(push: [:bin_path, :gem]) do |t|
   remote_path = configatron.deployment.remote_path.to_windows_path
 
   spec = Gem::Specification.load('rake-funnel.gemspec')
 
-  gem = Gem::PackageTask.new(spec) do |t|
-    t.package_dir = 'deploy'
+  gem = Gem::PackageTask.new(spec) do |task|
+    task.package_dir = 'deploy'
   end
 
   gem = File.join(File.expand_path(gem.package_dir), gem.gem_spec.file_name)

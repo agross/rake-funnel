@@ -10,8 +10,8 @@ Gem::Specification.new do |s|
   s.email       = ['agross@therightstuff.de']
   s.homepage    = 'http://grossweber.com'
   s.license     = 'BSD'
-  s.description = %q{A standardized build pipeline}
-  s.summary     = %q{The build pipeline}
+  s.description = 'A standardized build pipeline'
+  s.summary     = 'The build pipeline'
 
   s.required_ruby_version = '>= 2.0.0'
 
@@ -21,7 +21,15 @@ Gem::Specification.new do |s|
   s.add_dependency 'configatron', '~> 4.5'
 
   git = ENV['TEAMCITY_GIT_PATH'] || 'git'
-  s.files         = `"#{git}" ls-files -z`.split("\x0").reject { |file| file =~ %r{^(config/|tools/|lib/tasks|\.gitignore|\.travis)} || file =~ %r{(Guard|Rake)file} || File.extname(file) == '.cmd' }
+  files = `"#{git}" ls-files -z`
+    .split("\x0")
+    .reject do |file|
+      file =~ %r{^(config/|tools/|lib/tasks|\.gitignore|\.travis)} ||
+        file =~ %r{(Guard|Rake)file} ||
+        File.extname(file) == '.cmd'
+    end
+
+  s.files         = files
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.test_files    = s.files.grep(%r{^(test|spec|features)/})
   s.require_paths = ['lib']
