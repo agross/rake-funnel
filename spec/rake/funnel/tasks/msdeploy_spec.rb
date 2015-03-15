@@ -5,7 +5,6 @@ include Rake::Funnel::Support::MSDeploy
 
 describe Rake::Funnel::Tasks::MSDeploy do
   before {
-    CLEAN.clear
     Task.clear
   }
 
@@ -15,31 +14,9 @@ describe Rake::Funnel::Tasks::MSDeploy do
     its(:log_file) { should == 'msdeploy.log' }
     its(:args) { should == {} }
 
-    it 'should add the log file to the files to be cleaned' do
-      expect(CLEAN).to include(subject.log_file)
-    end
-  end
-
-  describe 'overriding defaults' do
     context 'when task name is specified' do
       it 'should have a default log file equal to the task name' do
         expect(described_class.new(:foo).log_file).to eq('foo.log')
-      end
-    end
-
-    context 'when task name and log file is specified' do
-      subject! {
-        described_class.new(:foo) do |t|
-          t.log_file = 'bar.log'
-        end
-      }
-
-      it 'should use custom log file' do
-        expect(subject.log_file).to eq('bar.log')
-      end
-
-      it 'should add the log file to the files to be cleaned' do
-        expect(CLEAN).to include(subject.log_file)
       end
     end
   end

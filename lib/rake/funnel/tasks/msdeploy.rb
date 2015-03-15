@@ -1,4 +1,3 @@
-require 'rake/clean'
 require 'rake/tasklib'
 
 module Rake::Funnel::Tasks
@@ -6,29 +5,31 @@ module Rake::Funnel::Tasks
     include Rake::Funnel::Support
     include Rake::Funnel::Support::MSDeploy
 
-    attr_accessor :name, :msdeploy, :log_file, :args
+    attr_accessor :name, :msdeploy, :args, :log_file
 
-    def initialize(name = :msdeploy)
-      @name = name
-      @msdeploy = 'msdeploy'
-      @args = {}
+    def initialize(*args, &task_block)
+      setup_ivars(args)
 
-      yield self if block_given?
-      define
-    end
-
-    def log_file
-      @log_file || "#{@name}.log"
+      define(args, &task_block)
     end
 
     private
-    def define
-      CLEAN.include(log_file)
+    def setup_ivars(args)
+      @name = args.shift || :msdeploy
 
-      desc "Deploy #{deploy_source(args)}"
-      task @name do
+      @msdeploy = 'msdeploy'
+      @args = {}
+      @log_file = "#{@name}.log"
+    end
+
+    def define(args, &task_block)
+      desc 'Deploy application' unless Rake.application.last_description
+
+      task(name, *args) do |_, task_args|
+        task_block.call(*[self, task_args].slice(0, task_block.arity)) if task_block
+
         mapper = Mapper.new(:MSDeploy)
-        cmd = [quote(msdeploy), mapper.map(args)]
+        cmd = [quote(msdeploy), mapper.map(@args)]
           .flatten
           .join(' ')
 
@@ -38,14 +39,6 @@ module Rake::Funnel::Tasks
       end
 
       self
-    end
-
-    def deploy_source(args)
-      source = (args || {}).fetch(:source, {})
-      path = source.first
-      return if path.nil?
-
-      Pathname.new(path[1]).relative_path_from(Pathname.new('.').realpath) rescue path[1]
     end
 
     def quote(value)
