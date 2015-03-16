@@ -43,7 +43,7 @@ describe Rake::Funnel::Tasks::Environments do
           t.default_env = 'custom default_env'
           t.default_config = 'custom default_config'
           t.local_config = 'custom local_config'
-          t.customizer = Proc.new {}
+          t.customizer = proc {}
         end
       }
 
@@ -94,8 +94,8 @@ describe Rake::Funnel::Tasks::Environments do
     }
 
     before {
-      allow(File).to receive(:exists?).and_return(true)
-      allow(File).to receive(:exists?).with(optional).and_return(false)
+      allow(File).to receive(:exist?).and_return(true)
+      allow(File).to receive(:exist?).with(optional).and_return(false)
     }
 
     subject! {
@@ -117,7 +117,8 @@ describe Rake::Funnel::Tasks::Environments do
 
       it 'should load all files' do
         expect(Loader)
-          .to have_received(:load_configuration).with(hash_including({ config_files: %w(config/default.yaml config/dev.yaml config/local.yaml) }), any_args)
+          .to have_received(:load_configuration)
+              .with(hash_including({ config_files: %w(config/default.yaml config/dev.yaml config/local.yaml) }), any_args)
       end
     end
 
@@ -126,7 +127,8 @@ describe Rake::Funnel::Tasks::Environments do
 
       it 'should load environment file and local file' do
         expect(Loader)
-          .to have_received(:load_configuration).with(hash_including({ config_files: %w(config/dev.yaml config/local.yaml) }), any_args)
+          .to have_received(:load_configuration)
+              .with(hash_including({ config_files: %w(config/dev.yaml config/local.yaml) }), any_args)
       end
     end
 
@@ -141,7 +143,7 @@ describe Rake::Funnel::Tasks::Environments do
   end
 
   describe 'customization' do
-    let(:customizer) { Proc.new {} }
+    let(:customizer) { proc {} }
     let(:files) {
       %w(config/dev.yaml)
     }

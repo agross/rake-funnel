@@ -44,7 +44,7 @@ describe Rake::Funnel::Integration::ProgressReport do
   end
 
   context 'when progess report was disabled' do
-    subject! {
+    subject {
       described_class.new
     }
 
@@ -67,14 +67,14 @@ describe Rake::Funnel::Integration::ProgressReport do
     subject! {
       described_class.new do |r|
         r.task_starting do |task, args|
-          receiver.starting({
+          receiver.task_starting({
             task: task,
             args: args
           })
         end
 
         r.task_finished do |task, args, error|
-          receiver.finished({
+          receiver.task_finished({
             task: task,
             args: args,
             error: error
@@ -92,33 +92,33 @@ describe Rake::Funnel::Integration::ProgressReport do
 
       describe 'starting handler' do
         it 'should run' do
-          expect(receiver).to have_received(:starting)
+          expect(receiver).to have_received(:task_starting)
         end
 
         it 'should receive task' do
-          expect(receiver).to have_received(:starting).with(hash_including({ task: kind_of(Task) }))
+          expect(receiver).to have_received(:task_starting).with(hash_including({ task: kind_of(Task) }))
         end
 
         it 'should receive task arguments' do
-          expect(receiver).to have_received(:starting).with(hash_including({ args: kind_of(TaskArguments) }))
+          expect(receiver).to have_received(:task_starting).with(hash_including({ args: kind_of(TaskArguments) }))
         end
       end
 
       describe 'finished handler' do
         it 'should run' do
-          expect(receiver).to have_received(:finished)
+          expect(receiver).to have_received(:task_finished)
         end
 
         it 'should receive task' do
-          expect(receiver).to have_received(:finished).with(hash_including({ task: kind_of(Task) }))
+          expect(receiver).to have_received(:task_finished).with(hash_including({ task: kind_of(Task) }))
         end
 
         it 'should receive task arguments' do
-          expect(receiver).to have_received(:finished).with(hash_including({ args: kind_of(TaskArguments) }))
+          expect(receiver).to have_received(:task_finished).with(hash_including({ args: kind_of(TaskArguments) }))
         end
 
         it 'should not receive error' do
-          expect(receiver).to have_received(:finished).with(hash_including({ error: nil }))
+          expect(receiver).to have_received(:task_finished).with(hash_including({ error: nil }))
         end
       end
     end
@@ -141,7 +141,7 @@ describe Rake::Funnel::Integration::ProgressReport do
 
       describe 'finished handler' do
         it 'should receive error' do
-          expect(receiver).to have_received(:finished).with(hash_including({ error: error }))
+          expect(receiver).to have_received(:task_finished).with(hash_including({ error: error }))
         end
       end
     end

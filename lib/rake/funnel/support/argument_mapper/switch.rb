@@ -1,10 +1,16 @@
-module Rake::Funnel::Support::ArgumentMapper
-  class Switch
-    attr_reader :switch, :values
+module Rake
+  module Funnel
+    module Support
+      module ArgumentMapper
+        class Switch
+          attr_reader :switch, :values
 
-    def initialize(switch, values)
-      @values = values
-      @switch = switch
+          def initialize(switch, values)
+            @values = values
+            @switch = switch
+          end
+        end
+      end
     end
   end
 end

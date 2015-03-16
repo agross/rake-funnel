@@ -52,7 +52,7 @@ describe Rake::Funnel::Support::Copier do
     end
 
     it 'should preserve metdata' do
-      expect(RakeFileUtils).to have_received(:cp).with(anything, anything, { preserve: true }).exactly(files.length).times
+      expect(RakeFileUtils).to have_received(:cp).with(anything, anything, preserve: true).exactly(files.length).times
     end
   end
 end

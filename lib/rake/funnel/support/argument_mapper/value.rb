@@ -1,10 +1,16 @@
-module Rake::Funnel::Support::ArgumentMapper
-  class Value
-    attr_reader :key, :value
+module Rake
+  module Funnel
+    module Support
+      module ArgumentMapper
+        class Value
+          attr_reader :key, :value
 
-    def initialize(value)
-      @key = nil
-      @value = value
+          def initialize(value)
+            @key = nil
+            @value = value
+          end
+        end
+      end
     end
   end
 end

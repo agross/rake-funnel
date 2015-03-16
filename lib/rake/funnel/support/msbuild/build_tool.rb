@@ -1,23 +1,29 @@
-module Rake::Funnel::Support::MSBuild
-  class BuildTool
-    class << self
-      def find
-        return 'xbuild' unless Rake::Win32.windows?
+module Rake
+  module Funnel
+    module Support
+      module MSBuild
+        class BuildTool
+          class << self
+            def find
+              return 'xbuild' unless Rake::Win32.windows?
 
-        require 'win32/registry'
+              require 'win32/registry'
 
-        %w(12.0 4.0 3.5 2.0).collect { |version|
-          key = "SOFTWARE\\Microsoft\\MSBuild\\ToolsVersions\\#{version}"
+              %w(12.0 4.0 3.5 2.0).collect { |version|
+                key = "SOFTWARE\\Microsoft\\MSBuild\\ToolsVersions\\#{version}"
 
-          begin
-            Win32::Registry::HKEY_LOCAL_MACHINE.open(key) do |reg|
-              candidate = File.join(reg['MSBuildToolsPath'] || '', 'msbuild.exe')
-              next candidate if File.exists?(candidate)
+                begin
+                  ::Win32::Registry::HKEY_LOCAL_MACHINE.open(key) do |reg|
+                    candidate = File.join(reg['MSBuildToolsPath'] || '', 'msbuild.exe')
+                    next candidate if File.exist?(candidate)
+                  end
+                rescue
+                  next
+                end
+              }.compact.first
             end
-          rescue
-            next
           end
-        }.compact.first
+        end
       end
     end
   end

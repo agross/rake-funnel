@@ -167,19 +167,19 @@ describe Rake::Funnel::Extensions::Shell do
     end
 
     it 'should yield the success status' do
-      expect { |b| subject.shell('foo', &b) }.to yield_with_args(true, be, be, be)
+      expect { |b| subject.shell('foo', &b) }.to yield_with_args(true, anything, anything, anything)
     end
 
     it 'should yield the command' do
-      expect { |b| subject.shell('foo', &b) }.to yield_with_args(be, 'foo', be, be)
+      expect { |b| subject.shell('foo', &b) }.to yield_with_args(anything, 'foo', anything, anything)
     end
 
     it 'should yield the exit code' do
-      expect { |b| subject.shell('foo', &b) }.to yield_with_args(be, be, 0, be)
+      expect { |b| subject.shell('foo', &b) }.to yield_with_args(anything, anything, 0, anything)
     end
 
     it 'should yield the log' do
-      expect { |b| subject.shell('foo', &b) }.to yield_with_args(be, be, be, /output/)
+      expect { |b| subject.shell('foo', &b) }.to yield_with_args(anything, anything, anything, /output/)
     end
   end
 

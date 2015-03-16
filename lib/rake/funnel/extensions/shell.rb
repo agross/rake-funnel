@@ -1,56 +1,92 @@
 require 'rake'
 require 'open3'
 require 'smart_colored/extend'
+require 'stringio'
 
-module Rake::Funnel::Extensions
-  module Shell
-    def shell(*cmd, log_file: nil, error_lines: nil)
-      mkdir_p(File.dirname(log_file)) if log_file
+module Rake
+  module Funnel
+    module Extensions
+      module Shell
+        def shell(*cmd, log_file: nil, error_lines: nil, &block)
+          mkdir_p(File.dirname(log_file)) if log_file
 
-      stdout = -> (msg) { $stdout.puts msg.sub(/\n$/, '').green }
-
-      error_logged = false
-      stderr = -> (msg) {
-        error_logged = true
-        $stderr.puts msg.sub(/\n$/, '').bold.red
-      }
-
-      log = StringIO.new
-
-      begin
-        cmd = cmd.flatten.reject(&:nil?)
-        Rake.rake_output_message(cmd.join(' '))
-
-        Open3.popen2e(*cmd) do |_, stdout_and_stderr, wait_thread|
-          stdout_and_stderr.each do |line|
-            out = stdout
-            out = stderr if error_lines && line =~ error_lines
-            out.call(line)
-
-            log.write(line)
-            File.open(log_file, 'a') { |f| f.write(line) } if log_file
+          run(cmd, log_file, error_lines) do |success, readable_cmd, result, log|
+            if block
+              block.call(success, readable_cmd, result, log)
+              return
+            end
           end
-
-          success = wait_thread.value.success? && error_logged == false
-          result = [cmd.join(' '),
-            wait_thread.value.exitstatus,
-            log.string]
-
-          if block_given?
-            yield(success, *result)
-            return
-          end
-
-          raise Rake::Funnel::ExecutionError.new(*result) unless success
         end
-      ensure
-        log.close
+
+        private
+        def run(cmd, log_file, error_lines)
+          cmd, readable_cmd = normalize(cmd)
+
+          Rake.rake_output_message(readable_cmd)
+
+          Open3.popen2e(*cmd) do |_, stdout_and_stderr, wait_thread|
+            log, error_logged = log_output(stdout_and_stderr, log_file, error_lines)
+            success = wait_thread.value.success? && error_logged == false
+
+            result = [readable_cmd, wait_thread.value.exitstatus, log]
+
+            yield(success, *result) if block_given?
+
+            fail Rake::Funnel::ExecutionError.new(*result) unless success
+          end
+        end
+
+        def normalize(cmd)
+          cmd = cmd.flatten.reject(&:nil?)
+          readable_cmd = cmd.join(' ')
+
+          [cmd, readable_cmd]
+        end
+
+        def log_output(stdout_and_stderr, log_file, error_lines)
+          log_string = StringIO.new
+
+          begin
+            statuses = log_lines(stdout_and_stderr, log_file, error_lines, log_string)
+
+            [log_string.string, statuses.any? { |s| s == :error }]
+          ensure
+            log_string.close
+          end
+        end
+
+        def log_lines(stdout_and_stderr, log_file, error_lines, log_string)
+          stdout_and_stderr.map do |line|
+            log_string.write(line)
+            File.open(log_file, 'a') { |f| f.write(line) } if log_file
+
+            handle_line(line, error_lines)
+          end
+        end
+
+        def handle_line(line, error_lines)
+          to_stderr(line, error_lines) || to_stdout(line)
+        end
+
+        def to_stdout(line)
+          $stdout.puts line.sub(/\n$/, '').green
+          :success
+        end
+
+        def to_stderr(line, error_lines)
+          return unless error_lines && line =~ error_lines
+
+          $stderr.puts line.sub(/\n$/, '').bold.red
+          :error
+        end
       end
     end
   end
 end
 
-module Rake::DSL
-  include Rake::Funnel::Extensions::Shell
-  private(*Rake::Funnel::Extensions::Shell.instance_methods(false))
+module Rake
+  module DSL
+    include Rake::Funnel::Extensions::Shell
+    private(*Rake::Funnel::Extensions::Shell.instance_methods(false))
+  end
 end

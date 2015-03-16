@@ -1,4 +1,4 @@
-describe Rake::Funnel::Extensions::PascalCase do
+describe Rake::Funnel::Extensions::Case::PascalCase do
   it 'should convert strings' do
     expect('foo'.pascalize).to eq('Foo')
   end

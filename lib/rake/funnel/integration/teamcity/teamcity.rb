@@ -1,14 +1,18 @@
-module Rake::Funnel::Integration
-  module TeamCity
-    ENV_VAR = 'TEAMCITY_PROJECT_NAME'
+module Rake
+  module Funnel
+    module Integration
+      module TeamCity
+        ENV_VAR = 'TEAMCITY_PROJECT_NAME'
 
-    class << self
-      def running?
-        ENV.include?(ENV_VAR)
-      end
+        class << self
+          def running?
+            ENV.include?(ENV_VAR)
+          end
 
-      def rake_runner?
-        running? && Object.const_defined?('Rake') && Rake.const_defined?('TeamCityApplication')
+          def rake_runner?
+            running? && Object.const_defined?('Rake') && Rake.const_defined?('TeamCityApplication')
+          end
+        end
       end
     end
   end

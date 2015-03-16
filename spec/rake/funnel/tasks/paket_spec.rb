@@ -11,7 +11,7 @@ describe Rake::Funnel::Tasks::Paket do
     its(:paket) { should == '.paket/paket.exe' }
     its(:paket_args) { should == 'restore' }
     its(:bootstrapper) { should == '.paket/paket.bootstrapper.exe' }
-    its(:bootstrapper_args) { should == nil }
+    its(:bootstrapper_args) { should be_nil }
   end
 
   describe 'execution' do
@@ -101,8 +101,6 @@ describe Rake::Funnel::Tasks::Paket do
       end
 
       context 'failure' do
-
-
         context 'paket.exe exists' do
           let(:paket_exists) { true }
 

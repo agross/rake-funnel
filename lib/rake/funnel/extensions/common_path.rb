@@ -1,44 +1,50 @@
 require 'abbrev'
 require 'pathname'
 
-module Rake::Funnel::Extensions
-  module CommonPath
-    def common_path
-      list = self
-        .to_a
-        .compact
-        .map { |x| components(x) }
+module Rake
+  module Funnel
+    module Extensions
+      module CommonPath
+        def common_path
+          list = to_a
+            .compact
+            .map { |x| components(x) }
 
-      min = list.min_by { |x| x.length }
+          min = list.min_by(&:length)
 
-      matches = list.map do |path|
-        longest_prefix = []
-
-        path.zip(min).each do |left, right|
-          if left != right
-            next
-          end
-          longest_prefix << right
+          matches = find_matches(list, min)
+          matches.min_by(&:length) || ''
         end
 
-        File.join(longest_prefix)
+        private
+        def components(path)
+          paths = []
+          Pathname.new(path).descend do |p|
+            paths << p
+          end
+
+          paths = paths.inject([]) { |components, p|
+            relative = p.relative_path_from(components.last[:absolute]) if components.any?
+
+            components << { absolute: p, relative: relative || p }
+          }
+
+          paths.map { |component| component[:relative].to_s }
+        end
+
+        def find_matches(list, min)
+          list.map do |path|
+            longest_prefix = []
+
+            path.zip(min).each do |left, right|
+              next if left != right
+              longest_prefix << right
+            end
+
+            File.join(longest_prefix)
+          end
+        end
       end
-
-      matches.min_by { |x| x.length } || ''
-    end
-
-    private
-    def components(path)
-      paths = []
-      Pathname.new(path).descend do |p|
-        paths << p
-      end
-
-      paths.inject([]) { |components, path|
-        relative = path.relative_path_from(components.last[:absolute]) if components.any?
-
-        components << { absolute: path, relative: relative || path }
-      }.map { |component| component[:relative].to_s }
     end
   end
 end
@@ -47,6 +53,8 @@ class Array
   include Rake::Funnel::Extensions::CommonPath
 end
 
-class Rake::FileList
-  include Rake::Funnel::Extensions::CommonPath
+module Rake
+  class FileList
+    include Rake::Funnel::Extensions::CommonPath
+  end
 end

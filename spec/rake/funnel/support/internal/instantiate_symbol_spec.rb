@@ -95,7 +95,6 @@ describe Rake::Funnel::Support::InstantiateSymbol do
       end
     end
 
-
     context 'with nil' do
       it 'should return nil' do
         expect(subject.send(:create, nil)).to eq(nil)
@@ -114,7 +113,7 @@ describe Rake::Funnel::Support::InstantiateSymbol do
 
         class Failure
           def initialize
-            raise "BAM!"
+            fail 'BAM!'
           end
         end
       end
@@ -124,7 +123,7 @@ describe Rake::Funnel::Support::InstantiateSymbol do
       }
 
       it 'should fail' do
-        expect { subject.send(:create, :Failure) }.to raise_error "BAM!"
+        expect { subject.send(:create, :Failure) }.to raise_error 'BAM!'
       end
     end
 
@@ -142,12 +141,12 @@ describe Rake::Funnel::Support::InstantiateSymbol do
         end
 
         class Single
-          def initialize(arg)
+          def initialize(_arg)
           end
         end
 
         class Multiple
-          def initialize(arg1, arg2)
+          def initialize(_arg1, _arg2)
           end
         end
       end

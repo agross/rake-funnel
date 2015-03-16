@@ -1,100 +1,104 @@
 require 'rake/tasklib'
 
-module Rake::Funnel::Tasks
-  class Timing < Rake::TaskLib
-    include Rake::Funnel::Support::Timing
+module Rake
+  module Funnel
+    module Tasks
+      class Timing < Rake::TaskLib
+        include Rake::Funnel::Support::Timing
 
-    attr_accessor :name
-    attr_reader :stats
+        attr_accessor :name
+        attr_reader :stats
 
-    def initialize(*args, &task_block)
-      setup_ivars(args)
+        def initialize(*args, &task_block)
+          setup_ivars(args)
 
-      define(args, &task_block)
-    end
-
-    def reset!
-      patches.each { |p| p.revert! }
-    end
-
-    private
-    def setup_ivars(args)
-      @name = args.shift || :timing
-
-      @stats = Statistics.new
-    end
-
-    def define(args, &task_block)
-      patches.each { |p| p.apply! }
-
-      desc 'Output task timing information' unless Rake.application.last_description
-
-      task name, :failed do |_, task_args|
-        task_block.call(*[self, task_args].slice(0, task_block.arity)) if task_block
-
-        Report.new(@stats, task_args).render
-      end
-
-      timing_task = Rake.application.current_scope.path_with_task_name(@name)
-      Rake.application.top_level_tasks.push(timing_task)
-
-      self
-    end
-
-    def patches
-      @patches ||= [report, benchmark]
-    end
-
-    def report
-      Rake::Funnel::Support::Patch.new do |p|
-        report_invoker = -> (opts) { Report.new(@stats, opts).render }
-
-        p.setup do
-          Rake::Application.class_eval do
-            orig_display_error_message = instance_method(:display_error_message)
-
-            define_method(:display_error_message) do |ex|
-              orig_display_error_message.bind(self).call(ex)
-
-              report_invoker.call(failed: true)
-            end
-
-            orig_display_error_message
-          end
+          define(args, &task_block)
         end
 
-        p.reset do |memo|
-          Rake::Application.class_eval do
-            define_method(:display_error_message) do |ex|
-              memo.bind(self).call(ex)
-            end
-          end
+        def reset!
+          patches.each(&:revert!)
         end
-      end
-    end
 
-    def benchmark
-      Rake::Funnel::Support::Patch.new do |p|
-        benchmark_invoker = -> (task, &block) { @stats.benchmark(task, &block) }
+        private
+        def setup_ivars(args)
+          @name = args.shift || :timing
 
-        p.setup do
-          Rake::Task.class_eval do
-            orig_execute = instance_method(:execute)
+          @stats = Statistics.new
+        end
 
-            define_method(:execute) do |args|
-              benchmark_invoker.call(self) do
-                orig_execute.bind(self).call(args)
+        def define(_args, &task_block)
+          patches.each(&:apply!)
+
+          desc 'Output task timing information' unless Rake.application.last_description
+
+          task name, :failed do |_, task_args|
+            task_block.call(*[self, task_args].slice(0, task_block.arity)) if task_block
+
+            Report.new(@stats, task_args).render
+          end
+
+          timing_task = Rake.application.current_scope.path_with_task_name(@name)
+          Rake.application.top_level_tasks.push(timing_task)
+
+          self
+        end
+
+        def patches
+          @patches ||= [report, benchmark]
+        end
+
+        def report
+          Rake::Funnel::Support::Patch.new do |p|
+            report_invoker = -> (opts) { Report.new(@stats, opts).render }
+
+            p.setup do
+              Rake::Application.class_eval do
+                orig_display_error_message = instance_method(:display_error_message)
+
+                define_method(:display_error_message) do |ex|
+                  orig_display_error_message.bind(self).call(ex)
+
+                  report_invoker.call(failed: true)
+                end
+
+                orig_display_error_message
               end
             end
 
-            orig_execute
+            p.reset do |memo|
+              Rake::Application.class_eval do
+                define_method(:display_error_message) do |ex|
+                  memo.bind(self).call(ex)
+                end
+              end
+            end
           end
         end
 
-        p.reset do |memo|
-          Rake::Task.class_eval do
-            define_method(:execute) do |ex|
-              memo.bind(self).call(ex)
+        def benchmark
+          Rake::Funnel::Support::Patch.new do |p|
+            benchmark_invoker = -> (task, &block) { @stats.benchmark(task, &block) }
+
+            p.setup do
+              Rake::Task.class_eval do
+                orig_execute = instance_method(:execute)
+
+                define_method(:execute) do |args|
+                  benchmark_invoker.call(self) do
+                    orig_execute.bind(self).call(args)
+                  end
+                end
+
+                orig_execute
+              end
+            end
+
+            p.reset do |memo|
+              Rake::Task.class_eval do
+                define_method(:execute) do |ex|
+                  memo.bind(self).call(ex)
+                end
+              end
             end
           end
         end

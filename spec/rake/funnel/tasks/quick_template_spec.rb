@@ -11,7 +11,7 @@ describe Rake::Funnel::Tasks::QuickTemplate do
   describe 'defaults' do
     its(:name) { should == :template }
     its(:search_pattern) { should eq(%w(**/*.erb)) }
-    its(:context) { should kind_of?(Binding) }
+    its(:context) { should be_an_instance_of(Binding) }
   end
 
   describe 'execution' do
