@@ -1,3 +1,6 @@
+require 'rspec/its'
+require 'rspec/collection_matchers'
+require 'rake/funnel'
 require 'simplecov'
 require 'coveralls'
 require 'codeclimate-test-reporter'
@@ -29,10 +32,6 @@ SimpleCov.start do
     Integration::TeamCity::ServiceMessages.build_status(text: "{build.status.text}, Code Coverage #{result.covered_percent.round(2)}%")
   end
 end
-
-require 'rspec/its'
-require 'rspec/collection_matchers'
-require 'rake/funnel'
 
 # When invoked via the rspec rake task, output needs to by synced.
 Rake::Funnel::Integration::SyncOutput.new
