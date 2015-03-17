@@ -7,145 +7,136 @@ describe Rake::Funnel::Support::VersionInfo do
       {
         context: {
           version: '1',
-          build_number: '42',
-          sha: '123'
+          metadata: {
+            pre: 'alpha',
+            build: '42',
+            sha: '123'
+          }
         },
         expected: {
           assembly_version: '1.0.0.0',
           assembly_file_version: '1.0.0.42',
-          assembly_informational_version: '1.0.0+build.42.sha.123'
+          assembly_informational_version: '1.0.0-alpha+build.42.sha.123'
         }
       },
       {
         context: {
           version: '1.2',
-          build_number: '42',
-          sha: '123'
+          metadata: {
+            pre: 'alpha',
+            build: '42',
+            sha: '123'
+          }
         },
         expected: {
           assembly_version: '1.2.0.0',
           assembly_file_version: '1.2.0.42',
-          assembly_informational_version: '1.2.0+build.42.sha.123'
+          assembly_informational_version: '1.2.0-alpha+build.42.sha.123'
         }
       },
       {
         context: {
           version: '1.2.3',
-          build_number: '42',
-          sha: '123'
+          metadata: {
+            pre: 'alpha',
+            build: '42',
+            sha: '123'
+          }
         },
         expected: {
           assembly_version: '1.2.3.0',
           assembly_file_version: '1.2.3.42',
-          assembly_informational_version: '1.2.3+build.42.sha.123'
+          assembly_informational_version: '1.2.3-alpha+build.42.sha.123'
         }
       },
       {
         context: {
           version: '1.2.3.4',
-          build_number: '42',
-          sha: '123'
+          metadata: {
+            pre: 'alpha',
+            build: '42',
+            sha: '123'
+          }
         },
         expected: {
           assembly_version: '1.2.3.4',
           assembly_file_version: '1.2.3.4',
-          assembly_informational_version: '1.2.3+build.42.sha.123'
+          assembly_informational_version: '1.2.3-alpha+build.42.sha.123'
         }
       },
       {
         context: {
           version: '-pre1',
-          build_number: '42',
-          sha: '123'
+          metadata: {
+            pre: 'alpha',
+            build: '42',
+            sha: '123'
+          }
         },
         expected: {
           assembly_version: '0.0.0.0',
           assembly_file_version: '0.0.0.42',
-          assembly_informational_version: '0.0.0-pre1+build.42.sha.123'
+          assembly_informational_version: '0.0.0-pre1-alpha+build.42.sha.123'
         }
       },
       {
         context: {
           version: '1-pre1',
-          build_number: '42',
-          sha: '123'
+          metadata: {
+            pre: 'alpha',
+            build: '42',
+            sha: '123'
+          }
         },
         expected: {
           assembly_version: '1.0.0.0',
           assembly_file_version: '1.0.0.42',
-          assembly_informational_version: '1.0.0-pre1+build.42.sha.123'
+          assembly_informational_version: '1.0.0-pre1-alpha+build.42.sha.123'
         }
       },
       {
         context: {
           version: '1.2-pre1',
-          build_number: '42',
-          sha: '123'
+          metadata: {
+            pre: 'alpha',
+            build: '42',
+            sha: '123'
+          }
         },
         expected: {
           assembly_version: '1.2.0.0',
           assembly_file_version: '1.2.0.42',
-          assembly_informational_version: '1.2.0-pre1+build.42.sha.123'
+          assembly_informational_version: '1.2.0-pre1-alpha+build.42.sha.123'
         }
       },
       {
         context: {
           version: '1.2.3-pre1',
-          build_number: '42',
-          sha: '123'
+          metadata: {
+            pre: 'alpha',
+            build: '42',
+            sha: '123'
+          }
         },
         expected: {
           assembly_version: '1.2.3.0',
           assembly_file_version: '1.2.3.42',
-          assembly_informational_version: '1.2.3-pre1+build.42.sha.123'
+          assembly_informational_version: '1.2.3-pre1-alpha+build.42.sha.123'
         }
       },
       {
         context: {
           version: '1.2.3.4-pre1',
-          build_number: '42',
-          sha: '123'
+          metadata: {
+            pre: 'alpha',
+            build: '42',
+            sha: '123'
+          }
         },
         expected: {
           assembly_version: '1.2.3.4',
           assembly_file_version: '1.2.3.4',
-          assembly_informational_version: '1.2.3-pre1+build.42.sha.123'
-        }
-      },
-      {
-        context: {
-          version: '1.2',
-          build_number: '-pre',
-          sha: '123'
-        },
-        expected: {
-          assembly_version: '1.2.0.0',
-          assembly_file_version: '1.2.0.0',
-          assembly_informational_version: '1.2.0-pre+sha.123'
-        }
-      },
-      {
-        context: {
-          version: '1.2',
-          build_number: '-pre42',
-          sha: '123'
-        },
-        expected: {
-          assembly_version: '1.2.0.0',
-          assembly_file_version: '1.2.0.0',
-          assembly_informational_version: '1.2.0-pre42+sha.123'
-        }
-      },
-      {
-        context: {
-          version: '1.2',
-          build_number: '42-pre',
-          sha: '123'
-        },
-        expected: {
-          assembly_version: '1.2.0.0',
-          assembly_file_version: '1.2.0.0',
-          assembly_informational_version: '1.2.0-42-pre+sha.123'
+          assembly_informational_version: '1.2.3-pre1-alpha+build.42.sha.123'
         }
       },
       {
@@ -158,9 +149,22 @@ describe Rake::Funnel::Support::VersionInfo do
       },
       {
         context: {
+          metadata: {}
+        },
+        expected: {
+          assembly_version: '0.0.0.0',
+          assembly_file_version: '0.0.0.0',
+          assembly_informational_version: '0.0.0'
+        }
+      },
+      {
+        context: {
           version: nil,
-          build_number: nil,
-          sha: nil
+          metadata: {
+            pre: nil,
+            build: nil,
+            sha: nil
+          }
         },
         expected: {
           assembly_version: '0.0.0.0',
@@ -171,8 +175,7 @@ describe Rake::Funnel::Support::VersionInfo do
       {
         context: {
           version: '1.2',
-          build_number: nil,
-          sha: nil
+          metadata: { }
         },
         expected: {
           assembly_version: '1.2.0.0',
@@ -183,8 +186,41 @@ describe Rake::Funnel::Support::VersionInfo do
       {
         context: {
           version: '1.2',
-          build_number: '42',
-          sha: nil
+          metadata: {
+            pre: nil,
+            build: nil,
+            sha: nil
+          }
+        },
+        expected: {
+          assembly_version: '1.2.0.0',
+          assembly_file_version: '1.2.0.0',
+          assembly_informational_version: '1.2.0'
+        }
+      },
+      {
+        context: {
+          version: '1.2',
+          metadata: {
+            pre: 'alpha',
+            build: nil,
+            sha: nil
+          }
+        },
+        expected: {
+          assembly_version: '1.2.0.0',
+          assembly_file_version: '1.2.0.0',
+          assembly_informational_version: '1.2.0-alpha'
+        }
+      },
+      {
+        context: {
+          version: '1.2',
+          metadata: {
+            pre: nil,
+            build: '42',
+            sha: nil
+          }
         },
         expected: {
           assembly_version: '1.2.0.0',
@@ -194,18 +230,36 @@ describe Rake::Funnel::Support::VersionInfo do
       },
       {
         context: {
+          version: '1.2',
+          metadata: {
+            pre: nil,
+            build: nil,
+            sha: '123'
+          }
+        },
+        expected: {
+          assembly_version: '1.2.0.0',
+          assembly_file_version: '1.2.0.0',
+          assembly_informational_version: '1.2.0+sha.123'
+        }
+      },
+      {
+        context: {
           version: 1,
-          build_number: 42,
-          sha: 123
+          metadata: {
+            pre: 123,
+            build: 456,
+            sha: 789
+          }
         },
         expected: {
           assembly_version: '1.0.0.0',
-          assembly_file_version: '1.0.0.42',
-          assembly_informational_version: '1.0.0+build.42.sha.123'
+          assembly_file_version: '1.0.0.456',
+          assembly_informational_version: '1.0.0-123+build.456.sha.789'
         }
       }
     ].each do |spec|
-      context "version #{spec[:context][:version] || 'none'}, build number #{spec[:context][:build_number] || 'none'}, SHA #{spec[:context][:sha] || 'none'}" do
+      context "version #{spec[:context][:version] || 'none'}, build number #{spec[:context].fetch(:metadata, {})[:build] || 'none'}, SHA #{spec[:context].fetch(:metadata, {})[:sha] || 'none'}" do
         let(:parsed) { described_class.parse(spec[:context]) }
 
         it "should generate assembly version #{spec[:expected][:assembly_version]}" do

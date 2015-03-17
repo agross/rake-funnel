@@ -6,12 +6,11 @@ module Rake
           include Rake::Funnel::Support
           include Enumerable
 
-          attr_reader :search_pattern, :build_number, :sha
+          attr_reader :search_pattern, :metadata
 
           def initialize(args = {})
             @search_pattern = args[:search_pattern] || %w(**/VERSION)
-            @build_number = args[:build_number]
-            @sha = args[:sha]
+            @metadata = args[:metadata]
           end
 
           def each
@@ -22,8 +21,7 @@ module Rake
 
               version_info = VersionInfo.parse(
                 version: VersionInfo.read_version_from(file),
-                build_number: build_number,
-                sha: sha
+                metadata: metadata
               )
 
               yield({ source: file, version_info: version_info })

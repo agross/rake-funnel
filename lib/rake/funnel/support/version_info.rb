@@ -49,7 +49,7 @@ module Rake
 
           def assembly_file_version(context)
             version = assembly_version(context)
-            build_number = numeric(context[:build_number])
+            build_number = numeric(context.fetch(:metadata, {})[:build])
             return version.sub(/\.0$/, ".#{build_number}") if build_number
             version
           end
@@ -64,31 +64,34 @@ module Rake
             numeric_version = pad(version, 3)
             alpha_version = version.sub(/^[\d\.]*/, '')
 
-            numeric_build_number = numeric(context[:build_number])
-            unless numeric_build_number
-              alpha_build_number = context[:build_number]
-              if alpha_build_number && alpha_build_number !~ /^-/
-                alpha_build_number = '-' + alpha_build_number
-              end
-            end
-
             semver = [
               numeric_version,
               alpha_version,
-              alpha_build_number
+              pre(context)
             ].join
-
-            metadata = [
-              numeric_build_number ? 'build' : nil,
-              numeric_build_number,
-              context[:sha] ? 'sha' : nil,
-              context[:sha]
-            ].compact.join('.')
 
             [
               semver,
-              metadata.empty? ? nil : metadata
+              metadata(context)
             ].compact.join('+')
+          end
+
+          def pre(context)
+            pre = context.fetch(:metadata, {})[:pre]
+            pre = "-#{pre}" if pre && pre.to_s !~ /^-/
+
+            pre
+          end
+
+          def metadata(context)
+            metadata = context.fetch(:metadata, {}).reject { |k, _| k == :pre }
+
+            metadata = metadata.map { |key, value|
+              [key.to_s, value.to_s] if value
+            }.compact
+
+            return nil if metadata.empty?
+            metadata.join('.')
           end
         end
       end

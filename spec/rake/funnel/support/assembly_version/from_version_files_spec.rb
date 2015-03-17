@@ -3,21 +3,18 @@ include Rake::Funnel::Support
 describe Rake::Funnel::Support::AssemblyVersion::FromVersionFiles do
   describe 'defaults' do
     its(:search_pattern) { should == %w(**/VERSION) }
-    its(:build_number) { should be_nil }
-    its(:sha) { should be_nil }
+    its(:metadata) { should be_nil }
 
     describe 'overriding defaults' do
       subject {
         described_class.new({
             search_pattern: 'search pattern',
-            build_number: 42,
-            sha: 'abc'
+            metadata: {},
           })
       }
 
       its(:search_pattern) { should == 'search pattern' }
-      its(:build_number) { should == 42 }
-      its(:sha) { should == 'abc' }
+      its(:metadata) { should == {} }
     end
   end
 
@@ -48,14 +45,18 @@ describe Rake::Funnel::Support::AssemblyVersion::FromVersionFiles do
     }
 
     subject {
-      described_class.new({ build_number: 42, sha: 'abc' })
+      described_class.new(metadata: { pre: 'alpha', build: 42, sha: 'abc' })
     }
 
     it 'should yield source and version info for each file' do
       args = files.map do |file|
         {
           source: file,
-          version_info: VersionInfo.parse(version: file, build_number: subject.build_number, sha: subject.sha)
+          version_info: VersionInfo.parse(version: file, metadata: {
+              pre: subject.metadata[:pre],
+              build: subject.metadata[:build],
+              sha: subject.metadata[:sha]
+            })
         }
       end
 
