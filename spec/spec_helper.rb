@@ -26,10 +26,10 @@ SimpleCov.start do
     result = SimpleCov.result
     result.format!
 
-    next unless Integration::TeamCity.running?
+    next unless Rake::Funnel::Integration::TeamCity.running?
 
     SimpleCov::Formatter::TeamcitySummaryFormatter.new.format(result)
-    Integration::TeamCity::ServiceMessages.build_status(text: "{build.status.text}, Code Coverage #{result.covered_percent.round(2)}%")
+    Rake::Funnel::Integration::TeamCity::ServiceMessages.build_status(text: "{build.status.text}, Code Coverage #{result.covered_percent.round(2)}%")
   end
 end
 
