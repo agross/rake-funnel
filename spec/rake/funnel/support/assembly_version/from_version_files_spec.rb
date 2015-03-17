@@ -52,10 +52,14 @@ describe Rake::Funnel::Support::AssemblyVersion::FromVersionFiles do
     }
 
     it 'should yield source and version info for each file' do
-      expect { |b| subject.each(&b) }.to yield_successive_args(
-          { source: '1', version_info: VersionInfo.new({ assembly_version: '1', assembly_file_version: '1.42', assembly_informational_version: '1.42-abc' }) },
-          { source: '2', version_info: VersionInfo.new({ assembly_version: '2', assembly_file_version: '2.42', assembly_informational_version: '2.42-abc' }) }
-        )
+      args = files.map do |file|
+        {
+          source: file,
+          version_info: VersionInfo.parse(version: file, build_number: subject.build_number, sha: subject.sha)
+        }
+      end
+
+      expect { |b| subject.each(&b) }.to yield_successive_args(*args)
     end
   end
 end

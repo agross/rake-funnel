@@ -6,131 +6,154 @@ describe Rake::Funnel::Support::VersionInfo do
     [
       {
         context: {
-          version: '1.2',
+          version: '1',
           build_number: '42',
-          sha: 'sha'
+          sha: '123'
         },
         expected: {
-          assembly_version: '1.2',
-          assembly_file_version: '1.2.42',
-          assembly_informational_version: '1.2.42-sha'
+          assembly_version: '1.0.0.0',
+          assembly_file_version: '1.0.0.42',
+          assembly_informational_version: '1.0.0+build.42.sha.123'
         }
       },
       {
         context: {
-          version: '1.2-pre1',
+          version: '1.2',
           build_number: '42',
-          sha: 'sha'
+          sha: '123'
         },
         expected: {
-          assembly_version: '1.2',
-          assembly_file_version: '1.2.42',
-          assembly_informational_version: '1.2-pre1.42-sha'
+          assembly_version: '1.2.0.0',
+          assembly_file_version: '1.2.0.42',
+          assembly_informational_version: '1.2.0+build.42.sha.123'
         }
       },
       {
         context: {
           version: '1.2.3',
           build_number: '42',
-          sha: 'sha' },
+          sha: '123'
+        },
         expected: {
-          assembly_version: '1.2.3',
+          assembly_version: '1.2.3.0',
           assembly_file_version: '1.2.3.42',
-          assembly_informational_version: '1.2.3.42-sha'
+          assembly_informational_version: '1.2.3+build.42.sha.123'
+        }
+      },
+      {
+        context: {
+          version: '1.2.3.4',
+          build_number: '42',
+          sha: '123'
+        },
+        expected: {
+          assembly_version: '1.2.3.4',
+          assembly_file_version: '1.2.3.4',
+          assembly_informational_version: '1.2.3+build.42.sha.123'
+        }
+      },
+      {
+        context: {
+          version: '-pre1',
+          build_number: '42',
+          sha: '123'
+        },
+        expected: {
+          assembly_version: '0.0.0.0',
+          assembly_file_version: '0.0.0.42',
+          assembly_informational_version: '0.0.0-pre1+build.42.sha.123'
+        }
+      },
+      {
+        context: {
+          version: '1-pre1',
+          build_number: '42',
+          sha: '123'
+        },
+        expected: {
+          assembly_version: '1.0.0.0',
+          assembly_file_version: '1.0.0.42',
+          assembly_informational_version: '1.0.0-pre1+build.42.sha.123'
+        }
+      },
+      {
+        context: {
+          version: '1.2-pre1',
+          build_number: '42',
+          sha: '123'
+        },
+        expected: {
+          assembly_version: '1.2.0.0',
+          assembly_file_version: '1.2.0.42',
+          assembly_informational_version: '1.2.0-pre1+build.42.sha.123'
         }
       },
       {
         context: {
           version: '1.2.3-pre1',
           build_number: '42',
-          sha: 'sha'
+          sha: '123'
         },
         expected: {
-          assembly_version: '1.2.3',
+          assembly_version: '1.2.3.0',
           assembly_file_version: '1.2.3.42',
-          assembly_informational_version: '1.2.3-pre1.42-sha'
+          assembly_informational_version: '1.2.3-pre1+build.42.sha.123'
+        }
+      },
+      {
+        context: {
+          version: '1.2.3.4-pre1',
+          build_number: '42',
+          sha: '123'
+        },
+        expected: {
+          assembly_version: '1.2.3.4',
+          assembly_file_version: '1.2.3.4',
+          assembly_informational_version: '1.2.3-pre1+build.42.sha.123'
         }
       },
       {
         context: {
           version: '1.2',
           build_number: '-pre',
-          sha: 'sha'
+          sha: '123'
         },
         expected: {
-          assembly_version: '1.2',
-          assembly_file_version: '1.2',
-          assembly_informational_version: '1.2-pre-sha'
+          assembly_version: '1.2.0.0',
+          assembly_file_version: '1.2.0.0',
+          assembly_informational_version: '1.2.0-pre+sha.123'
         }
       },
       {
         context: {
           version: '1.2',
           build_number: '-pre42',
-          sha: 'sha'
+          sha: '123'
         },
         expected: {
-          assembly_version: '1.2',
-          assembly_file_version: '1.2.42',
-          assembly_informational_version: '1.2-pre42-sha'
+          assembly_version: '1.2.0.0',
+          assembly_file_version: '1.2.0.0',
+          assembly_informational_version: '1.2.0-pre42+sha.123'
         }
       },
       {
         context: {
           version: '1.2',
-          build_number: nil,
-          sha: nil
+          build_number: '42-pre',
+          sha: '123'
         },
         expected: {
-          assembly_version: '1.2',
-          assembly_file_version: '1.2',
-          assembly_informational_version: '1.2'
+          assembly_version: '1.2.0.0',
+          assembly_file_version: '1.2.0.0',
+          assembly_informational_version: '1.2.0-42-pre+sha.123'
         }
       },
       {
-        context: {
-          version: '1.2',
-          build_number: '42',
-          sha: nil
-        },
+        context: {},
         expected: {
-          assembly_version: '1.2',
-          assembly_file_version: '1.2.42',
-          assembly_informational_version: '1.2.42'
-        }
-      },
-      {
-        context: {
-          version: 1,
-          build_number: '42',
-          sha: 'sha'
-        },
-        expected: {
-          assembly_version: '1',
-          assembly_file_version: '1.42',
-          assembly_informational_version: '1.42-sha'
-        }
-      },
-      {
-        context: {
-          version: '1.2',
-          build_number: 42,
-          sha: 'sha'
-        },
-        expected: {
-          assembly_version: '1.2',
-          assembly_file_version: '1.2.42',
-          assembly_informational_version: '1.2.42-sha'
-        }
-      },
-      {
-        context: {
-          version: '1.2'
-        },
-        expected: {
-          assembly_version: '1.2',
-          assembly_file_version: '1.2',
-          assembly_informational_version: '1.2'
+          assembly_version: '0.0.0.0',
+          assembly_file_version: '0.0.0.0',
+          assembly_informational_version: '0.0.0'
         }
       },
       {
@@ -140,17 +163,45 @@ describe Rake::Funnel::Support::VersionInfo do
           sha: nil
         },
         expected: {
-          assembly_version: '0',
-          assembly_file_version: '0',
-          assembly_informational_version: '0'
+          assembly_version: '0.0.0.0',
+          assembly_file_version: '0.0.0.0',
+          assembly_informational_version: '0.0.0'
         }
       },
       {
-        context: {},
+        context: {
+          version: '1.2',
+          build_number: nil,
+          sha: nil
+        },
         expected: {
-          assembly_version: '0',
-          assembly_file_version: '0',
-          assembly_informational_version: '0'
+          assembly_version: '1.2.0.0',
+          assembly_file_version: '1.2.0.0',
+          assembly_informational_version: '1.2.0'
+        }
+      },
+      {
+        context: {
+          version: '1.2',
+          build_number: '42',
+          sha: nil
+        },
+        expected: {
+          assembly_version: '1.2.0.0',
+          assembly_file_version: '1.2.0.42',
+          assembly_informational_version: '1.2.0+build.42'
+        }
+      },
+      {
+        context: {
+          version: 1,
+          build_number: 42,
+          sha: 123
+        },
+        expected: {
+          assembly_version: '1.0.0.0',
+          assembly_file_version: '1.0.0.42',
+          assembly_informational_version: '1.0.0+build.42.sha.123'
         }
       }
     ].each do |spec|

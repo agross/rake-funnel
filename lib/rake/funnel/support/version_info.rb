@@ -30,44 +30,65 @@ module Rake
 
           private
           def default_version(context)
-            context[:version] || '0'
+            context[:version].to_s || '0'
+          end
+
+          def pad(version, parts)
+            numerics = version.split('.').take(parts).map { |part| part.to_i }
+
+            template = Array.new(parts) { 0 }.map.with_index do |part, index|
+              numerics[index] || part
+            end
+            template.join('.')
           end
 
           def assembly_version(context)
-            strip_trailing_non_numeric(default_version(context))
+            version = default_version(context)
+            pad(version, 4)
           end
 
           def assembly_file_version(context)
-            numeric_build_number = strip_leading_non_numeric(context[:build_number])
+            version = assembly_version(context)
+            build_number = numeric(context[:build_number])
+            return version.sub(/\.0$/, ".#{build_number}") if build_number
+            version
+          end
 
-            [
-              assembly_version(context),
-              numeric_build_number
-            ].compact.join('.')
+          def numeric(str)
+            return str if str.to_s =~ /^\d+$/
+            nil
           end
 
           def assembly_informational_version(context)
-            build_number = context[:build_number]
-            join_using = '.'
-            join_using = '' if build_number =~ /^\D/
+            version = default_version(context)
+            numeric_version = pad(version, 3)
+            alpha_version = version.sub(/^[\d\.]*/, '')
 
-            prefix = [default_version(context), build_number].compact.join(join_using)
-            sha = context[:sha]
+            numeric_build_number = numeric(context[:build_number])
+            unless numeric_build_number
+              alpha_build_number = context[:build_number]
+              if alpha_build_number && alpha_build_number !~ /^-/
+                alpha_build_number = '-' + alpha_build_number
+              end
+            end
 
-            [prefix, sha].compact.join('-')
-          end
+            semver = [
+              numeric_version,
+              alpha_version,
+              alpha_build_number
+            ].join
 
-          def strip_trailing_non_numeric(str)
-            return nil if str.nil?
-            str.to_s.gsub(/[^\d\.].*/, '')
-          end
+            metadata = [
+              numeric_build_number ? 'build' : nil,
+              numeric_build_number,
+              context[:sha] ? 'sha' : nil,
+              context[:sha]
+            ].compact.join('.')
 
-          def strip_leading_non_numeric(str)
-            return nil if str.nil?
-            str = str.to_s.gsub(/[^\d\.]/, '')
-
-            return nil if str.empty?
-            str
+            [
+              semver,
+              metadata.empty? ? nil : metadata
+            ].compact.join('+')
           end
         end
       end
