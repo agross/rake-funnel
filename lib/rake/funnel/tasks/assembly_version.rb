@@ -14,6 +14,10 @@ module Rake
           define(args, &task_block)
         end
 
+        def next_to_source(language, _version_info, source)
+          File.join(File.dirname(source), "VersionInfo.#{language}")
+        end
+
         private
         def setup_ivars(args)
           @name = args.shift || :version
@@ -21,7 +25,9 @@ module Rake
           @language = :cs
           @source = :FromVersionFiles
           @source_args = {}
-          @target_path = next_to_version_file
+          @target_path = proc { |language, version_info, source|
+            next_to_source(language, version_info, source)
+          }
         end
 
         def define(args, &task_block)
@@ -33,10 +39,6 @@ module Rake
             writer = AssemblyVersionWriter.new(source, source_args)
             writer.write(target_path, language)
           end
-        end
-
-        def next_to_version_file
-          proc { |language, _version_info, source| File.join(File.dirname(source), "VersionInfo.#{language}") }
         end
       end
     end

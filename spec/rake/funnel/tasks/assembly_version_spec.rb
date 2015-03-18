@@ -14,6 +14,12 @@ describe Rake::Funnel::Tasks::AssemblyVersion do
     its(:target_path) { should be_an_instance_of(Proc) }
   end
 
+  describe '#next_to_source' do
+    it 'should place VersionInfo next to source' do
+      expect(described_class.new.next_to_source(:cs, {}, 'blah/VERSION')).to eq('blah/VersionInfo.cs')
+    end
+  end
+
   describe 'execution' do
     let(:writer) { instance_double(AssemblyVersionWriter).as_null_object }
 
