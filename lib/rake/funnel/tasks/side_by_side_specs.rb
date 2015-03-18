@@ -6,8 +6,7 @@ module Rake
       class SideBySideSpecs < Rake::TaskLib
         include Rake::Funnel::Support
 
-        attr_accessor :name, :projects, :references, :specs, :enabled
-        attr_accessor :paket_references, :packages
+        attr_accessor :name, :projects, :references, :specs, :packages, :enabled
 
         def initialize(*args, &task_block)
           setup_ivars(args)
@@ -21,9 +20,8 @@ module Rake
 
           @projects = %w(**/*.csproj **/*.vbproj **/*.fsproj)
           @references = []
-          @specs = %w(*Specs.cs **/*Specs.cs *Tests.cs **/*Tests.cs)
+          @specs = %w(*Specs.cs *Tests.cs)
           @enabled = false
-          @paket_references = %w(**/*paket.references)
           @packages = []
         end
 
@@ -45,7 +43,6 @@ module Rake
             projects: projects,
             references: references,
             specs: specs,
-            paket_references: paket_references,
             packages: packages
           }
         end

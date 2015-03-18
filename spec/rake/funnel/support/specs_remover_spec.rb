@@ -3,7 +3,6 @@ describe Rake::Funnel::Support::SpecsRemover do
     let(:projects) {}
     let(:references) {}
     let(:specs) {}
-    let(:paket_references) {}
     let(:packages) {}
 
     before {
@@ -17,7 +16,6 @@ describe Rake::Funnel::Support::SpecsRemover do
         described_class.remove(projects: projects,
                                references: references,
                                specs: specs,
-                               paket_references: paket_references,
                                packages: packages)
       }
 
@@ -46,131 +44,175 @@ describe Rake::Funnel::Support::SpecsRemover do
           expect(true).to be(true)
         end
       end
+
+      context 'string packages' do
+        let(:packages) { 'SomePackage' }
+
+        it 'should succeed' do
+          expect(true).to be(true)
+        end
+      end
     end
 
     describe 'unchanged files' do
-      let(:project_file) {}
-      let(:paket_references_file) {}
-
-      before {
-        allow(Dir).to receive(:[]).and_return([])
-      }
-
-      before {
-        allow(Dir).to receive(:[]).with(projects).and_return([project_file])
-        allow(File).to receive(:read).with(project_file).and_return('<root></root>')
-      }
-
-      before {
-        allow(Dir).to receive(:[]).with(paket_references).and_return([paket_references_file])
-        allow(File).to receive(:read).with(paket_references_file).and_return('SomePackage')
-      }
-
-      before {
-        described_class.remove(projects: projects,
-                               references: references,
-                               specs: specs,
-                               paket_references: paket_references,
-                               packages: packages)
-      }
-
-      context 'project unchanged' do
+      describe Rake::Funnel::Support::SpecsRemover::ProjectFiles do
         let(:projects) { '**/*.??proj' }
-        let(:project_file) { 'project.proj' }
+
+        before {
+          allow(Dir).to receive(:[]).and_return([:some])
+          allow(File).to receive(:read).and_return('<root></root>')
+        }
+
+        before {
+          described_class.remove_specs_and_references(projects, [], [])
+        }
 
         it 'should not write the project file' do
           expect(File).not_to have_received(:open)
         end
       end
 
-      context 'paket references unchanged' do
-        let(:paket_references) { '*paket.references' }
-        let(:paket_references_file) { 'paket.references' }
+      describe Rake::Funnel::Support::SpecsRemover::PaketReferences do
+        let(:projects) { %w(project.proj) }
 
-        it 'should not write the references file' do
+        before {
+          allow(Dir).to receive(:[]).and_return([:some])
+          allow(File).to receive(:exist?).and_return(true)
+          allow(File).to receive(:read).and_return('SomePackage')
+        }
+
+        before {
+          described_class.remove_packages(projects, [])
+        }
+
+        it 'should not write the project file' do
           expect(File).not_to have_received(:write)
         end
       end
     end
   end
 
-  describe 'example' do
-    let(:projects) { %w(**/*.??proj) }
-    let(:references) { %w(Sample-Ref-1 Sample-Ref-2 Sample-Ref-3) }
-    let(:specs) { %w(*Specs.cs **/*Specs.cs) }
-    let(:paket_references) { %w(**/*paket.references) }
-    let(:packages) { references }
+  describe 'examples' do
+    def content(file, dir = temp_dir)
+      File.read(File.join(dir, file))
+    end
 
+    def example_dir(example)
+      File.join(File.dirname(__FILE__), 'specs_remover', example)
+    end
+
+    let(:projects) { %w(**/*.??proj) }
+    let(:references) { %w(Some-Ref Ref-Without-HintPath Paket-Ref) }
+    let(:specs) { %w(*Specs.cs) }
+    let(:packages) { %w(Explicitly-Removed-Package) }
+
+    let(:current_dir) { Dir.pwd }
     let(:temp_dir) { Dir.mktmpdir }
 
     before {
-      FileUtils.cp_r(File.join(File.dirname(__FILE__), 'specs_remover/.'), temp_dir)
+      allow($stderr).to receive(:puts)
     }
 
     before {
-      allow(RakeFileUtils).to receive(:rm)
-    }
-
-    before {
-      Dir.chdir(temp_dir) do
-        described_class.remove(projects: projects,
-                               references: references,
-                               specs: specs,
-                               paket_references: paket_references,
-                               packages: packages)
-      end
+      FileUtils.cp_r(File.join(example_dir(example), '.'), temp_dir)
+      Dir.chdir(temp_dir)
     }
 
     after {
+      Dir.chdir(current_dir)
       FileUtils.rm_rf(temp_dir)
     }
 
-    describe 'code files' do
-      it 'should keep production code' do
-        expect(RakeFileUtils).not_to have_received(:rm).with('Code.cs')
-      end
+    context 'project' do
+      let(:example) { 'project' }
 
-      it 'should delete specs' do
-        expect(RakeFileUtils).to have_received(:rm).with('Specs.cs')
-        expect(RakeFileUtils).to have_received(:rm).with('FooSpecs.cs')
-        expect(RakeFileUtils).to have_received(:rm).with('subdir/BarSpecs.cs')
-      end
-    end
+      before {
+        described_class.remove(projects: projects,
+                               references: references,
+                               specs: specs,
+                               packages: packages)
+      }
 
-    describe 'projects' do
-      def project_xml
-        File.read(File.join(temp_dir, 'Sample.csproj'))
-      end
+      describe 'code files' do
+        describe 'production code' do
+          it 'should be kept' do
+            expect(File).to exist('FooCode.cs')
+          end
+        end
 
-      it 'should remove references' do
-        expect(project_xml).not_to include(*references)
-      end
+        describe 'uncompiled code' do
+          it 'should be kept' do
+            expect(File).to exist('uncompiled-code/BarCode.cs')
+            expect(File).to exist('uncompiled-code/BarSpecs.cs')
+          end
+        end
 
-      it 'should remove spec files' do
-        expect(project_xml).not_to include('Specs.cs', 'SampleSpecs.cs')
-      end
-    end
-
-    describe 'paket references' do
-      def content(file)
-        File.read(File.join(temp_dir, file))
-      end
-
-      it 'should remove packages' do
-        [
-          content('paket.references'),
-          content('subdir/foo.paket.references')
-        ].each do |content|
-          expect(content).not_to include(*packages)
+        describe 'specs' do
+          it 'should be deleted' do
+            expect(File).not_to exist('Specs.cs')
+            expect(File).not_to exist('FooSpecs.cs')
+          end
         end
       end
 
-      it 'should keep other packages' do
-        [
-          content('paket.references'),
-          content('subdir/foo.paket.references')
-        ].each do |content|
-          expect(content).to include('Untouched')
+      describe 'projects' do
+        it 'should remove references' do
+          expect(content('Sample.csproj')).not_to include(*references)
+        end
+
+        it 'should remove compiled specs' do
+          expect(content('Sample.csproj')).not_to include(*%w(Specs.cs SampleSpecs.cs DoesNotExistSpecs.cs))
+        end
+      end
+
+      describe 'paket references' do
+        describe 'paket.references for projects' do
+          it 'should remove packages' do
+            expect(content('paket.references')).not_to include(*(packages + references))
+          end
+
+          it 'should keep other packages' do
+            expect(content('paket.references')).to include('Untouched')
+          end
+        end
+
+        describe 'unused paket.references' do
+          it 'should not be modified' do
+            file = 'uncompiled-code/paket.references'
+            original_content = content(file, example_dir(example))
+
+            expect(content(file)).to eq(original_content)
+          end
+        end
+      end
+    end
+
+    context 'project-specific paket.references' do
+      let(:example) { 'project-specific paket.references' }
+
+      before {
+        described_class.remove(projects: projects,
+                               references: references,
+                               specs: specs,
+                               packages: packages)
+      }
+
+      describe 'paket.references for project' do
+        it 'should remove packages' do
+          expect(content('Sample.csproj.paket.references')).not_to include(*(packages + references))
+        end
+
+        it 'should keep other packages' do
+          expect(content('Sample.csproj.paket.references')).to include('Untouched')
+        end
+      end
+
+      describe 'global paket.references' do
+        it 'should not be modified' do
+          file = 'paket.references'
+          original_content = content(file, example_dir(example))
+
+          expect(content(file)).to eq(original_content)
         end
       end
     end

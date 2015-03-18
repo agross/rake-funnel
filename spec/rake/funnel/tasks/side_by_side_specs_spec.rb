@@ -12,9 +12,8 @@ describe Rake::Funnel::Tasks::SideBySideSpecs do
     its(:name) { should == :compile }
     its(:projects) { should == %w(**/*.csproj **/*.vbproj **/*.fsproj) }
     its(:references) { should == [] }
-    its(:specs) { should == %w(*Specs.cs **/*Specs.cs *Tests.cs **/*Tests.cs) }
+    its(:specs) { should == %w(*Specs.cs *Tests.cs) }
     its(:enabled) { should == false }
-    its(:paket_references) { should == %w(**/*paket.references) }
     its(:packages) { should == [] }
   end
 
@@ -25,7 +24,6 @@ describe Rake::Funnel::Tasks::SideBySideSpecs do
         t.references = %w(Ref)
         t.specs = %w(*Specs.cs **/*Specs.cs)
         t.enabled = enabled
-        t.paket_references = %w(paket.references)
         t.packages = %w(Package)
       end
     }
@@ -46,7 +44,6 @@ describe Rake::Funnel::Tasks::SideBySideSpecs do
             .with(projects: subject.projects,
                   references: subject.references,
                   specs: subject.specs,
-                  paket_references: subject.paket_references,
                   packages: subject.packages)
       end
     end
