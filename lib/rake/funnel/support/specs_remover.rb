@@ -5,45 +5,49 @@ module Rake
     module Support
       class SpecsRemover
         class << self
-          DEFAULTS = {
-            projects: [],
-            references: [],
-            specs: []
-          }
-
           def remove(args = {})
-            args = DEFAULTS.merge(args)
+            remove_specs_from_projects(args)
+            delete_test_files(args)
+            remove_paket_references(args)
+          end
 
+          private
+          def remove_specs_from_projects(args)
             projects(args).each do |project|
-              xml = REXML::Document.new(File.read(project), { attribute_quote: :quote })
-
+              xml = REXML::Document.new(File.read(project), attribute_quote: :quote)
               removed = remove_references(args, xml) + remove_specs(args, xml)
 
               write_xml(project, xml) if removed.flatten.any?
             end
-
-            delete_specs(args)
           end
 
-          private
-          def write_xml(project, xml)
-            File.open(project, 'w+') do |file|
-              xml.write(output: file, ie_hack: true)
+          def remove_paket_references(args)
+            paket_references(args).each do |references|
+              text = File.read(references)
+              removed = remove_packages(text, args)
+
+              File.write(references, removed) if removed != text
             end
           end
 
-          def delete_specs(args)
-            Dir[*args[:specs]].uniq.each do |spec|
+          def delete_test_files(args)
+            Dir[*list(args[:specs])].uniq.each do |spec|
               RakeFileUtils.rm(spec)
             end
           end
 
-          def projects(args)
-            Dir[*args[:projects]]
+          def list(args)
+            ([] << args).flatten.compact
           end
 
-          def list(args)
-            ([] << args).flatten
+          def projects(args)
+            Dir[*list(args[:projects])]
+          end
+
+          def write_xml(project, xml)
+            File.open(project, 'w+') do |file|
+              xml.write(output: file, ie_hack: true)
+            end
           end
 
           def remove_references(args, xml)
@@ -58,6 +62,17 @@ module Rake
               query = "/Project//Compile[matches(lower-case(@Include), '#{glob}')]"
               xml.elements.delete_all(query)
             end
+          end
+
+          def paket_references(args)
+            Dir[*list(args[:paket_references])]
+          end
+
+          def remove_packages(text, args)
+            list(args[:packages]).each do |package|
+              text = text.gsub(/^#{package}.*\n?/i, '')
+            end
+            text
           end
         end
       end

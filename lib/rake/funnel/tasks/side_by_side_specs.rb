@@ -7,6 +7,7 @@ module Rake
         include Rake::Funnel::Support
 
         attr_accessor :name, :projects, :references, :specs, :enabled
+        attr_accessor :paket_references, :packages
 
         def initialize(*args, &task_block)
           setup_ivars(args)
@@ -22,6 +23,8 @@ module Rake
           @references = []
           @specs = %w(*Specs.cs **/*Specs.cs *Tests.cs **/*Tests.cs)
           @enabled = false
+          @paket_references = %w(**/*paket.references)
+          @packages = []
         end
 
         def define(args, &task_block)
@@ -30,10 +33,21 @@ module Rake
             task_block.call(*[self, task_args].slice(0, task_block.arity)) if task_block
 
             next unless enabled
-            SpecsRemover.remove(projects: projects, references: references, specs: specs)
+
+            SpecsRemover.remove(remove_args)
           end
 
           self
+        end
+
+        def remove_args
+          {
+            projects: projects,
+            references: references,
+            specs: specs,
+            paket_references: paket_references,
+            packages: packages
+          }
         end
       end
     end
