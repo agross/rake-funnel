@@ -108,9 +108,17 @@ describe Rake::Funnel::Integration::TeamCity::ServiceMessages do
         end
       end
 
+      context 'when reporting a message with an unnamed non-string parameter' do
+        it 'should print the service message' do
+          described_class.progress_message 42
+
+          expect($stdout).to have_received(:puts).with("##teamcity[progressMessage '42']")
+        end
+      end
+
       context 'when reporting a message with a named parameter' do
         it 'should print the service message' do
-          described_class.block_opened({ name: 'block name' })
+          described_class.block_opened(name: 'block name')
 
           expect($stdout).to have_received(:puts).with("##teamcity[blockOpened name='block name']")
         end
@@ -118,7 +126,7 @@ describe Rake::Funnel::Integration::TeamCity::ServiceMessages do
 
       context 'when reporting a message with multiple named parameters' do
         it 'should print the service message' do
-          described_class.test_started ({ name: 'test name', captureStandardOutput: true })
+          described_class.test_started(name: 'test name', captureStandardOutput: true)
 
           expect($stdout).to have_received(:puts).with("##teamcity[testStarted name='test name' captureStandardOutput='true']")
         end
@@ -126,7 +134,7 @@ describe Rake::Funnel::Integration::TeamCity::ServiceMessages do
 
       context 'when reporting a message with Ruby-style named parameters' do
         it 'should print the service message' do
-          described_class.test_started ({ capture_standard_output: true })
+          described_class.test_started(capture_standard_output: true)
 
           expect($stdout).to have_received(:puts).with("##teamcity[testStarted captureStandardOutput='true']")
         end

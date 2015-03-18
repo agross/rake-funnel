@@ -21,6 +21,7 @@ module Rake
 
             def escape(string)
               string
+                .to_s
                 .gsub(/\|/, '||')
                 .gsub(/'/, "|'")
                 .gsub(/\r/, '|r')
@@ -35,8 +36,8 @@ module Rake
             def escaped_array_of(args)
               return [] if args.nil?
 
-              return "'#{escape args}'" unless args.is_a?(Hash)
-              args.map { |key, value| "#{key.camelize}='#{escape value.to_s}'" }
+              return "'#{escape(args)}'" unless args.is_a?(Hash)
+              args.map { |key, value| "#{key.camelize}='#{escape(value.to_s)}'" }
             end
           end
         end
