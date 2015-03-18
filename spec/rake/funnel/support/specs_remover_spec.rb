@@ -106,7 +106,6 @@ describe Rake::Funnel::Support::SpecsRemover do
     let(:specs) { %w(*Specs.cs) }
     let(:packages) { %w(Explicitly-Removed-Package) }
 
-    let(:current_dir) { Dir.pwd }
     let(:temp_dir) { Dir.mktmpdir }
 
     before {
@@ -115,11 +114,9 @@ describe Rake::Funnel::Support::SpecsRemover do
 
     before {
       FileUtils.cp_r(File.join(example_dir(example), '.'), temp_dir)
-      Dir.chdir(temp_dir)
     }
 
     after {
-      Dir.chdir(current_dir)
       FileUtils.rm_rf(temp_dir)
     }
 
@@ -127,30 +124,33 @@ describe Rake::Funnel::Support::SpecsRemover do
       let(:example) { 'project' }
 
       before {
-        described_class.remove(projects: projects,
-                               references: references,
-                               specs: specs,
-                               packages: packages)
+        Dir.chdir(temp_dir) do
+          described_class.remove(projects: projects,
+                                 references: references,
+                                 specs: specs,
+                                 packages: packages)
+        end
       }
 
       describe 'code files' do
         describe 'production code' do
           it 'should be kept' do
-            expect(File).to exist('FooCode.cs')
+            expect(File).to exist(File.join(temp_dir, 'FooCode.cs'))
           end
         end
 
         describe 'uncompiled code' do
           it 'should be kept' do
-            expect(File).to exist('uncompiled-code/BarCode.cs')
-            expect(File).to exist('uncompiled-code/BarSpecs.cs')
+            expect(File).to exist(File.join(temp_dir, 'uncompiled-code/BarCode.cs'))
+            expect(File).to exist(File.join(temp_dir, 'uncompiled-code/BarSpecs.cs'))
           end
         end
 
         describe 'specs' do
           it 'should be deleted' do
-            expect(File).not_to exist('Specs.cs')
-            expect(File).not_to exist('FooSpecs.cs')
+            expect(File).not_to exist(File.join(temp_dir, 'Specs.cs'))
+            expect(File).not_to exist(File.join(temp_dir, 'FooSpecs.cs'))
+            expect(File).not_to exist(File.join(temp_dir, 'subdir/SubdirSpecs.cs'))
           end
         end
       end
@@ -165,8 +165,8 @@ describe Rake::Funnel::Support::SpecsRemover do
         end
       end
 
-      describe 'paket references' do
-        describe 'paket.references for projects' do
+      describe 'paket.references' do
+        describe 'for projects' do
           it 'should remove packages' do
             expect(content('paket.references')).not_to include(*(packages + references))
           end
@@ -176,7 +176,7 @@ describe Rake::Funnel::Support::SpecsRemover do
           end
         end
 
-        describe 'unused paket.references' do
+        describe 'unused' do
           it 'should not be modified' do
             file = 'uncompiled-code/paket.references'
             original_content = content(file, example_dir(example))
@@ -191,28 +191,32 @@ describe Rake::Funnel::Support::SpecsRemover do
       let(:example) { 'project-specific paket.references' }
 
       before {
-        described_class.remove(projects: projects,
-                               references: references,
-                               specs: specs,
-                               packages: packages)
+        Dir.chdir(temp_dir) do
+          described_class.remove(projects: projects,
+                                 references: references,
+                                 specs: specs,
+                                 packages: packages)
+        end
       }
 
-      describe 'paket.references for project' do
-        it 'should remove packages' do
-          expect(content('Sample.csproj.paket.references')).not_to include(*(packages + references))
+      describe 'paket.references' do
+        describe 'for project' do
+          it 'should remove packages' do
+            expect(content('Sample.csproj.paket.references')).not_to include(*(packages + references))
+          end
+
+          it 'should keep other packages' do
+            expect(content('Sample.csproj.paket.references')).to include('Untouched')
+          end
         end
 
-        it 'should keep other packages' do
-          expect(content('Sample.csproj.paket.references')).to include('Untouched')
-        end
-      end
+        describe 'global' do
+          it 'should not be modified' do
+            file = 'paket.references'
+            original_content = content(file, example_dir(example))
 
-      describe 'global paket.references' do
-        it 'should not be modified' do
-          file = 'paket.references'
-          original_content = content(file, example_dir(example))
-
-          expect(content(file)).to eq(original_content)
+            expect(content(file)).to eq(original_content)
+          end
         end
       end
     end

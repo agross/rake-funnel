@@ -12,6 +12,7 @@
     <Compile Include="FooCode.cs" />
     <Compile Include="FooSpecs.cs" />
     <Compile Include="DoesNotExistSpecs.cs" />
+    <Compile Include="subdir\SubdirSpecs.cs" />
   </ItemGroup>
   <Choose>
     <When Condition="ignored">

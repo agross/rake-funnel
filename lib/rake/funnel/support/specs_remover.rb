@@ -28,7 +28,7 @@ module Rake
 
                 {
                   project: project,
-                  packages: resolve_package_names(project, references),
+                  packages: resolve_package_names(references),
                   specs: resolve_paths(project, specs)
                 }
               end
@@ -60,12 +60,12 @@ module Rake
               end
             end
 
-            def resolve_package_names(project, references)
-              references.map { |r| package_for(project, r) }.compact
+            def resolve_package_names(references)
+              references.map { |r| package_for(r) }.compact
             end
 
-            def package_for(project, reference)
-              path = File.expand_path(File.join(project, reference))
+            def package_for(reference)
+              path = normalize(reference)
 
               Pathname.new(path).ascend do |p|
                 break p.parent.basename.to_s if p.basename.to_s == 'lib'
@@ -73,7 +73,11 @@ module Rake
             end
 
             def resolve_paths(project, files)
-              files.map { |f| File.expand_path(File.join(File.dirname(project), f)) }
+              files.map { |f| File.expand_path(File.join(File.dirname(project), normalize(f))) }
+            end
+
+            def normalize(path)
+              path.gsub('\\', File::SEPARATOR)
             end
           end
         end
