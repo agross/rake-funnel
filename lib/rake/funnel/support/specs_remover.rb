@@ -20,38 +20,55 @@ module Rake
             private
             def remove(projects, references, specs)
               Dir[*projects].map do |project|
-                xml = REXML::Document.new(File.read(project), attribute_quote: :quote)
-                references = remove_references(references, xml)
-                specs = remove_specs(specs, xml)
+                Trace.message("Processing #{project} with references #{references} and specs #{specs}")
 
-                save(project, xml) if (references + specs).any?
+                removed_references, removed_specs = with_document(project) do |xml|
+                  [remove_references(references, xml), remove_specs(specs, xml)]
+                end
 
                 {
                   project: project,
-                  packages: resolve_package_names(references),
-                  specs: resolve_paths(project, specs)
+                  packages: resolve_package_names(removed_references),
+                  specs: resolve_paths(project, removed_specs)
                 }
               end
             end
 
+            def with_document(project)
+              xml = REXML::Document.new(File.read(project), attribute_quote: :quote)
+
+              removed = yield(xml) if block_given?
+
+              save(project, xml) if [removed].flatten.compact.any?
+
+              removed
+            end
+
             def remove_references(references, xml)
-              deleted = references.map do |ref|
+              deleted = references.map { |ref|
                 query = "/Project//Reference[starts-with(lower-case(@Include), '#{ref.downcase}')]"
                 xml.elements.delete_all(query)
-              end
+              }
+                .flatten
+                .tap { |d| Trace.message("Removed references: #{d.inspect}") }
 
-              deleted.flatten.map { |d|
+              deleted.map { |d|
                 d.get_elements('/HintPath').map(&:text)
-              }.flatten
+              }
+                .flatten
+                .tap { |d| Trace.message("HintPaths: #{d}") }
             end
 
             def remove_specs(specs, xml)
-              deleted = specs.map do |glob|
+              deleted = specs.map { |glob|
                 query = "/Project//Compile[matches(lower-case(@Include), '#{glob}')]"
                 xml.elements.delete_all(query)
-              end
+              }
 
-              deleted.flatten.map { |d| d.attributes['Include'] }
+              deleted
+                .flatten
+                .map { |d| d.attributes['Include'] }
+                .tap { |d| Trace.message("Removed specs: #{d}") }
             end
 
             def save(project, xml)
@@ -87,6 +104,8 @@ module Rake
             def remove_packages(projects, packages)
               projects.each do |project|
                 references = paket_references_for(project)
+                Trace.message("Found #{references || 'no paket.references'} for #{project}}")
+
                 next unless references
 
                 text = File.read(references)
@@ -105,6 +124,7 @@ module Rake
             end
 
             def remove(text, packages)
+              Trace.message("Removing packages: #{packages.inspect}")
               packages.each do |package|
                 text = text.gsub(/^#{package}.*\n?/i, '')
               end
@@ -119,9 +139,9 @@ module Rake
                                                                                  list(args[:references]),
                                                                                  list(args[:specs]))
 
-            delete(specs)
-
             PaketReferences.remove_packages(projects, list(args[:packages]) + packages)
+
+            delete(specs)
           end
 
           private

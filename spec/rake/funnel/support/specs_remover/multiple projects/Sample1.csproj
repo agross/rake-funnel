@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Reference Include="Some-Ref">
+      <HintPath>somewhere\Sample-Ref.dll</HintPath>
+    </Reference>
+    <Reference Include="Ref-Without-HintPath" />
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="1Specs.cs" />
+  </ItemGroup>
+  <Choose>
+    <When Condition="ignored">
+      <ItemGroup>
+        <Reference Include="Paket-Ref">
+          <HintPath>..\..\packages\Paket-Ref\lib\net451\Paket-Ref.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+</Project>

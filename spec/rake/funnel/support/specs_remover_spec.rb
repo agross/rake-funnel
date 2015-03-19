@@ -1,4 +1,8 @@
 describe Rake::Funnel::Support::SpecsRemover do
+  before {
+    allow(Rake::Funnel::Support::Trace).to receive(:message)
+  }
+
   describe 'removal' do
     let(:projects) {}
     let(:references) {}
@@ -217,6 +221,31 @@ describe Rake::Funnel::Support::SpecsRemover do
 
             expect(content(file)).to eq(original_content)
           end
+        end
+      end
+    end
+
+    context 'multiple projects' do
+      let(:example) { 'multiple projects' }
+
+      before {
+        Dir.chdir(temp_dir) do
+          described_class.remove(projects: projects,
+                                 references: references,
+                                 specs: specs,
+                                 packages: packages)
+        end
+      }
+
+      describe 'projects' do
+        it 'should remove references' do
+          expect(content('Sample1.csproj')).not_to include(*references)
+          expect(content('Sample2.csproj')).not_to include(*references)
+        end
+
+        it 'should remove compiled specs' do
+          expect(content('Sample1.csproj')).not_to include(*%w(Specs.cs))
+          expect(content('Sample2.csproj')).not_to include(*%w(Specs.cs))
         end
       end
     end
