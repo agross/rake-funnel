@@ -8,7 +8,6 @@ module Rake
 
         def initialize(hash = nil)
           super(hash)
-          freeze
         end
 
         def each(&block)

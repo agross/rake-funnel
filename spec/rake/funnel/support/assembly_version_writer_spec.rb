@@ -56,7 +56,7 @@ describe Rake::Funnel::Support::AssemblyVersionWriter do
     end
   end
 
-  describe 'generator' do
+  describe '#write' do
     let(:source) {
       [
         {
@@ -82,7 +82,6 @@ describe Rake::Funnel::Support::AssemblyVersionWriter do
 
     let(:target_path) { double(Proc).as_null_object }
     let(:languages) { [:vb, :cs, :fs] }
-    let(:erb) { double(ERB).as_null_object }
 
     subject {
       described_class.new(source)
@@ -93,11 +92,11 @@ describe Rake::Funnel::Support::AssemblyVersionWriter do
     }
 
     before {
-      allow(ERB).to receive(:new).and_return(erb)
+      allow(ERB).to receive(:new).and_call_original
     }
 
     before {
-      allow(File).to receive(:read).and_return('template')
+      allow(File).to receive(:read).and_call_original
       allow(File).to receive(:write)
     }
 
@@ -121,7 +120,7 @@ describe Rake::Funnel::Support::AssemblyVersionWriter do
       end
 
       it 'should run templates through ERb' do
-        expect(erb).to have_received(:result).exactly(languages.length * source.length).times
+        expect(ERB).to have_received(:new).exactly(languages.length * source.length).times
       end
 
       it 'should write version info file for each language in source' do
@@ -134,6 +133,23 @@ describe Rake::Funnel::Support::AssemblyVersionWriter do
 
       it 'should fail' do
         expect { subject.write(target_path, languages) }.to raise_error /Language is not supported: unsupported/
+      end
+    end
+
+    describe 'version modification' do
+      let(:target_path) {
+        proc { |_language, version_info, source|
+          version_info.assembly_informational_version = 'totally custom'
+          'file'
+        }
+      }
+
+      before {
+        subject.write(target_path, languages)
+      }
+
+      it 'should use modified version info to generate file' do
+        expect(File).to have_received(:write).with('file', /AssemblyInformationalVersion\("totally custom"\)/).at_least(:once)
       end
     end
   end

@@ -300,16 +300,6 @@ describe Rake::Funnel::Support::VersionInfo do
     it 'should be an OpenStruct' do
       expect(described_class < OpenStruct).to eq(true)
     end
-
-    describe 'immutability' do
-      let(:args) { { a: 42 } }
-
-      subject { described_class.new(args) }
-
-      it 'should be immutable' do
-        expect { subject.a = 23 }.to raise_error
-      end
-    end
   end
 
   describe '#read_version_from' do
