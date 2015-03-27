@@ -8,60 +8,66 @@ describe Rake::Funnel::ExecutionError do
     its(:exit_code) { should be_nil }
     its(:output) { should be_nil }
     its(:description) { should be_nil }
-    its(:to_s) { should =~ /^Error executing:\scommand/ }
-  end
+    its(:to_s) { should =~ /^Error executing:\ncommand/ }
 
-  context 'with command and exit code' do
-    subject { described_class.new('command', 127) }
+    context 'and exit code' do
+      subject { described_class.new('command', 127) }
 
-    its(:command) { should == 'command' }
-    its(:exit_code) { should == 127 }
-    its(:output) { should be_nil }
-    its(:description) { should be_nil }
-    its(:to_s) { should =~ /^Error executing:\scommand/ }
-    its(:to_s) { should =~ /^Exit code: 127/ }
-    end
+      its(:command) { should == 'command' }
+      its(:exit_code) { should == 127 }
+      its(:output) { should be_nil }
+      its(:description) { should be_nil }
+      its(:to_s) { should =~ /^Error executing:\ncommand/ }
+      its(:to_s) { should =~ /^Exit code: 127/ }
 
-  context 'with command and exit code and output' do
-    subject { described_class.new('command', 127, 'output') }
+      context 'and output' do
+        subject { described_class.new('command', 127, 'output') }
 
-    its(:command) { should == 'command' }
-    its(:exit_code) { should == 127 }
-    its(:output) { should == 'output' }
-    its(:description) { should be_nil }
-    its(:to_s) { should =~ /^Error executing:\scommand/ }
-    its(:to_s) { should =~ /^Exit code: 127/ }
-    its(:to_s) { should =~ /^Command output \(last 10 lines\):\soutput/ }
-  end
+        its(:command) { should == 'command' }
+        its(:exit_code) { should == 127 }
+        its(:output) { should == 'output' }
+        its(:description) { should be_nil }
+        its(:to_s) { should =~ /^Error executing:\ncommand/ }
+        its(:to_s) { should =~ /^Exit code: 127/ }
+        its(:to_s) { should =~ /^Command output \(last 10 lines\):\noutput/ }
 
-  context 'with command and exit code and output and message' do
-    subject { described_class.new('command', 127, 'output', 'description') }
+        context 'encoded output' do
+          subject { described_class.new('command', 127, 'output äöüß'.encode('CP850')) }
 
-    its(:command) { should == 'command' }
-    its(:exit_code) { should == 127 }
-    its(:output) { should == 'output' }
-    its(:description) { should == 'description' }
-    its(:to_s) { should =~ /^description/ }
-    its(:to_s) { should =~ /^Error executing:\scommand/ }
-    its(:to_s) { should =~ /^Exit code: 127/ }
-    its(:to_s) { should =~ /^Command output \(last 10 lines\):\soutput/ }
-  end
+          its(:to_s) { should =~ /^Command output \(last 10 lines\):\noutput/ }
+        end
 
-  context 'with output longer than 10 lines' do
-    let(:output) {
-      output = []
+        context 'longer than 10 lines' do
+          let(:output) {
+            output = []
 
-      11.times.each do |i|
-        output << "output #{i}"
+            11.times.each do |i|
+              output << "output #{i}"
+            end
+
+            output.join("\n")
+          }
+
+          subject { described_class.new(nil, nil, output) }
+
+          it 'should display the last 10 lines of output' do
+            expect(subject.to_s).not_to match(/^output 0/)
+          end
+        end
+
+        context 'and description' do
+          subject { described_class.new('command', 127, 'output', 'description') }
+
+          its(:command) { should == 'command' }
+          its(:exit_code) { should == 127 }
+          its(:output) { should == 'output' }
+          its(:description) { should == 'description' }
+          its(:to_s) { should =~ /^description/ }
+          its(:to_s) { should =~ /^Error executing:\ncommand/ }
+          its(:to_s) { should =~ /^Exit code: 127/ }
+          its(:to_s) { should =~ /^Command output \(last 10 lines\):\noutput/ }
+        end
       end
-
-      output.join("\n")
-    }
-
-    subject { described_class.new(nil, nil, output) }
-
-    it 'should display the last 10 lines of output' do
-      expect(subject.to_s).not_to match(/^output 0/)
     end
   end
 end

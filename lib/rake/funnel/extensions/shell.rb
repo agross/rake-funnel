@@ -69,14 +69,14 @@ module Rake
         end
 
         def to_stdout(line)
-          $stdout.puts line.sub(/\n$/, '').green
+          $stdout.puts line.rstrip.green
           :success
         end
 
         def to_stderr(line, error_lines)
           return unless error_lines && line =~ error_lines
 
-          $stderr.puts line.sub(/\n$/, '').bold.red
+          $stderr.puts line.rstrip.bold.red
           :error
         end
       end

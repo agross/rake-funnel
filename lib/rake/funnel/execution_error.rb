@@ -13,15 +13,28 @@ module Rake
       end
 
       def to_s
-        msg = []
-        (msg << description << nil) if description
-        (msg << 'Error executing:' << command << nil) if command
-        (msg << "Exit code: #{exit_code}" << nil) if exit_code
-        (msg << 'Command output (last 10 lines):' << output.split("\n").last(10) << nil) if output
-
+        msg = [] << inspect_description << inspect_command << inspect_exit_code << last_output
+        msg = msg.flatten.compact
         msg = [super.to_s] if msg.empty?
 
         msg.join("\n")
+      end
+
+      private
+      def inspect_description
+        [description] if description
+      end
+
+      def inspect_command
+        ['Error executing:', command] if command
+      end
+
+      def inspect_exit_code
+        ["Exit code: #{exit_code}"] if exit_code
+      end
+
+      def last_output
+        ['Command output (last 10 lines):', output.encode('UTF-8').split("\n").last(10)] if output
       end
     end
   end

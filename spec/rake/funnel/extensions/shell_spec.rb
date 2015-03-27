@@ -159,6 +159,14 @@ describe Rake::Funnel::Extensions::Shell do
         expect($stdout).to have_received(:puts).with(/output 2/)
       end
     end
+
+    context 'lines with different encoding' do
+      let(:stdout_and_stderr) { StringIO.new('error äöüß'.encode('CP850')) }
+
+      it 'should log to stdout before error' do
+        expect($stderr).to have_received(:puts).with(/error/)
+      end
+    end
   end
 
   describe 'callback block' do
