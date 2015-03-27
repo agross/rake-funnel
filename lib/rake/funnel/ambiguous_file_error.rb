@@ -14,17 +14,25 @@ module Rake
       end
 
       def to_s
-        msg = []
-        (msg << description) if description
-        (msg << "Search pattern used: #{@search_pattern}") if @search_pattern
-        unless (@candidates || []).empty?
-          msg << 'Candidates:'
-          msg << @candidates.map { |c| "  - #{c}" }
-        end
-
+        msg = [] << inspect_description << inspect_search_pattern << inspect_candidates
+        msg = msg.flatten.compact
         msg = [super.to_s] if msg.empty?
 
         msg.join("\n")
+      end
+
+      private
+      def inspect_description
+        [description] if description
+      end
+
+      def inspect_search_pattern
+        ["Search pattern used: #{search_pattern}"] if search_pattern
+      end
+
+      def inspect_candidates
+        return if (candidates || []).empty?
+        ['Candidates:', candidates.map { |c| "  - #{c}" }]
       end
     end
   end
