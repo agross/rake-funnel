@@ -202,7 +202,6 @@ describe Rake::Funnel::Tasks::MSDeploy do
         }
 
         it 'should quote the string' do
-          args = '"path to/msdeploy" -"simple key":"simple value" -hash:"hash key 1"="hash value 1","hash key 2"="hash value 2" -array:"array value 1" -array:"array value 2" -"some flag"'
           args = %w(
             "path to/msdeploy"
             -"simple key":"simple value"
