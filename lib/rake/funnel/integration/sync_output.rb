@@ -3,8 +3,15 @@ module Rake
     module Integration
       class SyncOutput
         def initialize
-          $stdout.sync = true
-          $stderr.sync = true
+          sync($stdout)
+          sync($stderr)
+        end
+
+        private
+        def sync(stream)
+          stream.sync = true
+        rescue => e
+          Rake.rake_output_message "Failed to set up sync output #{e}"
         end
       end
     end
