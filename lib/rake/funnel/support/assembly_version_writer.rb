@@ -11,7 +11,7 @@ module Rake
         include InstantiateSymbol
         instantiate AssemblyVersion
 
-        def initialize(type = :FromVersionFiles, args = {})
+        def initialize(type = :from_version_files, args = {})
           @type = create(type, args)
         end
 

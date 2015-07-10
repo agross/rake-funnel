@@ -10,7 +10,7 @@ module Rake
         include InstantiateSymbol
         instantiate Styles
 
-        def initialize(style = :Default)
+        def initialize(style = :default)
           raise "You cannot use the 'nil' mapper style. Available mappers are: #{available.inspect}" if style.nil?
 
           @style = create(style)

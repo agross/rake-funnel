@@ -10,12 +10,12 @@ describe Rake::Funnel::Support::AssemblyVersionWriter do
       }
 
       it 'should create FromVersionFiles with empty args' do
-        expect(subject).to have_received(:create).with(:FromVersionFiles, {})
+        expect(subject).to have_received(:create).with(:from_version_files, {})
       end
     end
 
     describe 'custom type' do
-      let(:source) { :Custom }
+      let(:source) { :custom }
       let(:source_args) { { foo: 42 } }
 
       before {

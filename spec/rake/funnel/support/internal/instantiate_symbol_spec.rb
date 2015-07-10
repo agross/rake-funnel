@@ -25,6 +25,20 @@ describe Rake::Funnel::Support::InstantiateSymbol do
     end
   end
 
+  module SnakeCase
+    class SnakeCase
+    end
+
+    class Snake_Case
+    end
+  end
+
+  class SnakeCaseModuleDefinition
+    include Rake::Funnel::Support::InstantiateSymbol
+
+    instantiate SnakeCase
+  end
+
   describe 'module methods' do
     subject {
       ExplicitModuleDefinition.new
@@ -34,6 +48,7 @@ describe Rake::Funnel::Support::InstantiateSymbol do
       it 'should not be public' do
         expect(subject).not_to respond_to(:create)
         expect(subject).not_to respond_to(:available)
+        expect(subject).not_to respond_to(:mod)
       end
     end
 
@@ -104,6 +119,20 @@ describe Rake::Funnel::Support::InstantiateSymbol do
     context 'symbol not defined' do
       it 'should fail' do
         expect { subject.send(:create, :does_not_exist) }.to raise_error 'Unknown type to instantiate: :does_not_exist. Available types are: [:One, :Three, :Two]'
+      end
+    end
+
+    context 'snake cased symbol' do
+      subject {
+        SnakeCaseModuleDefinition.new
+      }
+
+      it 'should return instance' do
+        expect(subject.send(:create, :snake_case)).to be_an_instance_of(SnakeCase::SnakeCase)
+      end
+
+      it 'should prefer explicit type' do
+        expect(subject.send(:create, :Snake_Case)).to be_an_instance_of(SnakeCase::Snake_Case)
       end
     end
 

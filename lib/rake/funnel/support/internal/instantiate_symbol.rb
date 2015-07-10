@@ -20,17 +20,22 @@ module Rake
         def create(sym, *args)
           return sym unless sym.is_a?(Symbol)
 
-          begin
-            type = self.class.module.const_get(sym)
-          rescue NameError
-            raise NameError, "Unknown type to instantiate: #{sym.inspect}. Available types are: #{available.inspect}"
-          end
+          found = [sym, sym.pascalize.to_sym]
+            .select { |candidate| mod.constants.include?(candidate) }
+            .first
 
+          raise NameError, "Unknown type to instantiate: #{sym.inspect}. Available types are: #{available.inspect}" if found.nil?
+
+          type = mod.const_get(found)
           type.new(*args)
         end
 
         def available
-          self.class.module.constants.sort
+          mod.constants.sort
+        end
+
+        def mod
+          self.class.module
         end
       end
     end
