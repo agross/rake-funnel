@@ -41,7 +41,7 @@ describe Rake::Funnel::Support::TemplateEngine do
         var = 42
         template = '<%= var %>'
 
-        expect { described_class.render(template) }.to raise_error
+        expect { described_class.render(template) }.to raise_error(NameError)
       end
     end
 

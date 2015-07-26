@@ -91,7 +91,7 @@ describe Rake::Funnel::Integration::TeamCity do
 
         context 'block error' do
           it 'should reset path' do
-            expect { described_class.with_java_runtime { fail 'with some error' } }.to raise_error
+            expect { described_class.with_java_runtime { fail 'with some error' } }.to raise_error(/with some error/)
 
             expect(ENV).to have_received(:[]=).with('PATH', original_path)
           end

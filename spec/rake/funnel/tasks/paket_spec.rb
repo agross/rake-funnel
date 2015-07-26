@@ -110,7 +110,7 @@ describe Rake::Funnel::Tasks::Paket do
             }
 
             it 'should fail' do
-              expect { Task[subject.name].invoke }.to raise_error
+              expect { Task[subject.name].invoke }.to raise_error(RuntimeError)
             end
           end
         end
@@ -130,7 +130,7 @@ describe Rake::Funnel::Tasks::Paket do
             end
 
             it 'should fail' do
-              expect { Task[subject.name].invoke }.to raise_error
+              expect { Task[subject.name].invoke }.to raise_error(RuntimeError)
             end
           end
         end
