@@ -1,12 +1,3 @@
-case RbConfig::CONFIG['target_os']
-when /windows|bccwin|cygwin|djgpp|mingw|mswin|wince/i
-  notification :gntp, host: 'localhost'
-when /linux/i
-  notification :notifysend
-when /mac|darwin/i
-  notification :growl
-end
-
 guard :bundler do
   watch('Gemfile')
   watch(/^.+\.gemspec/)
