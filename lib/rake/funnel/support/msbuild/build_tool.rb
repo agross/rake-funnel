@@ -9,7 +9,7 @@ module Rake
 
               require 'win32/registry'
 
-              %w(12.0 4.0 3.5 2.0).collect { |version|
+              %w(14.0 12.0 4.0 3.5 2.0).collect { |version|
                 key = "SOFTWARE\\Microsoft\\MSBuild\\ToolsVersions\\#{version}"
 
                 begin
