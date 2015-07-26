@@ -59,20 +59,24 @@ module Rake
               resets = []
 
               p.setup do
-                resets = KEYS.map do |key|
-                  root.create(key) do |r|
-                    begin
-                      r[VERSION_VALUE]
+                begin
+                  resets = KEYS.map do |key|
+                    root.create(key) do |r|
+                      begin
+                        r[VERSION_VALUE]
 
-                      delete_version = proc {}
-                    rescue ::Win32::Registry::Error
-                      r[VERSION_VALUE] = FAKE_VERSION
+                        delete_version = proc {}
+                      rescue ::Win32::Registry::Error
+                        r[VERSION_VALUE] = FAKE_VERSION
 
-                      delete_version = delete_value(r, VERSION_VALUE)
+                        delete_version = delete_value(r, VERSION_VALUE)
+                      end
+
+                      delete_key(r) || delete_version
                     end
-
-                    delete_key(r) || delete_version
                   end
+                rescue ::Win32::Registry::Error => e
+                  warn "Could not patch registry to pretend MSDeploy is installed: #{e}"
                 end
               end
 

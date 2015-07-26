@@ -1,4 +1,8 @@
 describe Rake::Funnel::Support::MSDeploy::RegistryPatch do
+  before {
+    allow_any_instance_of(described_class).to receive(:warn)
+  }
+
   describe 'execution' do
     it 'should yield block' do
       result = 0
@@ -80,6 +84,20 @@ describe Rake::Funnel::Support::MSDeploy::RegistryPatch do
           keys.each do |key|
             expect(key).to have_received(:delete_key).with(File.basename(key.keyname), true)
           end
+        end
+      end
+
+      context 'registry access is denied' do
+        before {
+          allow(root).to receive(:create).and_raise(::Win32::Registry::Error.new(5))
+        }
+
+        before {
+          described_class.new
+        }
+
+        it 'should warn' do
+          expect(subject).to have_received(:warn).with(/Could not patch registry to pretend MSDeploy is installed/)
         end
       end
 
