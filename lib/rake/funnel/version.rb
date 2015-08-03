@@ -1,5 +1,5 @@
 module Rake
   module Funnel
-    VERSION = '0.13.0.pre'
+    VERSION = '0.14.0.pre'
   end
 end

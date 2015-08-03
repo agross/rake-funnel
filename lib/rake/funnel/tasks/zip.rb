@@ -6,7 +6,7 @@ module Rake
       class Zip < Rake::TaskLib
         include Rake::Funnel::Support
 
-        attr_accessor :name, :source, :target, :zip_root
+        attr_accessor :name, :source, :target, :zip_root, :allow_empty
 
         def initialize(*args, &task_block)
           setup_ivars(args)
@@ -21,6 +21,7 @@ module Rake
           @source = []
           @target = nil
           @zip_root = nil
+          @allow_empty = true
         end
 
         def define(args, &task_block)
@@ -28,6 +29,11 @@ module Rake
 
           task(name, *args) do |_, task_args|
             task_block.call(*[self, task_args].slice(0, task_block.arity)) if task_block
+
+            if files.empty? && !allow_empty
+              Rake.rake_output_message('No files to zip')
+              next
+            end
 
             Zipper.zip(files, target, zip_root)
 
