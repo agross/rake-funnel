@@ -29,16 +29,16 @@ describe Rake::Funnel::Integration::ProgressReport do
     }
 
     context 'not on TeamCity' do
-      it 'should write task name in square brackets' do
-        expect($stdout).to have_received(:puts).with("\n[task]")
+      it 'should write colored task name in square brackets' do
+        expect($stdout).to have_received(:puts).with("\n[task]".bold.cyan)
       end
     end
 
     context 'on TeamCity' do
       let(:teamcity_running?) { true }
 
-      it 'should not write task name in square brackets since it would clutter the output' do
-        expect($stdout).to_not have_received(:puts).with("\n[task]")
+      it 'should not write task name since it would clutter the output' do
+        expect($stdout).to_not have_received(:puts).with(/task/)
       end
     end
   end
