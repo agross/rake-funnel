@@ -6,9 +6,6 @@ require: rubocop-rspec
 Metrics/LineLength:
   Enabled: false
 
-Style/Blocks:
-  Enabled: false
-
 Style/Documentation:
   Enabled: false
 
