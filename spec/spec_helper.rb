@@ -14,10 +14,12 @@ SimpleCov.start do
     ]
   end
 
-  formatter SimpleCov::Formatter::MultiFormatter[
+  formatter SimpleCov::Formatter::MultiFormatter.new(
+    [
       SimpleCov::Formatter::HTMLFormatter,
       *external_services
     ]
+  )
 
   coverage_dir('build/coverage')
 
