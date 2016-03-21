@@ -11,11 +11,11 @@ Gem::Specification.new do |s|
   s.homepage    = 'http://grossweber.com'
   s.license     = 'BSD'
   s.description = 'A standardized build pipeline'
-  s.summary     = 'The build pipeline'
+  s.summary     = 'A build pipeline targeted at .NET projects. Supports environment configuration and makes invoking .NET-related tasks easier.'
 
   s.required_ruby_version = '>= 2.0.0'
 
-  s.add_dependency 'rake', '~> 10.4'
+  s.add_dependency 'rake', '>= 10.4', '< 12'
   s.add_dependency 'rubyzip', '~> 1.0'
   s.add_dependency 'smart_colored'
   s.add_dependency 'configatron', '~> 4.5'
