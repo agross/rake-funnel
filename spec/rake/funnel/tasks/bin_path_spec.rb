@@ -20,33 +20,49 @@ describe Rake::Funnel::Tasks::BinPath do
       allow(Rake).to receive(:rake_output_message)
     }
 
-    before {
-      allow(Dir).to receive(:[]).with(*search_pattern).and_return(search_pattern)
-    }
-
     subject {
       described_class.new do |t|
         t.search_pattern = search_pattern
       end
     }
 
-    before {
-      Task[subject.name].invoke
-    }
+    context 'paths to add' do
+      before {
+        allow(Dir).to receive(:[]).with(*search_pattern).and_return(search_pattern)
+      }
 
-    it 'should prepend sorted matching folders to the PATH environment variable' do
-      paths = search_pattern.map { |path| File.expand_path(path) }.sort.join(File::PATH_SEPARATOR)
+      before {
+        Task[subject.name].invoke
+      }
 
-      expect(ENV).to have_received(:[]=).with('PATH',/^#{paths}/)
+      it 'should prepend sorted matching folders to the PATH environment variable' do
+        paths = search_pattern.map { |path| File.expand_path(path) }.sort.join(File::PATH_SEPARATOR)
+
+        expect(ENV).to have_received(:[]=).with('PATH',/^#{paths}/)
+      end
+
+      it 'should append original PATH environment variable' do
+        expect(ENV).to have_received(:[]=).with('PATH', /#{default_path}$/)
+      end
+
+      it 'should report added paths' do
+        expect(Rake).to have_received(:rake_output_message).with(%r|/foo$|)
+        expect(Rake).to have_received(:rake_output_message).with(%r|/bar$|)
+      end
     end
 
-    it 'should append original PATH environment variable' do
-      expect(ENV).to have_received(:[]=).with('PATH', /#{default_path}$/)
-    end
+    context 'no paths to add' do
+      before {
+        allow(Dir).to receive(:[]).with(*search_pattern).and_return([])
+      }
 
-    it 'should report added paths' do
-      expect(Rake).to have_received(:rake_output_message).with(%r|/foo$|)
-      expect(Rake).to have_received(:rake_output_message).with(%r|/bar$|)
+      before {
+        Task[subject.name].invoke
+      }
+
+      it 'should not print message' do
+        expect(Rake).not_to have_received(:rake_output_message)
+      end
     end
   end
 end

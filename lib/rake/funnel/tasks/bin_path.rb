@@ -24,8 +24,11 @@ module Rake
           task(name, *args) do |_, task_args|
             task_block.call(*[self, task_args].slice(0, task_block.arity)) if task_block
 
+            next unless paths.any?
+
+            add_pattern_to_path_environment(paths)
             Rake.rake_output_message 'Added the following paths to the PATH environment variable:'
-            add_pattern_to_path_environment.each do |p|
+            paths.each do |p|
               Rake.rake_output_message "  - #{p}"
             end
           end
@@ -33,9 +36,11 @@ module Rake
           self
         end
 
-        def add_pattern_to_path_environment
-          paths = Dir[*search_pattern].map { |path| File.expand_path(path) }.sort
+        def paths
+          @paths ||= Dir[*search_pattern].map { |path| File.expand_path(path) }.sort
+        end
 
+        def add_pattern_to_path_environment(paths)
           ENV['PATH'] = ([] << paths << ENV['PATH']).flatten.join(File::PATH_SEPARATOR)
           paths
         end
