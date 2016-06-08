@@ -4,7 +4,7 @@ module Rake
   module Funnel
     module Tasks
       class BinPath < Rake::TaskLib
-        attr_accessor :name, :search_pattern
+        attr_accessor :name, :search_pattern, :path_modifier
 
         def initialize(*args, &task_block)
           setup_ivars(args)
@@ -16,6 +16,7 @@ module Rake
         def setup_ivars(args)
           @name = args.shift || :bin_path
           @search_pattern = %w(tools/* tools/*/bin packages/**/tools)
+          @path_modifier = proc { |paths| paths }
         end
 
         def define(args, &task_block)
@@ -26,7 +27,7 @@ module Rake
 
             next unless paths.any?
 
-            add_pattern_to_path_environment(paths)
+            prepend_pattern_to_path_environment(paths)
             Rake.rake_output_message 'Added the following paths to the PATH environment variable:'
             paths.each do |p|
               Rake.rake_output_message "  - #{p}"
@@ -37,10 +38,12 @@ module Rake
         end
 
         def paths
-          @paths ||= Dir[*search_pattern].map { |path| File.expand_path(path) }.sort
+          @paths ||= @path_modifier.call(Dir[*search_pattern])
+                                   .map { |path| File.expand_path(path) }
+                                   .sort
         end
 
-        def add_pattern_to_path_environment(paths)
+        def prepend_pattern_to_path_environment(paths)
           ENV['PATH'] = ([] << paths << ENV['PATH']).flatten.join(File::PATH_SEPARATOR)
           paths
         end
