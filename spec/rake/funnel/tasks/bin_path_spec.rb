@@ -12,7 +12,11 @@ describe Rake::Funnel::Tasks::BinPath do
 
   describe 'execution' do
     let(:default_path) { 'default PATH contents' }
-    let(:search_pattern) { %w(foo bar) }
+    let(:search_pattern) { %w(foo bar not-a-directory) }
+    let(:directories) { search_pattern.first(2)
+                                      .map { |path| File.expand_path(path) }
+                                      .sort
+                                      .join(File::PATH_SEPARATOR) }
     let(:path_modifier) { nil }
 
     before {
@@ -31,6 +35,8 @@ describe Rake::Funnel::Tasks::BinPath do
     context 'paths to add' do
       before {
         allow(Dir).to receive(:[]).with(*search_pattern).and_return(search_pattern)
+        allow(File).to receive(:directory?).and_return(true)
+        allow(File).to receive(:directory?).with(search_pattern.last).and_return(false)
       }
 
       before {
@@ -38,9 +44,11 @@ describe Rake::Funnel::Tasks::BinPath do
       }
 
       it 'should prepend sorted matching folders to the PATH environment variable' do
-        paths = search_pattern.map { |path| File.expand_path(path) }.sort.join(File::PATH_SEPARATOR)
+        expect(ENV).to have_received(:[]=).with('PATH', /^#{directories}/)
+      end
 
-        expect(ENV).to have_received(:[]=).with('PATH',/^#{paths}/)
+      it 'should reject files' do
+        expect(ENV).not_to have_received(:[]=).with('PATH', /#{search_pattern.last}/)
       end
 
       it 'should append original PATH environment variable' do

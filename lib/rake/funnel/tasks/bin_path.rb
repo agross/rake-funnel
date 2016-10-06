@@ -38,7 +38,7 @@ module Rake
         end
 
         def paths
-          @paths ||= @path_modifier.call(Dir[*search_pattern])
+          @paths ||= @path_modifier.call(Dir[*search_pattern].select { |path| File.directory?(path) })
                                    .map { |path| File.expand_path(path) }
                                    .sort
         end
