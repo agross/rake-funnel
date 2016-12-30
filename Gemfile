@@ -27,7 +27,7 @@ group :development, :ci do
   gem 'rspec-collection_matchers'
   gem 'coveralls'
   gem 'codeclimate-test-reporter'
-  gem 'rubocop', '~> 0.37.2'
+  gem 'rubocop', '~> 0.46'
   gem 'rubocop-rspec'
   gem 'simplecov-teamcity-summary'
 end
