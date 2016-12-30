@@ -15,16 +15,10 @@ os:
   - linux
   - osx
 rvm:
-  - 2.0.0
-  - 2.1.0
   - 2.2.0
-  - 2.2.4
+  - 2.3.0
   - ruby-head
-  - jruby-head
 matrix:
-  exclude:
-    - rvm: 2.2.4
-      os: osx
   allow_failures:
     - rvm: ruby-head
 
