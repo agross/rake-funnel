@@ -45,7 +45,8 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
       expect(Rake).to have_received(:rake_output_message).with("Installing TeamCity NUnit addin for version #{plugin_version} in #{which}")
     end
 
-    context 'Windows-style path in environment variable', platform: :win32 do
+    context 'Windows-style path in environment variable',
+            skip: ('Windows Registry not available' unless defined?(::Win32::Registry)) do
       let(:env_var) { 'C:\path\to\nunit plugins\nunit-' }
 
       it 'should convert path to Ruby-style' do

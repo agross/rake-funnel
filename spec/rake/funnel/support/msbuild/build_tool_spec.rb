@@ -3,7 +3,8 @@ describe Rake::Funnel::Support::MSBuild::BuildTool do
     allow(Rake::Win32).to receive(:windows?).and_return(windows?)
   }
 
-  context 'on Windows', platform: :win32 do
+  context 'on Windows',
+          skip: ('Windows Registry not available' unless defined?(::Win32::Registry)) do
     let(:windows?) { true }
 
     before {

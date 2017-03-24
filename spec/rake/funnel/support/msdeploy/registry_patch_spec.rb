@@ -30,7 +30,7 @@ describe Rake::Funnel::Support::MSDeploy::RegistryPatch do
       end
     end
 
-    context 'on Windows', platform: :win32 do
+    context 'on Windows', skip: ('Windows Registry not available' unless defined?(::Win32::Registry)) do
       let(:root) { Win32::Registry::HKEY_LOCAL_MACHINE }
 
       let(:keys) {
