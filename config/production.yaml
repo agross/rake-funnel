@@ -1,4 +1,0 @@
-deployment:
-  connection:
-    computer_name: gems.grossweber.com
-  remote_path: C:/GROSSWEBER/gems

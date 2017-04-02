@@ -1,6 +1,0 @@
-deployment:
-  connection:
-    computer_name: localhost
-    username:  <%= ENV['DEPLOY_USER'] %>
-    password: <%= ENV['DEPLOY_PASSWORD'] %>
-  remote_path: <%= File.expand_path(File.join(ENV['TEMP'] || '', '_gems')) %>
