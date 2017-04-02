@@ -8,8 +8,10 @@ before_install:
   - gem install bundler
 bundler_args: --without development
 script:
+  - bundle update
   - bundle exec rspec
-after_script:
+after_success:
+  - bundle exec codeclimate-test-reporter
   - bundle exec rake package
 os:
   - linux
