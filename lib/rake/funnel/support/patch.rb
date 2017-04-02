@@ -32,6 +32,7 @@ module Rake
         end
 
         private
+
         def noop
           proc {}
         end

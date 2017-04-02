@@ -2,9 +2,9 @@ include Rake
 include Rake::Funnel::Support
 
 describe Rake::Funnel::Tasks::Zip do
-  before {
+  before do
     Task.clear
-  }
+  end
 
   describe 'defaults' do
     its(:name) { should == :package }
@@ -18,27 +18,27 @@ describe Rake::Funnel::Tasks::Zip do
     let(:source) { %w(bin/1 bin/2 bin/3/4) }
     let(:finder) { instance_double(Finder).as_null_object }
 
-    before {
+    before do
       allow(finder).to receive(:all_or_default).and_return(source)
       allow(Finder).to receive(:new).and_return(finder)
-    }
+    end
 
-    before {
+    before do
       allow(Zipper).to receive(:zip)
       allow(Rake).to receive(:rake_output_message)
-    }
+    end
 
-    subject {
+    subject do
       described_class.new do |t|
         t.source = source
         t.target = 'some path/file.zip'
         t.zip_root = 'zip root'
       end
-    }
+    end
 
-    before {
+    before do
       Task[subject.name].invoke
-    }
+    end
 
     it 'should delegate to Zipper' do
       expect(Zipper).to have_received(:zip).with(subject.source, subject.target, subject.zip_root)
@@ -49,22 +49,22 @@ describe Rake::Funnel::Tasks::Zip do
     end
 
     describe '#allow_empty' do
-      subject {
+      subject do
         described_class.new do |t|
           t.source = source
           t.target = 'some path/file.zip'
           t.zip_root = 'zip root'
           t.allow_empty = allow_empty
         end
-      }
+      end
 
       context 'empty allowed with empty file list' do
         let(:source) { [] }
         let(:allow_empty) { true }
 
-        before {
+        before do
           Task[subject.name].invoke
-        }
+        end
 
         it 'should invoker Zipper' do
           expect(Zipper).to have_received(:zip)
@@ -75,9 +75,9 @@ describe Rake::Funnel::Tasks::Zip do
         let(:source) { [] }
         let(:allow_empty) { false }
 
-        before {
+        before do
           Task[subject.name].invoke
-        }
+        end
 
         it 'should not invoker Zipper' do
           expect(Zipper).not_to have_received(:zip)

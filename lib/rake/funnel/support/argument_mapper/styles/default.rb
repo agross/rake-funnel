@@ -12,14 +12,15 @@ module Rake
             end
 
             def generate_from(model)
-              model.map { |switch|
-                switch.values.flatten.map { |value|
+              model.map do |switch|
+                switch.values.flatten.map do |value|
                   [top_level(switch), nested(value)].reject(&:empty?)
-                }
-              }.flatten(2)
+                end
+              end.flatten(2)
             end
 
             private
+
             def top_level(switch)
               [prefix, switch.switch]
             end

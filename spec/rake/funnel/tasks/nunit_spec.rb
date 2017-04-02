@@ -1,12 +1,14 @@
+# rubocop:disable RSpec/FilePath
+
 include Rake
 include Rake::Funnel
 include Rake::Funnel::Integration::TeamCity
 include Rake::Funnel::Support
 
 describe Rake::Funnel::Tasks::NUnit do
-  before {
+  before do
     Task.clear
-  }
+  end
 
   describe 'defaults' do
     its(:name) { should == :test }
@@ -18,10 +20,10 @@ describe Rake::Funnel::Tasks::NUnit do
   describe 'execution' do
     let(:args) { {} }
 
-    let(:mapper) { double(Mapper).as_null_object }
-    let(:finder) { double(Finder).as_null_object }
+    let(:mapper) { instance_double(Mapper).as_null_object }
+    let(:finder) { instance_double(Finder).as_null_object }
 
-    before {
+    before do
       allow(subject).to receive(:sh)
 
       allow(Mapper).to receive(:new).and_return(mapper)
@@ -31,11 +33,11 @@ describe Rake::Funnel::Tasks::NUnit do
       allow(Mono).to receive(:invocation).and_wrap_original do |_original_method, *args, &_block|
         args.compact
       end
-    }
+    end
 
-    before {
+    before do
       Task[subject.name].invoke
-    }
+    end
 
     it 'should use test assembly finder' do
       expect(finder).to have_received(:all)
@@ -62,11 +64,11 @@ describe Rake::Funnel::Tasks::NUnit do
     end
 
     context 'with custom NUnit executable' do
-      subject {
+      subject do
         described_class.new do |t|
           t.nunit = 'custom nunit.exe'
         end
-      }
+      end
 
       its(:nunit) { should == 'custom nunit.exe' }
     end

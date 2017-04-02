@@ -16,11 +16,9 @@ module Rake
 
         class << self
           def parse(context)
-            VersionInfo.new({
-                assembly_version: assembly_version(context),
-                assembly_file_version: assembly_file_version(context),
-                assembly_informational_version: assembly_informational_version(context)
-              })
+            VersionInfo.new(assembly_version: assembly_version(context),
+                            assembly_file_version: assembly_file_version(context),
+                            assembly_informational_version: assembly_informational_version(context))
           end
 
           def read_version_from(file)
@@ -28,12 +26,13 @@ module Rake
           end
 
           private
+
           def default_version(context)
             context[:version].to_s || '0'
           end
 
           def pad(version, parts)
-            numerics = version.split('.').take(parts).map { |part| part.to_i }
+            numerics = version.split('.').take(parts).map(&:to_i)
 
             template = Array.new(parts) { 0 }.map.with_index do |part, index|
               numerics[index] || part
@@ -58,7 +57,7 @@ module Rake
             nil
           end
 
-          def assembly_informational_version(context)
+          def assembly_informational_version(context) # rubocop:disable Metrics/MethodLength
             version = default_version(context)
             numeric_version = pad(version, 3)
             alpha_version = version.sub(/^[\d\.]*/, '')
@@ -85,9 +84,9 @@ module Rake
           def metadata(context)
             metadata = context.fetch(:metadata, {}).reject { |k, _| k == :pre }
 
-            metadata = metadata.map { |key, value|
+            metadata = metadata.map do |key, value|
               [key.to_s, value.to_s] if value
-            }.compact
+            end.compact
 
             return nil if metadata.empty?
             metadata.join('.')

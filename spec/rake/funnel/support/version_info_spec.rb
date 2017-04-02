@@ -175,7 +175,7 @@ describe Rake::Funnel::Support::VersionInfo do
       {
         context: {
           version: '1.2',
-          metadata: { }
+          metadata: {}
         },
         expected: {
           assembly_version: '1.2.0.0',
@@ -259,7 +259,7 @@ describe Rake::Funnel::Support::VersionInfo do
         }
       }
     ].each do |spec|
-      context "version #{spec[:context][:version] || 'none'}, build number #{spec[:context].fetch(:metadata, {})[:build] || 'none'}, SHA #{spec[:context].fetch(:metadata, {})[:sha] || 'none'}" do
+      context "version #{spec[:context][:version] || 'none'}, build number #{spec[:context].fetch(:metadata, {})[:build] || 'none'}, SHA #{spec[:context].fetch(:metadata, {})[:sha] || 'none'}" do # rubocop:disable Metrics/LineLength
         let(:parsed) { described_class.parse(spec[:context]) }
 
         it "should generate assembly version #{spec[:expected][:assembly_version]}" do
@@ -304,16 +304,18 @@ describe Rake::Funnel::Support::VersionInfo do
 
   describe '#read_version_from' do
     let(:file) { 'file with version info' }
-    let(:contents) { <<-EOF
+    let(:contents) do
+      # rubocop:disable Style/IndentHeredoc
+      <<-EOF
   first line with expected version number
 other crap
-    EOF
-    }
+      EOF
+      # rubocop:enable Style/IndentHeredoc
+    end
 
     it 'should read the first line with leading and trailing whitespace removed' do
       Dir.mktmpdir do |tmp|
         Dir.chdir(tmp) do
-
           File.write(file, contents)
           expect(described_class.read_version_from(file)).to eq('first line with expected version number')
         end

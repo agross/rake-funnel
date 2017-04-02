@@ -1,12 +1,14 @@
+# rubocop:disable RSpec/FilePath
+
 include Rake
 include Rake::Funnel
 include Rake::Funnel::Support
 include Rake::Funnel::Support::MSBuild
 
 describe Rake::Funnel::Tasks::MSBuild do
-  before {
+  before do
     Task.clear
-  }
+  end
 
   describe 'defaults' do
     its(:name) { should == :compile }
@@ -15,9 +17,9 @@ describe Rake::Funnel::Tasks::MSBuild do
     its(:search_pattern) { should == %w(**/*.sln) }
 
     describe 'build tool' do
-      before {
+      before do
         allow(BuildTool).to receive(:find).and_return('build tool')
-      }
+      end
 
       it 'should use build tool finder' do
         expect(subject.msbuild).to eq('build tool')
@@ -28,19 +30,19 @@ describe Rake::Funnel::Tasks::MSBuild do
   describe 'execution' do
     let(:args) { {} }
 
-    let(:mapper) { double(Mapper).as_null_object }
-    let(:finder) { double(Finder).as_null_object }
+    let(:mapper) { instance_double(Mapper).as_null_object }
+    let(:finder) { instance_double(Finder).as_null_object }
 
-    before {
+    before do
       allow(subject).to receive(:sh)
 
       allow(Mapper).to receive(:new).and_return(mapper)
       allow(Finder).to receive(:new).and_return(finder)
-    }
+    end
 
-    before {
+    before do
       Task[subject.name].invoke
-    }
+    end
 
     it 'should use solution finder' do
       expect(finder).to have_received(:single)
@@ -60,30 +62,32 @@ describe Rake::Funnel::Tasks::MSBuild do
 
     describe 'overriding defaults' do
       context 'when msbuild executable is specified' do
-        subject {
+        subject do
           described_class.new do |t|
             t.msbuild = 'custom build tool.exe'
           end
-        }
+        end
 
         its(:msbuild) { should == 'custom build tool.exe' }
       end
 
       context 'when project or solution is specified' do
-        before {
+        before do
           allow(Finder).to receive(:new).and_call_original
-        }
+        end
 
-        subject {
+        subject do
           described_class.new do |t|
             t.project_or_solution = 'project.sln'
           end
-        }
+        end
 
         its(:project_or_solution) { should be_instance_of(Finder) }
 
         it 'should set project or solution' do
-          expect(Finder).to have_received(:new).with('project.sln', subject, 'No projects or more than one project found.')
+          expect(Finder).to have_received(:new).with('project.sln',
+                                                     subject,
+                                                     'No projects or more than one project found.')
         end
       end
     end

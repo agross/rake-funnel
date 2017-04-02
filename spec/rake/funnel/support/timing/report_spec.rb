@@ -2,18 +2,17 @@ include Rake
 include Rake::Funnel::Support::Timing
 
 describe Rake::Funnel::Support::Timing::Report do
-
   include DSL
 
   subject { described_class.new(stats, opts) }
 
   let(:opts) { {} }
 
-  before {
+  before do
     allow($stdout).to receive(:puts)
     allow($stderr).to receive(:puts)
     subject.render
-  }
+  end
 
   shared_examples_for :report do
     it 'should separator lines' do
@@ -53,18 +52,18 @@ describe Rake::Funnel::Support::Timing::Report do
   describe 'empty report' do
     let(:stats) { Statistics.new }
 
-    it_should_behave_like :report
+    it_behaves_like :report
   end
 
   describe 'report for 2 tasks' do
-    let(:stats) {
+    let(:stats) do
       s = Statistics.new
-      s.benchmark(task :foo) { }
-      s.benchmark(task :bar) { }
+      s.benchmark(task(:foo)) {}
+      s.benchmark(task(:bar)) {}
       s
-    }
+    end
 
-    it_should_behave_like :report
+    it_behaves_like :report
 
     it 'should print each task' do
       expect($stdout).to have_received(:puts).with(/^foo/)
@@ -77,27 +76,27 @@ describe Rake::Funnel::Support::Timing::Report do
   end
 
   describe 'formatting' do
-    let(:stats) {
+    let(:stats) do
       s = Statistics.new
-      s.benchmark(task task_name) { }
+      s.benchmark(task(task_name)) {}
       s
-    }
+    end
 
-    let(:header_space) {
+    let(:header_space) do
       diff = task_name.to_s.length - subject.columns[0].header.length
       diff = 0 if diff < 0
       diff + described_class::SPACE
-    }
+    end
 
-    let(:header_underline) {
+    let(:header_underline) do
       [subject.columns[0].header.length, task_name.to_s.length].max
-    }
+    end
 
-    let(:value_space) {
+    let(:value_space) do
       diff = subject.columns.first.header.length - task_name.to_s.length
       diff = 0 if diff < 0
       diff + described_class::SPACE
-    }
+    end
 
     shared_examples_for :padding do
       it 'should pad headers' do
@@ -117,13 +116,13 @@ describe Rake::Funnel::Support::Timing::Report do
     context 'task names are shorter than headers' do
       let(:task_name) { :a }
 
-      it_should_behave_like :padding
+      it_behaves_like :padding
     end
 
     context 'task names are longer than headers' do
       let(:task_name) { :aaaaaaaaaaaa }
 
-      it_should_behave_like :padding
+      it_behaves_like :padding
     end
   end
 end

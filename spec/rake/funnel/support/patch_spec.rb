@@ -14,7 +14,7 @@ describe Rake::Funnel::Support::Patch do
   end
 
   describe 'with definition' do
-    subject {
+    subject do
       described_class.new do |p|
         p.setup do
           output.puts 'setup'
@@ -25,7 +25,7 @@ describe Rake::Funnel::Support::Patch do
           output.puts memo
         end
       end
-    }
+    end
 
     let(:output) { double.as_null_object }
 
@@ -42,10 +42,10 @@ describe Rake::Funnel::Support::Patch do
     end
 
     context 'when reverting the patch' do
-      let!(:ret) {
+      let!(:ret) do
         subject.apply!
         subject.revert!
-      }
+      end
 
       it 'should execute the reset' do
         expect(output).to have_received(:puts).with(42)
@@ -60,15 +60,15 @@ describe Rake::Funnel::Support::Patch do
       before { subject.revert! }
 
       it 'should not execute the reset' do
-        expect(output).to_not have_received(:puts).with(42)
+        expect(output).not_to have_received(:puts).with(42)
       end
     end
 
     context 'when applying twice' do
-      before {
+      before do
         subject.apply!
         subject.apply!
-      }
+      end
 
       it 'should execute the setup once' do
         expect(output).to have_received(:puts).with('setup').once
@@ -76,11 +76,11 @@ describe Rake::Funnel::Support::Patch do
     end
 
     context 'when reverting twice' do
-      before {
+      before do
         subject.apply!
         subject.revert!
         subject.revert!
-      }
+      end
 
       it 'should execute the revert once' do
         expect(output).to have_received(:puts).with(42).once
@@ -90,13 +90,13 @@ describe Rake::Funnel::Support::Patch do
     describe 'context' do
       let(:context) { 42 }
 
-      subject {
+      subject do
         described_class.new(context) do |p|
           p.setup do |context|
             output.puts context
           end
         end
-      }
+      end
 
       before { subject.apply!.revert! }
 

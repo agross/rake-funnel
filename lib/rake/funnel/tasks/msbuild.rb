@@ -8,6 +8,7 @@ module Rake
         include Rake::Funnel::Support::MSBuild
 
         attr_accessor :name, :msbuild, :project_or_solution, :args, :search_pattern
+        attr_writer :project_or_solution
 
         def initialize(*args, &task_block)
           setup_ivars(args)
@@ -19,11 +20,8 @@ module Rake
           Finder.new(@project_or_solution || search_pattern, self, 'No projects or more than one project found.')
         end
 
-        def project_or_solution=(value)
-          @project_or_solution = value
-        end
-
         private
+
         def setup_ivars(args)
           @name = args.shift || :compile
 
@@ -32,11 +30,11 @@ module Rake
           @search_pattern = %w(**/*.sln)
         end
 
-        def define(args, &task_block)
+        def define(args, &task_block) # rubocop:disable Metrics/MethodLength
           desc 'Compile MSBuild projects' unless Rake.application.last_description
 
           task(name, *args) do |_, task_args|
-            task_block.call(*[self, task_args].slice(0, task_block.arity)) if task_block
+            yield(*[self, task_args].slice(0, task_block.arity)) if task_block
 
             cmd = [
               msbuild,

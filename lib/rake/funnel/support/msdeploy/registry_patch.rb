@@ -6,20 +6,19 @@ module Rake
           KEYS = [
             'SOFTWARE\Microsoft\IIS Extensions\MSDeploy\3',
             'SOFTWARE\Wow6432Node\Microsoft\IIS Extensions\MSDeploy\3'
-          ]
-          VERSION_VALUE = 'Version'
-          FAKE_VERSION = '99.0.0.0'
+          ].freeze
+          VERSION_VALUE = 'Version'.freeze
+          FAKE_VERSION = '99.0.0.0'.freeze
 
           def initialize(&block)
-            begin
-              patch.apply!
-              yield block if block_given?
-            ensure
-              patch.revert!
-            end
+            patch.apply!
+            yield block if block_given?
+          ensure
+            patch.revert!
           end
 
           private
+
           def patch
             @patch ||= create_patch
           end
@@ -32,23 +31,23 @@ module Rake
             return nil unless key.created?
 
             keyname = key.keyname
-            proc {
+            proc do
               root.create(File.dirname(keyname)) do |r|
                 r.delete_key(File.basename(keyname), true)
               end
-            }
+            end
           end
 
           def delete_value(key, value)
             keyname = key.keyname
-            proc {
+            proc do
               root.create(keyname) do |r|
                 r.delete_value(value)
               end
-            }
+            end
           end
 
-          def create_patch
+          def create_patch # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
             begin
               require 'win32/registry'
             rescue LoadError
@@ -81,9 +80,7 @@ module Rake
               end
 
               p.reset do
-                resets.compact.each do |reset|
-                  reset.call
-                end
+                resets.compact.each(&:call)
               end
             end
           end

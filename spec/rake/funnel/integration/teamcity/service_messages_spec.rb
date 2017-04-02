@@ -1,10 +1,12 @@
+# rubocop:disable RSpec/FilePath
+
 include Rake::Funnel::Integration
 
 describe Rake::Funnel::Integration::TeamCity::ServiceMessages do
-  before {
+  before do
     allow(TeamCity).to receive(:running?).and_return(teamcity_running?)
     allow($stdout).to receive(:puts)
-  }
+  end
 
   context 'when running outside TeamCity' do
     let(:teamcity_running?) { false }
@@ -22,9 +24,11 @@ describe Rake::Funnel::Integration::TeamCity::ServiceMessages do
     describe 'escaping' do
       context 'when publishing messages without special characters' do
         it 'should not escape' do
-          described_class.progress_start "the message"
+          described_class.progress_start 'the message'
 
-          expect($stdout).to have_received(:puts).with("##teamcity[progressStart 'the message']")
+          expect($stdout).to \
+            have_received(:puts)
+            .with("##teamcity[progressStart 'the message']")
         end
       end
 
@@ -32,61 +36,81 @@ describe Rake::Funnel::Integration::TeamCity::ServiceMessages do
         it 'should escape apostrophes' do
           described_class.progress_start "'"
 
-          expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|'']")
+          expect($stdout).to \
+            have_received(:puts)
+            .with("##teamcity[progressStart '|'']")
         end
 
         it 'should escape line feeds' do
           described_class.progress_start "\n"
 
-          expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|n']")
+          expect($stdout).to \
+            have_received(:puts)
+            .with("##teamcity[progressStart '|n']")
         end
 
         it 'should escape carriage returns' do
           described_class.progress_start "\r"
 
-          expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|r']")
+          expect($stdout).to \
+            have_received(:puts)
+            .with("##teamcity[progressStart '|r']")
         end
 
         it 'should escape next lines' do
           described_class.progress_start "\u0085"
 
-          expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|x']")
+          expect($stdout).to \
+            have_received(:puts)
+            .with("##teamcity[progressStart '|x']")
         end
 
         it 'should escape line separators' do
           described_class.progress_start "\u2028"
 
-          expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|l']")
+          expect($stdout).to \
+            have_received(:puts)
+            .with("##teamcity[progressStart '|l']")
         end
 
         it 'should escape paragraph separators' do
           described_class.progress_start "\u2029"
 
-          expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|p']")
+          expect($stdout).to \
+            have_received(:puts)
+            .with("##teamcity[progressStart '|p']")
         end
 
         it 'should escape vertical bars' do
           described_class.progress_start '|'
 
-          expect($stdout).to have_received(:puts).with("##teamcity[progressStart '||']")
+          expect($stdout).to \
+            have_received(:puts)
+            .with("##teamcity[progressStart '||']")
         end
 
         it 'should escape opening brackets' do
           described_class.progress_start '['
 
-          expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|[']")
+          expect($stdout).to \
+            have_received(:puts)
+            .with("##teamcity[progressStart '|[']")
         end
 
         it 'should escape closing brackets' do
           described_class.progress_start ']'
 
-          expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|]']")
+          expect($stdout).to \
+            have_received(:puts)
+            .with("##teamcity[progressStart '|]']")
         end
 
         it 'should escape all special characters in a string' do
           described_class.progress_start "[\r|\n]"
 
-          expect($stdout).to have_received(:puts).with("##teamcity[progressStart '|[|r|||n|]']")
+          expect($stdout).to \
+            have_received(:puts)
+            .with("##teamcity[progressStart '|[|r|||n|]']")
         end
       end
     end
@@ -96,7 +120,9 @@ describe Rake::Funnel::Integration::TeamCity::ServiceMessages do
         it 'should print the service message' do
           described_class.enable_service_messages
 
-          expect($stdout).to have_received(:puts).with('##teamcity[enableServiceMessages]')
+          expect($stdout).to \
+            have_received(:puts)
+            .with('##teamcity[enableServiceMessages]')
         end
       end
 
@@ -104,7 +130,9 @@ describe Rake::Funnel::Integration::TeamCity::ServiceMessages do
         it 'should print the service message' do
           described_class.progress_message 'the message'
 
-          expect($stdout).to have_received(:puts).with("##teamcity[progressMessage 'the message']")
+          expect($stdout).to \
+            have_received(:puts)
+            .with("##teamcity[progressMessage 'the message']")
         end
       end
 
@@ -112,7 +140,9 @@ describe Rake::Funnel::Integration::TeamCity::ServiceMessages do
         it 'should print the service message' do
           described_class.progress_message 42
 
-          expect($stdout).to have_received(:puts).with("##teamcity[progressMessage '42']")
+          expect($stdout).to \
+            have_received(:puts)
+            .with("##teamcity[progressMessage '42']")
         end
       end
 
@@ -120,7 +150,9 @@ describe Rake::Funnel::Integration::TeamCity::ServiceMessages do
         it 'should print the service message' do
           described_class.block_opened(name: 'block name')
 
-          expect($stdout).to have_received(:puts).with("##teamcity[blockOpened name='block name']")
+          expect($stdout).to \
+            have_received(:puts)
+            .with("##teamcity[blockOpened name='block name']")
         end
       end
 
@@ -128,7 +160,9 @@ describe Rake::Funnel::Integration::TeamCity::ServiceMessages do
         it 'should print the service message' do
           described_class.test_started(name: 'test name', captureStandardOutput: true)
 
-          expect($stdout).to have_received(:puts).with("##teamcity[testStarted name='test name' captureStandardOutput='true']")
+          expect($stdout).to \
+            have_received(:puts)
+            .with("##teamcity[testStarted name='test name' captureStandardOutput='true']")
         end
       end
 
@@ -136,7 +170,9 @@ describe Rake::Funnel::Integration::TeamCity::ServiceMessages do
         it 'should print the service message' do
           described_class.test_started(capture_standard_output: true)
 
-          expect($stdout).to have_received(:puts).with("##teamcity[testStarted captureStandardOutput='true']")
+          expect($stdout).to \
+            have_received(:puts)
+            .with("##teamcity[testStarted captureStandardOutput='true']")
         end
       end
     end

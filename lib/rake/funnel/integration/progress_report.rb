@@ -29,11 +29,12 @@ module Rake
         end
 
         private
+
         def patch
           @patch ||= create_patch
         end
 
-        def create_patch
+        def create_patch # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
           Rake::Funnel::Support::Patch.new(self) do |p|
             p.setup do |context|
               Rake::Task.class_eval do
@@ -49,7 +50,7 @@ module Rake
                     error = e
                   ensure
                     context.finished.call(self, args, error) if context.finished
-                    fail error if error
+                    raise error if error
                   end
                 end
 

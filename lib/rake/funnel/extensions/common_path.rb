@@ -7,8 +7,8 @@ module Rake
       module CommonPath
         def common_path
           list = to_a
-            .compact
-            .map { |x| components(x) }
+                 .compact
+                 .map { |x| components(x) }
 
           min = list.min_by(&:length)
 
@@ -17,17 +17,18 @@ module Rake
         end
 
         private
+
         def components(path)
           paths = []
           Pathname.new(path).descend do |p|
             paths << p
           end
 
-          paths = paths.inject([]) { |components, p|
+          paths = paths.inject([]) do |components, p|
             relative = p.relative_path_from(components.last[:absolute]) if components.any?
 
             components << { absolute: p, relative: relative || p }
-          }
+          end
 
           paths.map { |component| component[:relative].to_s }
         end

@@ -6,12 +6,10 @@ describe Rake::Funnel::Support::AssemblyVersion::FromVersionFiles do
     its(:metadata) { should be_nil }
 
     describe 'overriding defaults' do
-      subject {
-        described_class.new({
-            search_pattern: 'search pattern',
-            metadata: {},
-          })
-      }
+      subject do
+        described_class.new(search_pattern: 'search pattern',
+                            metadata: {})
+      end
 
       its(:search_pattern) { should == 'search pattern' }
       its(:metadata) { should == {} }
@@ -28,35 +26,35 @@ describe Rake::Funnel::Support::AssemblyVersion::FromVersionFiles do
   end
 
   describe 'enumeration' do
-    let(:finder) { double(Finder).as_null_object }
+    let(:finder) { instance_double(Finder).as_null_object }
     let(:files) { %w(1 2) }
 
-    before {
+    before do
       allow(finder).to receive(:all_or_default).and_return(files)
       allow(Finder).to receive(:new).and_return(finder)
-    }
+    end
 
-    before {
+    before do
       allow(VersionInfo).to receive(:read_version_from).and_return(*files)
-    }
+    end
 
-    before {
+    before do
       allow(Rake).to receive(:rake_output_message)
-    }
+    end
 
-    subject {
+    subject do
       described_class.new(metadata: { pre: 'alpha', build: 42, sha: 'abc' })
-    }
+    end
 
     it 'should yield source and version info for each file' do
       args = files.map do |file|
         {
           source: file,
           version_info: VersionInfo.parse(version: file, metadata: {
-              pre: subject.metadata[:pre],
-              build: subject.metadata[:build],
-              sha: subject.metadata[:sha]
-            })
+                                            pre: subject.metadata[:pre],
+                                            build: subject.metadata[:build],
+                                            sha: subject.metadata[:sha]
+                                          })
         }
       end
 

@@ -16,6 +16,7 @@ module Rake
         end
 
         private
+
         def setup_ivars(args)
           @name = args.shift || :msdeploy
 
@@ -24,16 +25,16 @@ module Rake
           @log_file = "#{@name}.log"
         end
 
-        def define(args, &task_block)
+        def define(args, &task_block) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
           desc 'Deploy application' unless Rake.application.last_description
 
           task(name, *args) do |_, task_args|
-            task_block.call(*[self, task_args].slice(0, task_block.arity)) if task_block
+            yield(*[self, task_args].slice(0, task_block.arity)) if task_block
 
             mapper = Mapper.new(:MSDeploy)
             cmd = [quote(msdeploy), mapper.map(@args)]
-              .flatten
-              .join(' ')
+                  .flatten
+                  .join(' ')
 
             RegistryPatch.new do
               shell(cmd, log_file: log_file, error_lines: /^(error|[\w\.]*exception)/i)
@@ -45,7 +46,7 @@ module Rake
 
         def quote(value)
           value = value.gsub(/"/, '""') if value.is_a?(String)
-          return %Q{"#{value}"} if value =~ /\s/
+          return %("#{value}") if value =~ /\s/
           value
         end
       end

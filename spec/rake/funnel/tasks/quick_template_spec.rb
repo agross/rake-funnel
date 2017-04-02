@@ -4,9 +4,9 @@ include Rake
 include Rake::Funnel::Support
 
 describe Rake::Funnel::Tasks::QuickTemplate do
-  before {
+  before do
     Task.clear
-  }
+  end
 
   describe 'defaults' do
     its(:name) { should == :template }
@@ -17,23 +17,23 @@ describe Rake::Funnel::Tasks::QuickTemplate do
   describe 'execution' do
     let(:templates) { %w(1.template two/2.template) }
 
-    let(:finder) { double(Finder).as_null_object }
+    let(:finder) { instance_double(Finder).as_null_object }
     let(:engine) { TemplateEngine }
 
-    before {
+    before do
       allow(finder).to receive(:all_or_default).and_return(templates)
       allow(Finder).to receive(:new).and_return(finder)
       allow(engine).to receive(:render).and_return('file content')
       allow(Rake).to receive(:rake_output_message)
       allow(File).to receive(:read).and_return('template content')
       allow(File).to receive(:write)
-    }
+    end
 
     subject! { described_class.new }
 
-    before {
+    before do
       Task[subject.name].invoke
-    }
+    end
 
     it 'should report created files' do
       templates.each do |template|

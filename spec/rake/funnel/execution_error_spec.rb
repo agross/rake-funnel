@@ -38,7 +38,7 @@ describe Rake::Funnel::ExecutionError do
         end
 
         context 'longer than 10 lines' do
-          let(:output) {
+          let(:output) do
             output = []
 
             11.times.each do |i|
@@ -46,7 +46,7 @@ describe Rake::Funnel::ExecutionError do
             end
 
             output.join("\n")
-          }
+          end
 
           subject { described_class.new(nil, nil, output) }
 

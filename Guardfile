@@ -16,7 +16,7 @@ group :specs, halt_on_fail: true do
   end
 
   guard :rubocop do
-    watch(%r{.+\.(rb|rake|gemspec)$})
+    watch(/.+\.(rb|rake|gemspec)$/)
     watch(%r{(?:.+/)?\.rubocop\.yml$}) { |m| File.dirname(m[0]) }
   end
 end

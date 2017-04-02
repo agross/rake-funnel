@@ -1,31 +1,45 @@
 AllCops:
   DisplayCopNames: true
+  TargetRubyVersion: 2.0
 
 require: rubocop-rspec
 
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*_spec.rb
+
 Metrics/LineLength:
-  Enabled: false
+  Max: 120
 
 Style/Documentation:
   Enabled: false
 
-Style/EmptyLinesAroundAccessModifier:
-  Enabled: false
-
-Style/MultilineOperationIndentation:
-  Enabled: false
-
-Style/PercentLiteralDelimiters:
-  Enabled: false
-
-Style/RaiseArgs:
-  EnforcedStyle: compact
-
-Style/RegexpLiteral:
-  Enabled: false
-
-Style/SingleLineBlockParams:
+Style/EndOfLine:
   Enabled: false
 
 RSpec/ExampleWording:
+  Enabled: false
+
+RSpec/NamedSubject:
+  Enabled: false
+
+RSpec/LeadingSubject:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Max: 3
+
+RSpec/NestedGroups:
+  Max: 6
+
+RSpec/ImplicitExpect:
+  Enabled: false
+
+RSpec/ScatteredSetup:
+  Enabled: false
+
+RSpec/SubjectStub:
+  Enabled: false
+
+RSpec/ExampleLength:
   Enabled: false

@@ -7,7 +7,7 @@ module Rake
         class ProgressReport < Rake::Funnel::Integration::ProgressReport
           include Rake::Funnel::Integration
 
-          def initialize
+          def initialize # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity
             super do
               task_starting do |task, _args|
                 next unless TeamCity.running?

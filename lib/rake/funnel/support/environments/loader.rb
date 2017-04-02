@@ -13,17 +13,7 @@ module Rake
               store.reset!
 
               store.env = config[:name]
-
-              operation = 'Loading'
-              config.fetch(:config_files, []).each do |file|
-                Rake.rake_output_message("#{operation} #{file}")
-                operation = 'Merging'
-
-                yaml = File.read(file)
-                yaml = evaluate_erb(yaml, file)
-                yaml = YAML.load(yaml) || {}
-                store.configure_from_hash(yaml)
-              end
+              load(config, store)
 
               customizer.call(store) if customizer && customizer.respond_to?(:call)
 
@@ -31,6 +21,21 @@ module Rake
 
               Rake.rake_output_message('')
               Rake.rake_output_message(store.inspect)
+            end
+
+            private
+
+            def load(config, store)
+              operation = 'Loading'
+              config.fetch(:config_files, []).each do |file|
+                Rake.rake_output_message("#{operation} #{file}")
+                operation = 'Merging'
+
+                yaml = File.read(file)
+                yaml = evaluate_erb(yaml, file)
+                yaml = YAML.load(yaml) || {} # rubocop:disable Security/YAMLLoad
+                store.configure_from_hash(yaml)
+              end
             end
 
             def evaluate_erb(yaml, filename)

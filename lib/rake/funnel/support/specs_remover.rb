@@ -18,7 +18,8 @@ module Rake
             end
 
             private
-            def remove(projects, references, specs)
+
+            def remove(projects, references, specs) # rubocop:disable Metrics/MethodLength
               Dir[*projects].map do |project|
                 Trace.message("Processing #{project} with references #{references} and specs #{specs}")
 
@@ -45,25 +46,25 @@ module Rake
             end
 
             def remove_references(references, xml)
-              deleted = references.map { |ref|
+              deleted = references.flat_map do |ref|
                 query = "/Project//Reference[starts-with(lower-case(@Include), '#{ref.downcase}')]"
                 xml.elements.delete_all(query)
-              }
-                .flatten
-                .tap { |d| Trace.message("Removed references: #{d.inspect}") }
+              end
 
-              deleted.map { |d|
+              deleted.each { |d| Trace.message("Removed references: #{d.inspect}") }
+
+              deleted = deleted.flat_map do |d|
                 d.get_elements('/HintPath').map(&:text)
-              }
-                .flatten
-                .tap { |d| Trace.message("HintPaths: #{d}") }
+              end
+
+              deleted.each { |d| Trace.message("HintPaths: #{d}") }
             end
 
             def remove_specs(specs, xml)
-              deleted = specs.map { |glob|
+              deleted = specs.map do |glob|
                 query = "/Project//Compile[matches(lower-case(@Include), '#{glob}')]"
                 xml.elements.delete_all(query)
-              }
+              end
 
               deleted
                 .flatten
@@ -116,6 +117,7 @@ module Rake
             end
 
             private
+
             def paket_references_for(project)
               project_specific = project + '.paket.references'
               global = File.join(File.dirname(project), 'paket.references')
@@ -145,6 +147,7 @@ module Rake
           end
 
           private
+
           def list(args)
             ([] << args).flatten.compact
           end

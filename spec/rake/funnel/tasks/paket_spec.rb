@@ -2,9 +2,9 @@ include Rake
 include Rake::Funnel::Support
 
 describe Rake::Funnel::Tasks::Paket do
-  before {
+  before do
     Task.clear
-  }
+  end
 
   describe 'defaults' do
     its(:name) { should == :paket }
@@ -15,31 +15,31 @@ describe Rake::Funnel::Tasks::Paket do
   end
 
   describe 'execution' do
-    before {
+    before do
       allow(subject).to receive(:sh)
       allow(Mono).to receive(:invocation).and_wrap_original do |_original_method, *args, &_block|
         args.compact
       end
-    }
+    end
 
     context 'overriding defaults' do
-      subject {
+      subject do
         described_class.new do |t|
           t.bootstrapper = 'custom bootstrapper.exe'
           t.bootstrapper_args = %w(arg1 arg2)
           t.paket = 'custom paket.exe'
           t.paket_args = %w(arg1 arg2)
         end
-      }
+      end
 
-      before {
+      before do
         allow(File).to receive(:exist?).and_return(false)
         allow(subject).to receive(:sh)
-      }
+      end
 
-      before {
+      before do
         Task[subject.name].invoke
-      }
+      end
 
       it 'should use custom bootstrapper' do
         expect(subject).to have_received(:sh).with(subject.bootstrapper, subject.bootstrapper_args)
@@ -51,9 +51,9 @@ describe Rake::Funnel::Tasks::Paket do
     end
 
     describe 'mono invocation' do
-      before {
+      before do
         Task[subject.name].invoke
-      }
+      end
 
       it 'should use mono invocation for bootstrapper' do
         expect(Mono).to have_received(:invocation).with(subject.bootstrapper, subject.bootstrapper_args)
@@ -65,15 +65,15 @@ describe Rake::Funnel::Tasks::Paket do
     end
 
     describe 'optional download' do
-      before {
+      before do
         allow(File).to receive(:exist?).with(subject.paket).and_return(paket_exists)
         allow(subject).to receive(:sh).with(subject.bootstrapper)
-      }
+      end
 
       context 'success' do
-        before {
+        before do
           Task[subject.name].invoke
-        }
+        end
 
         context 'paket.exe exists' do
           let(:paket_exists) { true }
@@ -105,9 +105,9 @@ describe Rake::Funnel::Tasks::Paket do
           let(:paket_exists) { true }
 
           context 'paket failed' do
-            before {
+            before do
               allow(subject).to receive(:sh).with(subject.paket, anything).and_raise
-            }
+            end
 
             it 'should fail' do
               expect { Task[subject.name].invoke }.to raise_error(RuntimeError)
@@ -119,12 +119,16 @@ describe Rake::Funnel::Tasks::Paket do
           let(:paket_exists) { false }
 
           context 'bootstrapper failed' do
-            before {
+            before do
               allow(subject).to receive(:sh).with(subject.bootstrapper).and_raise
-            }
+            end
 
             it 'should not run paket' do
-              Task[subject.name].invoke rescue nil
+              begin
+                Task[subject.name].invoke
+              rescue
+                nil
+              end
 
               expect(subject).not_to have_received(:sh).with(subject.paket, subject.paket_args)
             end

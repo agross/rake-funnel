@@ -1,3 +1,5 @@
+# rubocop:disable RSpec/FilePath
+
 describe Rake::Funnel::Support::InstantiateSymbol do
   module Creatable
     class One
@@ -29,7 +31,7 @@ describe Rake::Funnel::Support::InstantiateSymbol do
     class SnakeCase
     end
 
-    class Snake_Case
+    class Snake_Case # rubocop:disable Style/ClassAndModuleCamelCase
     end
   end
 
@@ -40,9 +42,9 @@ describe Rake::Funnel::Support::InstantiateSymbol do
   end
 
   describe 'module methods' do
-    subject {
+    subject do
       ExplicitModuleDefinition.new
-    }
+    end
 
     describe 'instance methods' do
       it 'should not be public' do
@@ -61,32 +63,32 @@ describe Rake::Funnel::Support::InstantiateSymbol do
 
   describe 'inspection' do
     context 'implicit module' do
-      subject {
+      subject do
         ImplicitModuleDefinition.new
-      }
+      end
 
       it 'should yield constants in self' do
-        expect(subject.send(:available)).to eq([:ClassMethods, :Nested])
+        expect(subject.send(:available)).to eq(%i(ClassMethods Nested))
       end
     end
 
     context 'explicit module' do
-      subject {
+      subject do
         ExplicitModuleDefinition.new
-      }
+      end
 
       it 'should yield sorted constants in module' do
-        expect(subject.send(:available)).to eq([:One, :Three, :Two])
+        expect(subject.send(:available)).to eq(%i(One Three Two))
       end
     end
 
     context 'multiple uses' do
-      subject {
+      subject do
         [
           ExplicitModuleDefinition.new,
           ImplicitModuleDefinition.new
         ]
-      }
+      end
 
       it 'should not overlap' do
         first = subject[0].send(:available)
@@ -98,9 +100,9 @@ describe Rake::Funnel::Support::InstantiateSymbol do
   end
 
   describe 'instantiation' do
-    subject {
+    subject do
       ExplicitModuleDefinition.new
-    }
+    end
 
     context 'with instance' do
       it 'should return instance' do
@@ -118,14 +120,15 @@ describe Rake::Funnel::Support::InstantiateSymbol do
 
     context 'symbol not defined' do
       it 'should fail' do
-        expect { subject.send(:create, :does_not_exist) }.to raise_error 'Unknown type to instantiate: :does_not_exist. Available types are: [:One, :Three, :Two]'
+        expect { subject.send(:create, :does_not_exist) }.to \
+          raise_error('Unknown type to instantiate: :does_not_exist. Available types are: [:One, :Three, :Two]')
       end
     end
 
     context 'snake cased symbol' do
-      subject {
+      subject do
         SnakeCaseModuleDefinition.new
-      }
+      end
 
       it 'should return instance' do
         expect(subject.send(:create, :snake_case)).to be_an_instance_of(SnakeCase::SnakeCase)
@@ -142,14 +145,14 @@ describe Rake::Funnel::Support::InstantiateSymbol do
 
         class Failure
           def initialize
-            fail 'BAM!'
+            raise 'BAM!'
           end
         end
       end
 
-      subject {
+      subject do
         WillFail.new
-      }
+      end
 
       it 'should fail' do
         expect { subject.send(:create, :Failure) }.to raise_error 'BAM!'
@@ -165,18 +168,15 @@ describe Rake::Funnel::Support::InstantiateSymbol do
     describe 'args' do
       module CreatableWithArgs
         class None
-          def initialize
-          end
+          def initialize; end
         end
 
         class Single
-          def initialize(_arg)
-          end
+          def initialize(_arg); end
         end
 
         class Multiple
-          def initialize(_arg1, _arg2)
-          end
+          def initialize(_arg1, _arg2); end
         end
       end
 
@@ -185,9 +185,9 @@ describe Rake::Funnel::Support::InstantiateSymbol do
         instantiate CreatableWithArgs
       end
 
-      subject {
+      subject do
         WithArgs.new
-      }
+      end
 
       context 'no argument' do
         it 'should not pass arg' do

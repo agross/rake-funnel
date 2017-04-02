@@ -1,16 +1,18 @@
+# rubocop:disable RSpec/FilePath
+
 describe Rake::Funnel::Support::Mapper::Styles::NUnit do
   subject { Mapper.new(:NUnit) }
 
   describe 'prefix' do
-    before {
+    before do
       allow(Rake::Win32).to receive(:windows?).and_return(windows?)
-    }
+    end
 
     context 'on Windows' do
       let(:windows?) { true }
 
       it "should use '/'" do
-        expect(subject.map({ switch: nil })).to eq(['/switch'])
+        expect(subject.map(switch: nil)).to eq(['/switch'])
       end
     end
 
@@ -18,7 +20,7 @@ describe Rake::Funnel::Support::Mapper::Styles::NUnit do
       let(:windows?) { false }
 
       it "should use '-'" do
-        expect(subject.map({ switch: nil })).to eq(['-switch'])
+        expect(subject.map(switch: nil)).to eq(['-switch'])
       end
     end
   end

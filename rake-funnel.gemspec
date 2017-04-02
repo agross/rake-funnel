@@ -2,16 +2,16 @@ lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'rake/funnel/version'
 
-Gem::Specification.new do |s|
+Gem::Specification.new do |s| # rubocop:disable Metrics/BlockLength
   s.name        = 'rake-funnel'
   s.version     = Rake::Funnel::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Alexander Groß']
   s.email       = ['agross@therightstuff.de']
   s.homepage    = 'http://grossweber.com'
-  s.license     = 'BSD'
+  s.license     = 'BSD-3-Clause'
   s.description = 'A standardized build pipeline'
-  s.summary     = 'A build pipeline targeted at .NET projects. Supports environment configuration and makes invoking .NET-related tasks easier.'
+  s.summary     = 'A build pipeline targeted at .NET projects. Supports environment configuration and makes invoking .NET-related tasks easier.' # rubocop:disable Metrics/LineLength
 
   s.required_ruby_version = '>= 2.0.0'
 
@@ -22,13 +22,13 @@ Gem::Specification.new do |s|
 
   git = ENV['TEAMCITY_GIT_PATH'] || 'git'
   files = `"#{git}" ls-files -z`
-    .split("\x0")
-    .reject do |file|
-      file =~ %r{^(config/|tools/|lib/tasks)} ||
-        file =~ %r{\.git|\.travis|\.ruby-version|\.rubocop} ||
-        file =~ %r{(Guard|Rake)file} ||
-        File.extname(file) == '.cmd'
-    end
+          .split("\x0")
+          .reject do |file|
+    file =~ %r{^(config/|tools/|lib/tasks)} ||
+      file =~ /\.git|\.travis|\.ruby-version|\.rubocop/ ||
+      file =~ /(Guard|Rake)file/ ||
+      File.extname(file) == '.cmd'
+  end
 
   s.files         = files
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }

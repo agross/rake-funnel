@@ -8,14 +8,14 @@ module Rake
           class Column
             attr_reader :header
 
-            def initialize(stats: [], header: '', accessor: -> (_) { '' })
+            def initialize(stats: [], header: '', accessor: ->(_) { '' })
               @stats = stats
               @header = header
               @accessor = accessor
             end
 
             def width
-              longest_value = @stats.map { |s| @accessor.call(s) }.max_by { |m| m.length } || ''
+              longest_value = @stats.map { |s| @accessor.call(s) }.max_by(&:length) || ''
               width = longest_value.length
               width = @header.length if width < @header.length
               width
@@ -45,19 +45,20 @@ module Rake
           end
 
           def columns
-            @columns ||= ([
-              Column.new(stats: @stats, header: 'Target', accessor: -> (timing) { timing[:task].name }),
-              Column.new(stats: @stats, header: 'Duration', accessor: -> (timing) { format(timing[:time]) })
-            ])
+            @columns ||= begin [
+              Column.new(stats: @stats, header: 'Target', accessor: ->(timing) { timing[:task].name }),
+              Column.new(stats: @stats, header: 'Duration', accessor: ->(timing) { format(timing[:time]) })
+            ] end
           end
 
           private
-          def header
+
+          def header # rubocop:disable Metrics/AbcSize
             puts '-' * HEADER_WIDTH
             puts 'Build time report'
             puts '-' * HEADER_WIDTH
 
-            puts columns.map { |c| c.format_header }.join(' ' * SPACE)
+            puts columns.map(&:format_header).join(' ' * SPACE)
             puts columns.map { |c| c.format_header.gsub(/./, '-') }.join(' ' * SPACE)
           end
 
@@ -67,7 +68,7 @@ module Rake
             end
           end
 
-          def footer
+          def footer # rubocop:disable Metrics/AbcSize
             puts '-' * HEADER_WIDTH
             puts 'Total'.ljust(columns[0].width) + ' ' * SPACE + format(Time.now - @stats.started_at)
             status_message
@@ -78,7 +79,7 @@ module Rake
             Time.at(seconds).utc.strftime('%H:%M:%S')
           end
 
-          def status_message
+          def status_message # rubocop:disable Metrics/AbcSize
             status = @opts[:failed] ? 'Failed' : 'OK'
             status = 'Status'.ljust(columns[0].width) + ' ' * SPACE + status
 

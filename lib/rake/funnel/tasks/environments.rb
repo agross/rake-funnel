@@ -16,6 +16,7 @@ module Rake
         end
 
         private
+
         def setup_ivars(_args)
           @store = configatron
           @default_env = nil
@@ -25,7 +26,7 @@ module Rake
         end
 
         def define(args, &task_block)
-          task_block.call(*[self].slice(0, task_block.arity)) if task_block
+          yield(*[self].slice(0, task_block.arity)) if task_block
 
           environments.each do |env|
             desc "Configure for the #{env[:name]} environment"
@@ -38,7 +39,7 @@ module Rake
           default_environment_setup
         end
 
-        def environments
+        def environments # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
           default = File.join(base_dir, config_ext(default_config))
           local = File.join(base_dir, config_ext(local_config))
 
@@ -60,17 +61,17 @@ module Rake
           "#{name}.yaml"
         end
 
-        def default_environment_setup
+        def default_environment_setup # rubocop:disable Metrics/MethodLength
           return unless default_env
 
-          top_level_envs = top_level_env_tasks
-          if top_level_envs.empty?
+          envs = top_level_env_tasks
+          if envs.empty?
             task = Rake.application.current_scope.path_with_task_name(default_env)
             prepend_task(task)
           else
-            top_level_envs.each do |task|
-              Rake.application.top_level_tasks.delete(task)
-              prepend_task(task)
+            envs.each do |env|
+              Rake.application.top_level_tasks.delete(env)
+              prepend_task(env)
             end
           end
         end
@@ -80,7 +81,10 @@ module Rake
         end
 
         def top_level_env_tasks
-          expect_user_defined = environments.map { |env| Rake.application.current_scope.path_with_task_name(env[:name]) }
+          expect_user_defined = environments.map do |env|
+            Rake.application.current_scope.path_with_task_name(env[:name])
+          end
+
           Rake.application.top_level_tasks.select { |t| expect_user_defined.include?(t) }
         end
       end

@@ -13,19 +13,20 @@ module Rake
             end
 
             def generate_from(model)
-              model.map { |switch|
-                switch.values.flatten.map { |value|
+              model.flat_map do |switch|
+                switch.values.flatten.map do |value|
                   top_level(switch) + nested(value)
-                }
-              }.flatten(1)
+                end
+              end
             end
 
             private
+
             def top_level(switch)
               [prefix, switch.switch]
             end
 
-            def nested(value)
+            def nested(value) # rubocop:disable Metrics/AbcSize
               res = []
               res << separator unless value.key.nil? && value.value.nil?
               res << value.key

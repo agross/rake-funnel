@@ -4,14 +4,19 @@ module Rake
       module TeamCity
         class ServiceMessages
           class << self
-            def method_missing(method, *args, &_block)
+            def respond_to_missing?(_method, _include_private = false)
+              true
+            end
+
+            def method_missing(method, *args, &_block) # rubocop:disable Style/MethodMissing
               return unless Rake::Funnel::Integration::TeamCity.running?
 
               message_name = method.camelize
-              publish message_name, args[0]
+              publish(message_name, args[0])
             end
 
             private
+
             def publish(message_name, args)
               args = [message_name] << escaped_array_of(args)
               args = args.flatten.reject(&:nil?)
@@ -19,7 +24,7 @@ module Rake
               puts "##teamcity[#{args.join(' ')}]"
             end
 
-            def escape(string)
+            def escape(string) # rubocop:disable Metrics/MethodLength
               string
                 .to_s
                 .gsub(/\|/, '||')

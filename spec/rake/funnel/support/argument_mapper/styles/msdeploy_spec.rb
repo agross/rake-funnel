@@ -1,3 +1,5 @@
+# rubocop:disable RSpec/FilePath
+
 include Rake::Funnel::Support
 
 describe Rake::Funnel::Support::Mapper::Styles::MSDeploy do

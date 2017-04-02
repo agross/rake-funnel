@@ -3,7 +3,7 @@ module Rake
     module Integration
       module TeamCity
         class NUnitPlugin
-          ENV_VAR = 'teamcity.dotnet.nunitaddin'
+          ENV_VAR = 'teamcity.dotnet.nunitaddin'.freeze
 
           class << self
             def setup(nunit_executable)
@@ -16,6 +16,7 @@ module Rake
             end
 
             private
+
             def get_addin_dir(source)
               return nil unless source
 

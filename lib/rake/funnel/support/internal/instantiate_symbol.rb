@@ -11,20 +11,25 @@ module Rake
           attr_reader :module
 
           private
+
           def instantiate(mod)
             @module = mod
           end
         end
 
         private
-        def create(sym, *args)
+
+        def create(sym, *args) # rubocop:disable Metrics/AbcSize
           return sym unless sym.is_a?(Symbol)
 
           found = [sym, sym.pascalize.to_sym]
-            .select { |candidate| mod.constants.include?(candidate) }
-            .first
+                  .select { |candidate| mod.constants.include?(candidate) }
+                  .first
 
-          raise NameError, "Unknown type to instantiate: #{sym.inspect}. Available types are: #{available.inspect}" if found.nil?
+          if found.nil?
+            raise NameError,
+                  "Unknown type to instantiate: #{sym.inspect}. Available types are: #{available.inspect}"
+          end
 
           type = mod.const_get(found)
           type.new(*args)

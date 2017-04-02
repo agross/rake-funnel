@@ -3,9 +3,9 @@ require 'tmpdir'
 include Rake::Funnel::Support
 
 describe Rake::Funnel::Support::Mono do
-  before {
+  before do
     allow(Rake::Win32).to receive(:windows?).and_return(windows?)
-  }
+  end
 
   context 'on Windows' do
     let(:windows?) { true }
@@ -34,16 +34,16 @@ describe Rake::Funnel::Support::Mono do
   context 'not on Windows' do
     let(:windows?) { false }
 
-    before {
+    before do
       allow(Which).to receive(:which)
-    }
+    end
 
-    before {
+    before do
       @cmd = described_class.invocation('executable.exe')
-    }
+    end
 
     it "should prepend 'mono'" do
-      expect(@cmd.first).to eq('mono')
+      expect(@cmd.first).to eq('mono') # rubocop:disable RSpec/InstanceVariable
     end
 
     it 'should resolve executable through which' do

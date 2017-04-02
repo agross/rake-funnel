@@ -3,39 +3,39 @@ include Rake::Funnel::Support::ArgumentMapper
 Styles.constants.reject { |x| x == :MSDeploy }.each do |style|
   style_path = Styles.const_get(style)
   describe style_path do
-    subject {
+    subject do
       Mapper.new(style)
-    }
+    end
 
-    let (:style) {
+    let(:style) do
       Styles.const_get(style).new
-    }
+    end
 
-    def styled(switch, key = nil, value = nil)
-      unless style.respond_to?(:separator)
-        styled = [
-          [
-            style.prefix,
-            switch
-          ],
-          [
-            key && key,
-            value && style.value_separator,
-            value && value
-          ]
-        ]
-      else
-        styled = [
-          [
-            style.prefix,
-            switch,
-            key && style.separator,
-            key && key,
-            value && style.value_separator,
-            value && value
-          ]
-        ]
-      end
+    def styled(switch, key = nil, value = nil) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/LineLength
+      styled = if style.respond_to?(:separator)
+                 [
+                   [
+                     style.prefix,
+                     switch,
+                     key && style.separator,
+                     key && key,
+                     value && style.value_separator,
+                     value && value
+                   ]
+                 ]
+               else
+                 [
+                   [
+                     style.prefix,
+                     switch
+                   ],
+                   [
+                     key && key,
+                     value && style.value_separator,
+                     value && value
+                   ]
+                 ]
+               end
 
       styled.map(&:join).reject(&:empty?)
     end
@@ -74,30 +74,33 @@ Styles.constants.reject { |x| x == :MSDeploy }.each do |style|
       it 'should convert switch => <truthy> enumerable' do
         args = { switch: [true, 1] }
         expect(subject.map(args)).to match_array(
-            [
-              *styled('switch', 'true'),
-              *styled('switch', '1')
-            ])
+          [
+            *styled('switch', 'true'),
+            *styled('switch', '1')
+          ]
+        )
       end
 
       it 'should convert hash values' do
         args = { switch: { foo: true, bar: true } }
         expect(subject.map(args)).to match_array(
-            [
-              *styled('switch', 'foo', 'true'),
-              *styled('switch', 'bar', 'true')
-            ])
+          [
+            *styled('switch', 'foo', 'true'),
+            *styled('switch', 'bar', 'true')
+          ]
+        )
       end
 
       it 'should convert enumerable hash values' do
         args = { switch: [{ foo: true, bar: 1 }, { baz: :baz, foobar: 'foobar' }] }
         expect(subject.map(args)).to match_array(
-            [
-              *styled('switch', 'foo', 'true'),
-              *styled('switch', 'bar', '1'),
-              *styled('switch', 'baz', 'baz'),
-              *styled('switch', 'foobar', 'foobar'),
-            ])
+          [
+            *styled('switch', 'foo', 'true'),
+            *styled('switch', 'bar', '1'),
+            *styled('switch', 'baz', 'baz'),
+            *styled('switch', 'foobar', 'foobar')
+          ]
+        )
       end
     end
 
@@ -115,28 +118,31 @@ Styles.constants.reject { |x| x == :MSDeploy }.each do |style|
       it 'should convert switch => <falsy> enumerable' do
         args = { switch: [false, nil] }
         expect(subject.map(args)).to match_array(
-            [
-              *styled('switch', 'false'),
-              *styled('switch')
-            ])
+          [
+            *styled('switch', 'false'),
+            *styled('switch')
+          ]
+        )
       end
 
       it 'should convert hash values' do
         args = { switch: { foo: false, bar: nil } }
         expect(subject.map(args)).to match_array(
-            [
-              *styled('switch', 'foo', 'false'),
-              *styled('switch', 'bar')
-            ])
+          [
+            *styled('switch', 'foo', 'false'),
+            *styled('switch', 'bar')
+          ]
+        )
       end
 
       it 'should convert enumerable hash values' do
         args = { switch: [{ foo: false }, { bar: nil }] }
         expect(subject.map(args)).to match_array(
-            [
-              *styled('switch', 'foo', 'false'),
-              *styled('switch', 'bar')
-            ])
+          [
+            *styled('switch', 'foo', 'false'),
+            *styled('switch', 'bar')
+          ]
+        )
       end
     end
 
@@ -144,28 +150,31 @@ Styles.constants.reject { |x| x == :MSDeploy }.each do |style|
       it 'should convert switch => <enumerable>' do
         args = { switch: [1, 'two'] }
         expect(subject.map(args)).to match_array(
-            [
-              *styled('switch', '1'),
-              *styled('switch', 'two')
-            ])
+          [
+            *styled('switch', '1'),
+            *styled('switch', 'two')
+          ]
+        )
       end
 
       it 'should convert switch => <hash>' do
         args = { switch: { one: 1, two: 2 } }
         expect(subject.map(args)).to match_array(
-            [
-              *styled('switch', 'one', '1'),
-              *styled('switch', 'two', '2')
-            ])
+          [
+            *styled('switch', 'one', '1'),
+            *styled('switch', 'two', '2')
+          ]
+        )
       end
 
       it 'should convert switch => <enumerable of hash>' do
         args = { switch: [{ one: 1 }, { two: 2 }] }
         expect(subject.map(args)).to match_array(
-            [
-              *styled('switch', 'one', '1'),
-              *styled('switch', 'two', '2')
-            ])
+          [
+            *styled('switch', 'one', '1'),
+            *styled('switch', 'two', '2')
+          ]
+        )
       end
     end
 

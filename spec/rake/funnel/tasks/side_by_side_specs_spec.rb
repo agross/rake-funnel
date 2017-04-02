@@ -4,9 +4,9 @@ include Rake
 include Rake::Funnel::Support
 
 describe Rake::Funnel::Tasks::SideBySideSpecs do
-  before {
+  before do
     Task.clear
-  }
+  end
 
   describe 'defaults' do
     its(:name) { should == :compile }
@@ -18,7 +18,7 @@ describe Rake::Funnel::Tasks::SideBySideSpecs do
   end
 
   describe 'execution' do
-    subject {
+    subject do
       described_class.new do |t|
         t.projects = %w(**/*.??proj)
         t.references = %w(Ref)
@@ -26,25 +26,25 @@ describe Rake::Funnel::Tasks::SideBySideSpecs do
         t.enabled = enabled
         t.packages = %w(Package)
       end
-    }
+    end
 
-    before {
+    before do
       allow(SpecsRemover).to receive(:remove)
-    }
+    end
 
-    before {
+    before do
       Task[subject.name].invoke
-    }
+    end
 
     context 'enabled' do
       let(:enabled) { true }
 
       it 'should use remover' do
         expect(SpecsRemover).to have_received(:remove)
-            .with(projects: subject.projects,
-                  references: subject.references,
-                  specs: subject.specs,
-                  packages: subject.packages)
+          .with(projects: subject.projects,
+                references: subject.references,
+                specs: subject.specs,
+                packages: subject.packages)
       end
     end
 

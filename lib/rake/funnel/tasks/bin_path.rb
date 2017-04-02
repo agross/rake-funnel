@@ -13,17 +13,18 @@ module Rake
         end
 
         private
+
         def setup_ivars(args)
           @name = args.shift || :bin_path
           @search_pattern = %w(tools/* tools/*/bin packages/**/tools)
           @path_modifier = proc { |paths| paths }
         end
 
-        def define(args, &task_block)
+        def define(args, &task_block) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
           desc 'Add local binaries to PATH environment variable' unless Rake.application.last_description
 
           task(name, *args) do |_, task_args|
-            task_block.call(*[self, task_args].slice(0, task_block.arity)) if task_block
+            yield(*[self, task_args].slice(0, task_block.arity)) if task_block
 
             next unless paths.any?
 

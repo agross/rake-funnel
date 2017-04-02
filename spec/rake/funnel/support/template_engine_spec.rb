@@ -16,17 +16,21 @@ describe Rake::Funnel::Support::TemplateEngine do
   end
 
   it 'should omit newlines for pure ruby lines' do
+    # rubocop:disable Style/IndentHeredoc
     template = <<-EOF
 <%= 42 %>
     EOF
+    # rubocop:enable Style/IndentHeredoc
 
     expect(described_class.render(template)).to eq('42')
   end
 
   it 'should not omit newlines for mixed ruby lines' do
+    # rubocop:disable Style/IndentHeredoc
     template = <<-EOF
 12 <%= 34 %> 56
     EOF
+    # rubocop:enable Style/IndentHeredoc
 
     expect(described_class.render(template)).to eq("12 34 56\n")
   end
@@ -38,8 +42,7 @@ describe Rake::Funnel::Support::TemplateEngine do
   describe 'binding' do
     context 'without binding' do
       it 'should not support contextual variables' do
-        var = 42
-        template = '<%= var %>'
+        template = '<%= undefined_variable %>'
 
         expect { described_class.render(template) }.to raise_error(NameError)
       end
@@ -60,6 +63,6 @@ describe Rake::Funnel::Support::TemplateEngine do
 
   it 'should report errors with file name' do
     expect { described_class.render('<%= undefined %>', 'file.template') }
-      .to raise_error { |ex| expect(ex.backtrace.join("\n")).to match(/file\.template/) }
+      .to(raise_error { |ex| expect(ex.backtrace.join("\n")).to match(/file\.template/) })
   end
 end

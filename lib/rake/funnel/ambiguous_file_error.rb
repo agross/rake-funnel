@@ -22,6 +22,7 @@ module Rake
       end
 
       private
+
       def inspect_description
         [description] if description
       end

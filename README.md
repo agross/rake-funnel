@@ -4,7 +4,7 @@
 
 rake-funnel is my set of rake tasks, mostly targeted at .NET development.
 
-* Tested against Ruby 2.0.0, 2.1.0 through 2.2.1 and ruby-head
+* Tested against Ruby 2.0.0, 2.1.0, 2.2.0, 2.3.0, 2.4.0 and ruby-head
 * Ruby < 2.0 is not supported
 
 ## Installation

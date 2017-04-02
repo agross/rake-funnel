@@ -32,6 +32,7 @@ module Rake
         end
 
         private
+
         def evaluate_erb(language, version_info, target)
           template = template_for(language)
 

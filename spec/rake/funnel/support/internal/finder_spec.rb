@@ -1,3 +1,5 @@
+# rubocop:disable RSpec/FilePath
+
 require 'tmpdir'
 
 include Rake::Funnel
@@ -7,22 +9,22 @@ describe Rake::Funnel::Support::Finder do
   let(:generate) { [] }
   let(:temp_dir) { Dir.mktmpdir }
 
-  before {
+  before do
     Dir.chdir(temp_dir) do
       ([] << generate).flatten.each do |file|
         FileUtils.mkdir_p(File.dirname(file))
         FileUtils.touch(file)
       end
     end
-  }
+  end
 
-  after {
+  after do
     FileUtils.rm_rf(temp_dir)
-  }
+  end
 
-  subject {
+  subject do
     described_class.new(pattern, OpenStruct.new(name: 'task name'), 'error message')
-  }
+  end
 
   def map_temp(*files)
     mapped = files.map { |f| File.join(temp_dir, f) }

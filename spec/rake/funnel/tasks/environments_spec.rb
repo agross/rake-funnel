@@ -7,24 +7,24 @@ include Rake::Funnel::Tasks
 describe Rake::Funnel::Tasks::Environments do
   include Rake::DSL
 
-  before {
+  before do
     Task.clear
-  }
+  end
 
   let(:files) { [] }
 
-  before {
+  before do
     allow(Dir).to receive(:[]).and_return(files)
-  }
+  end
 
   def disable_default_env_setup
-    allow_any_instance_of(described_class).to receive(:default_environment_setup)
+    allow_any_instance_of(described_class).to receive(:default_environment_setup) # rubocop:disable RSpec/AnyInstance
   end
 
   describe 'defaults' do
-    before {
+    before do
       disable_default_env_setup
-    }
+    end
 
     its(:store) { should == configatron }
     its(:base_dir) { should == 'config' }
@@ -36,7 +36,7 @@ describe Rake::Funnel::Tasks::Environments do
     describe 'overriding defaults' do
       let(:store) { OpenStruct.new }
 
-      subject {
+      subject do
         described_class.new do |t|
           t.store = store
           t.base_dir = 'custom base_dir'
@@ -45,7 +45,7 @@ describe Rake::Funnel::Tasks::Environments do
           t.local_config = 'custom local_config'
           t.customizer = proc {}
         end
-      }
+      end
 
       its(:store) { should == store }
       its(:base_dir) { should == subject.base_dir }
@@ -57,17 +57,17 @@ describe Rake::Funnel::Tasks::Environments do
   end
 
   describe 'definition' do
-    before {
+    before do
       disable_default_env_setup
-    }
+    end
 
-    before {
-      allow_any_instance_of(described_class).to receive(:task)
-    }
+    before do
+      allow_any_instance_of(described_class).to receive(:task) # rubocop:disable RSpec/AnyInstance
+    end
 
-    let(:files) {
+    let(:files) do
       %w(config/default.yaml config/local.yaml config/dev.yaml config/production.yaml)
-    }
+    end
 
     it 'should define a task for each config file' do
       expect(subject).to have_received(:task).with('dev')
@@ -85,28 +85,28 @@ describe Rake::Funnel::Tasks::Environments do
 
   describe 'config files to load' do
     let(:optional) { nil }
-    let(:files) {
+    let(:files) do
       %w(config/dev.yaml)
-    }
+    end
 
-    before {
+    before do
       allow(Loader).to receive(:load_configuration)
-    }
+    end
 
-    before {
+    before do
       allow(File).to receive(:exist?).and_return(true)
       allow(File).to receive(:exist?).with(optional).and_return(false)
-    }
+    end
 
-    subject! {
+    subject! do
       described_class.new do |t|
         t.default_env = 'dev'
       end
-    }
+    end
 
-    before {
+    before do
       Task['dev'].invoke
-    }
+    end
 
     it 'should store configuration in configatron singleton' do
       expect(Loader).to have_received(:load_configuration).with(anything, configatron, any_args)
@@ -118,7 +118,7 @@ describe Rake::Funnel::Tasks::Environments do
       it 'should load all files' do
         expect(Loader)
           .to have_received(:load_configuration)
-              .with(hash_including({ config_files: %w(config/default.yaml config/dev.yaml config/local.yaml) }), any_args)
+          .with(hash_including(config_files: %w(config/default.yaml config/dev.yaml config/local.yaml)), any_args)
       end
     end
 
@@ -128,7 +128,7 @@ describe Rake::Funnel::Tasks::Environments do
       it 'should load environment file and local file' do
         expect(Loader)
           .to have_received(:load_configuration)
-              .with(hash_including({ config_files: %w(config/dev.yaml config/local.yaml) }), any_args)
+          .with(hash_including(config_files: %w(config/dev.yaml config/local.yaml)), any_args)
       end
     end
 
@@ -136,31 +136,33 @@ describe Rake::Funnel::Tasks::Environments do
       let(:optional) { 'config/local.yaml' }
 
       it 'should load default file and environment file' do
-        expect(Loader)
-          .to have_received(:load_configuration).with(hash_including({ config_files: %w(config/default.yaml config/dev.yaml) }), any_args)
+        expect(Loader).to \
+          have_received(:load_configuration)
+          .with(hash_including(config_files: %w(config/default.yaml config/dev.yaml)),
+                any_args)
       end
     end
   end
 
   describe 'customization' do
     let(:customizer) { proc {} }
-    let(:files) {
+    let(:files) do
       %w(config/dev.yaml)
-    }
+    end
 
-    subject! {
+    subject! do
       described_class.new do |t|
         t.customizer = customizer
       end
-    }
+    end
 
-    before {
+    before do
       allow(Loader).to receive(:load_configuration)
-    }
+    end
 
-    before {
+    before do
       Task['dev'].invoke
-    }
+    end
 
     it 'should pass customizer to loader' do
       expect(Loader).to have_received(:load_configuration).with(anything, anything, customizer)
@@ -168,21 +170,21 @@ describe Rake::Funnel::Tasks::Environments do
   end
 
   describe 'automatic environment setup' do
-    let(:files) {
+    let(:files) do
       %w(config/dev.yaml config/production.yaml)
-    }
+    end
 
-    before {
+    before do
       Rake.application.top_level_tasks.clear
       Rake.application.top_level_tasks.push(*top_level_tasks)
-    }
+    end
 
     context 'environment task defined in top-level Rake namespace' do
-      subject! {
+      subject! do
         described_class.new do |t|
           t.default_env = default_env
         end
-      }
+      end
 
       context 'no default environment configured' do
         let(:default_env) { nil }
@@ -215,7 +217,7 @@ describe Rake::Funnel::Tasks::Environments do
     end
 
     context 'environment task defined in Rake namespace' do
-      subject! {
+      subject! do
         namespace :foo do
           namespace :bar do
             described_class.new do |t|
@@ -223,7 +225,7 @@ describe Rake::Funnel::Tasks::Environments do
             end
           end
         end
-      }
+      end
 
       context 'default environment configured' do
         let(:default_env) { 'dev' }

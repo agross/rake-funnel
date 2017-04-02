@@ -9,8 +9,8 @@ describe Rake::Funnel::Support::Mapper do
         enum_hash: [{ one: 1 }, { two: 2 }, { unset: nil }]
       }
 
-      _ = subject.map(args)
-      expect(_).not_to be_empty
+      result = subject.map(args)
+      expect(result).not_to be_empty
 
       skip('for manual testing only')
     end
@@ -52,7 +52,8 @@ describe Rake::Funnel::Support::Mapper do
 
     context 'nil mapper' do
       it 'should fail' do
-        expect { described_class.new(nil) }.to raise_error(/You cannot use the 'nil' mapper style. Available mappers are:/)
+        expect { described_class.new(nil) }.to \
+          raise_error(/You cannot use the 'nil' mapper style. Available mappers are:/)
       end
     end
 

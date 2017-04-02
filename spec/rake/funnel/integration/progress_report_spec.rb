@@ -6,27 +6,27 @@ describe Rake::Funnel::Integration::ProgressReport do
 
   let(:teamcity_running?) { false }
 
-  before {
+  before do
     allow($stdout).to receive(:puts)
     allow(TeamCity).to receive(:running?).and_return(teamcity_running?)
 
     Task.clear
-  }
+  end
 
-  after {
+  after do
     subject.disable!
-  }
+  end
 
   describe 'defaults' do
-    subject! {
+    subject! do
       described_class.new
-    }
+    end
 
-    before {
+    before do
       task :task
 
       Task[:task].invoke
-    }
+    end
 
     context 'not on TeamCity' do
       it 'should write colored task name in square brackets' do
@@ -38,57 +38,53 @@ describe Rake::Funnel::Integration::ProgressReport do
       let(:teamcity_running?) { true }
 
       it 'should not write task name since it would clutter the output' do
-        expect($stdout).to_not have_received(:puts).with(/task/)
+        expect($stdout).not_to have_received(:puts).with(/task/)
       end
     end
   end
 
   context 'when progess report was disabled' do
-    subject {
+    subject do
       described_class.new
-    }
+    end
 
-    before {
+    before do
       subject.disable!
 
       task :task
 
       Task[:task].invoke
-    }
+    end
 
     it 'should not write' do
-      expect($stdout).to_not have_received(:puts).with("\n[task]")
+      expect($stdout).not_to have_received(:puts).with("\n[task]")
     end
   end
 
   describe 'custom event handlers' do
     let(:receiver) { double.as_null_object }
 
-    subject! {
+    subject! do
       described_class.new do |r|
         r.task_starting do |task, args|
-          receiver.task_starting({
-            task: task,
-            args: args
-          })
+          receiver.task_starting(task: task,
+                                 args: args)
         end
 
         r.task_finished do |task, args, error|
-          receiver.task_finished({
-            task: task,
-            args: args,
-            error: error
-          })
+          receiver.task_finished(task: task,
+                                 args: args,
+                                 error: error)
         end
       end
-    }
+    end
 
     context 'when task succeeds' do
-      before {
+      before do
         task :task
 
         Task[:task].invoke
-      }
+      end
 
       describe 'starting handler' do
         it 'should run' do
@@ -96,11 +92,11 @@ describe Rake::Funnel::Integration::ProgressReport do
         end
 
         it 'should receive task' do
-          expect(receiver).to have_received(:task_starting).with(hash_including({ task: kind_of(Task) }))
+          expect(receiver).to have_received(:task_starting).with(hash_including(task: kind_of(Task)))
         end
 
         it 'should receive task arguments' do
-          expect(receiver).to have_received(:task_starting).with(hash_including({ args: kind_of(TaskArguments) }))
+          expect(receiver).to have_received(:task_starting).with(hash_including(args: kind_of(TaskArguments)))
         end
       end
 
@@ -110,15 +106,15 @@ describe Rake::Funnel::Integration::ProgressReport do
         end
 
         it 'should receive task' do
-          expect(receiver).to have_received(:task_finished).with(hash_including({ task: kind_of(Task) }))
+          expect(receiver).to have_received(:task_finished).with(hash_including(task: kind_of(Task)))
         end
 
         it 'should receive task arguments' do
-          expect(receiver).to have_received(:task_finished).with(hash_including({ args: kind_of(TaskArguments) }))
+          expect(receiver).to have_received(:task_finished).with(hash_including(args: kind_of(TaskArguments)))
         end
 
         it 'should not receive error' do
-          expect(receiver).to have_received(:task_finished).with(hash_including({ error: nil }))
+          expect(receiver).to have_received(:task_finished).with(hash_including(error: nil))
         end
       end
     end
@@ -128,20 +124,20 @@ describe Rake::Funnel::Integration::ProgressReport do
 
       let(:error) { SpecificError.new('task error') }
 
-      before {
+      before do
         task :task do
           raise error
         end
 
         begin
           Task[:task].invoke
-        rescue SpecificError
+        rescue SpecificError # rubocop:disable Lint/HandleExceptions
         end
-      }
+      end
 
       describe 'finished handler' do
         it 'should receive error' do
-          expect(receiver).to have_received(:task_finished).with(hash_including({ error: error }))
+          expect(receiver).to have_received(:task_finished).with(hash_including(error: error))
         end
       end
     end

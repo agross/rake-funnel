@@ -20,6 +20,7 @@ module Rake
           end
 
           private
+
           def target_path(file, common_path, target)
             target_relative = Pathname.new(file).relative_path_from(Pathname.new(common_path)).to_s
             File.join(target, target_relative)

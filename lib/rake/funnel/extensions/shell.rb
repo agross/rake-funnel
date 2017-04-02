@@ -12,13 +12,14 @@ module Rake
 
           run(cmd, log_file, error_lines) do |success, readable_cmd, result, log|
             if block
-              block.call(success, readable_cmd, result, log)
+              yield(success, readable_cmd, result, log)
               return
             end
           end
         end
 
         private
+
         def run(cmd, log_file, error_lines)
           cmd, readable_cmd = normalize(cmd)
 
@@ -32,7 +33,7 @@ module Rake
 
             yield(success, *result) if block_given?
 
-            fail Rake::Funnel::ExecutionError.new(*result) unless success
+            raise Rake::Funnel::ExecutionError.new(*result) unless success
           end
         end
 

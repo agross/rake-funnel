@@ -3,19 +3,19 @@ include Rake
 describe Rake::Funnel::Tasks::Timing do
   include DSL
 
-  before {
+  before do
     Rake.application = nil
     Task.clear
 
     expect(define_tasks).to be
     expect(subject).to be
-  }
+  end
 
   let(:define_tasks) { task :task }
 
-  after {
+  after do
     subject.reset!
-  }
+  end
 
   describe 'defaults' do
     its(:name) { should == :timing }
@@ -52,7 +52,7 @@ describe Rake::Funnel::Tasks::Timing do
   end
 
   describe 'execution' do
-    before {
+    before do
       allow(Rake.application).to receive(:init)
       allow(Rake.application).to receive(:load_rakefile)
       Rake.application.top_level_tasks.unshift(:task)
@@ -64,14 +64,14 @@ describe Rake::Funnel::Tasks::Timing do
       allow($stderr).to receive(:print)
 
       Rake.application.run
-    }
+    end
 
     context 'with task defined' do
-      let(:define_tasks) {
+      let(:define_tasks) do
         task :task do
           puts 'hello'
         end
-      }
+      end
 
       it 'should execute tasks' do
         expect($stdout).to have_received(:puts).with('hello')
@@ -92,10 +92,10 @@ describe Rake::Funnel::Tasks::Timing do
     end
 
     context 'with unreachable task defined' do
-      let(:define_tasks) {
+      let(:define_tasks) do
         task :task
         task :not_executed
-      }
+      end
 
       it 'should not record timing information for unexecuted tasks' do
         expect(subject.stats.map { |s| s[:task].name }).not_to include('not_executed')
@@ -114,11 +114,11 @@ describe Rake::Funnel::Tasks::Timing do
       end
 
       context 'when rake failed' do
-        let(:define_tasks) {
+        let(:define_tasks) do
           task :task do
             raise
           end
-        }
+        end
 
         it 'should print the report' do
           expect($stdout).to have_received(:puts).with(/Build time report/)

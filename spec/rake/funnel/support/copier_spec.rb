@@ -15,7 +15,7 @@ describe Rake::Funnel::Support::Copier do
   end
 
   describe 'recursive copy' do
-    before {
+    before do
       allow(File).to receive(:directory?).and_return(false)
       directories.each do |dir|
         allow(File).to receive(:directory?).with(dir).and_return(true)
@@ -23,14 +23,14 @@ describe Rake::Funnel::Support::Copier do
 
       allow(RakeFileUtils).to receive(:mkdir_p)
       allow(RakeFileUtils).to receive(:cp)
-    }
+    end
 
-    before {
+    before do
       described_class.copy(source, target)
-    }
+    end
 
     def no_prefix(file)
-      file.sub(%r|bin/|, '')
+      file.sub(%r{bin/}, '')
     end
 
     it 'should create target directories' do

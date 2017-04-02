@@ -2,9 +2,9 @@ include Rake
 include Rake::Funnel::Support
 
 describe Rake::Funnel::Tasks::AssemblyVersion do
-  before {
+  before do
     Task.clear
-  }
+  end
 
   describe 'defaults' do
     its(:name) { should == :version }
@@ -23,22 +23,22 @@ describe Rake::Funnel::Tasks::AssemblyVersion do
   describe 'execution' do
     let(:writer) { instance_double(AssemblyVersionWriter).as_null_object }
 
-    before {
+    before do
       allow(AssemblyVersionWriter).to receive(:new).and_return(writer)
-    }
+    end
 
-    subject {
+    subject do
       described_class.new(:name) do |t|
-        t.language = [:cs, :vb]
+        t.language = %i(cs vb)
         t.source = %w(one two)
         t.source_args = { foo: 42 }
         t.target_path = 'will not work'
       end
-    }
+    end
 
-    before {
+    before do
       Task[subject.name].invoke
-    }
+    end
 
     it 'should pass source and source_args' do
       expect(AssemblyVersionWriter).to have_received(:new).with(subject.source, subject.source_args)

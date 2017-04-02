@@ -11,7 +11,7 @@ module Rake
         end
 
         def each
-          block_given? or return enum_for(__method__)
+          block_given? || (return enum_for(__method__))
           all_or_default.each { |x| yield x }
         end
 
@@ -40,6 +40,7 @@ module Rake
         end
 
         private
+
         def first_sln
           return candidates.first if candidates.one?
 

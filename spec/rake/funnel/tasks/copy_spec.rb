@@ -2,9 +2,9 @@ include Rake
 include Rake::Funnel::Support
 
 describe Rake::Funnel::Tasks::Copy do
-  before {
+  before do
     Task.clear
-  }
+  end
 
   describe 'defaults' do
     its(:name) { should == :copy }
@@ -17,25 +17,25 @@ describe Rake::Funnel::Tasks::Copy do
     let(:target) { 'target' }
     let(:finder) { instance_double(Finder).as_null_object }
 
-    before {
+    before do
       allow(finder).to receive(:all_or_default).and_return(source)
       allow(Finder).to receive(:new).and_return(finder)
-    }
+    end
 
-    before {
+    before do
       allow(Copier).to receive(:copy)
-    }
+    end
 
-    subject {
+    subject do
       described_class.new do |t|
         t.source = source
         t.target = target
       end
-    }
+    end
 
-    before {
+    before do
       Task[subject.name].invoke
-    }
+    end
 
     it 'should delegate to Copier' do
       expect(Copier).to have_received(:copy).with(source, subject.target)

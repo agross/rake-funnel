@@ -15,6 +15,7 @@ module Rake
         end
 
         private
+
         def setup_ivars(args)
           @name = args.shift || :paket
 
@@ -29,7 +30,7 @@ module Rake
           desc 'Restore packages' unless Rake.application.last_description
 
           task(name, *args) do |_, task_args|
-            task_block.call(*[self, task_args].slice(0, task_block.arity)) if task_block
+            yield(*[self, task_args].slice(0, task_block.arity)) if task_block
 
             sh(*bootstrapper_cmd) unless File.exist?(paket)
             sh(*paket_cmd)

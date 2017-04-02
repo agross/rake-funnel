@@ -6,9 +6,9 @@ describe Rake::Funnel::Support::BinaryVersionReader do
 
   let(:file) { 'some assembly' }
 
-  before {
+  before do
     allow(File).to receive(:binread).with(file).and_return(contents)
-  }
+  end
 
   describe 'version can be read' do
     let(:version) { %w(1 2 3 4) }

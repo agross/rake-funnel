@@ -1,8 +1,10 @@
+# rubocop:disable RSpec/FilePath
+
 describe Rake::Funnel::Integration::TeamCity do
   describe 'runner detection' do
-    before {
+    before do
       allow(ENV).to receive(:include?).with(described_class::PROJECT_ENV_VAR).and_return(teamcity_running?)
-    }
+    end
 
     context 'when running outside TeamCity' do
       let(:teamcity_running?) { false }
@@ -38,14 +40,14 @@ describe Rake::Funnel::Integration::TeamCity do
     let(:original_path) { 'original path environment variable contents' }
     let(:jre) { nil }
 
-    before {
+    before do
       allow(ENV).to receive(:[]=)
 
       allow(ENV).to receive(:[]).with('PATH').and_return(original_path)
 
       allow(ENV).to receive(:include?).with(described_class::JRE_ENV_VAR).and_return(!jre.nil?)
       allow(ENV).to receive(:[]).with(described_class::JRE_ENV_VAR).and_return(jre)
-    }
+    end
 
     context 'without block' do
       it 'should not modify environment variables' do
@@ -91,7 +93,7 @@ describe Rake::Funnel::Integration::TeamCity do
 
         context 'block error' do
           it 'should reset path' do
-            expect { described_class.with_java_runtime { fail 'with some error' } }.to raise_error(/with some error/)
+            expect { described_class.with_java_runtime { raise 'with some error' } }.to raise_error(/with some error/)
 
             expect(ENV).to have_received(:[]=).with('PATH', original_path)
           end

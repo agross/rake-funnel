@@ -6,9 +6,7 @@ module Rake
           def invocation(executable, *args)
             exe_args = ([executable] << args).flatten.compact
 
-            if Rake::Win32.windows?
-              return exe_args
-            end
+            return exe_args if Rake::Win32.windows?
 
             executable = exe_args.shift
             found = Which.which(executable) || executable

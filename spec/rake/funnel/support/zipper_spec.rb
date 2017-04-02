@@ -19,21 +19,21 @@ describe Rake::Funnel::Support::Zipper do
       let(:zip_root) { nil }
       let(:zip) { instance_double(::Zip::File).as_null_object }
       let(:mtime) { Time.new(2015, 3, 9) }
-      let(:zip_entry) { double(::Zip::Entry).as_null_object }
+      let(:zip_entry) { double(::Zip::Entry).as_null_object } # rubocop:disable RSpec/VerifiedDoubles
 
-      before {
+      before do
         allow(RakeFileUtils).to receive(:mkdir_p)
-      }
+      end
 
-      before {
+      before do
         allow(::Zip::File).to receive(:open).with(target, ::Zip::File::CREATE).and_yield(zip)
         allow(zip).to receive(:add).and_return(zip_entry)
         allow(File).to receive(:mtime).and_return(mtime)
-      }
+      end
 
-      before {
+      before do
         described_class.zip(source, target, zip_root)
-      }
+      end
 
       it 'should create the target directory' do
         expect(RakeFileUtils).to have_received(:mkdir_p).with(File.dirname(target))
@@ -66,7 +66,7 @@ describe Rake::Funnel::Support::Zipper do
           context "with '#{root || 'nil'}'" do
             let(:zip_root) { root }
 
-            it "should put files below #{(root.nil? || root.empty?) ? 'the root' : "'#{root}'"}" do
+            it "should put files below #{root.nil? || root.empty? ? 'the root' : "'#{root}'"}" do
               expect(zip).to have_received(:add).with(/^#{root}/, anything).exactly(source.length).times
             end
           end

@@ -14,7 +14,7 @@ module Rake
           end
 
           def each
-            block_given? or return enum_for(__method__)
+            block_given? || (return enum_for(__method__))
 
             files.each do |file|
               Rake.rake_output_message("Reading #{file}")
@@ -29,6 +29,7 @@ module Rake
           end
 
           private
+
           def files
             Finder.new(search_pattern, self, 'No version files found.').all_or_default
           end

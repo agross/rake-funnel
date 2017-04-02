@@ -8,6 +8,7 @@ module Rake
         end
 
         private
+
         def sync(stream)
           stream.sync = true
         rescue => e

@@ -17,6 +17,7 @@ module Rake
           end
 
           private
+
           def configure_zip
             ::Zip.unicode_names = true
             ::Zip.default_compression = Zlib::BEST_COMPRESSION

@@ -1,12 +1,15 @@
+# rubocop:disable RSpec/FilePath
+
 describe Rake::Funnel::Extensions::REXML::Functions do
-  let(:xml) { <<EOF
+  let(:xml) do
+    <<EOF
   <editors xmlns="http://example.com">
     <editor id="emacs">EMACS</editor>
     <editor id="vi">VIM</editor>
     <editor id="notepad">Notepad</editor>
   </editors>
 EOF
-  }
+  end
 
   subject { REXML::Document.new(xml) }
 

@@ -20,19 +20,20 @@ module Rake
         end
 
         private
+
         def setup_ivars(args)
           @name = args.shift || :timing
 
           @stats = Statistics.new
         end
 
-        def define(_args, &task_block)
+        def define(_args, &task_block) # rubocop:disable Metrics/AbcSize
           patches.each(&:apply!)
 
           desc 'Output task timing information' unless Rake.application.last_description
 
           task name, :failed do |_, task_args|
-            task_block.call(*[self, task_args].slice(0, task_block.arity)) if task_block
+            yield(*[self, task_args].slice(0, task_block.arity)) if task_block
 
             Report.new(@stats, task_args).render
           end
@@ -47,9 +48,9 @@ module Rake
           @patches ||= [report, benchmark]
         end
 
-        def report
+        def report # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
           Rake::Funnel::Support::Patch.new do |p|
-            report_invoker = -> (opts) { Report.new(@stats, opts).render }
+            report_invoker = ->(opts) { Report.new(@stats, opts).render }
 
             p.setup do
               Rake::Application.class_eval do
@@ -75,9 +76,9 @@ module Rake
           end
         end
 
-        def benchmark
+        def benchmark # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
           Rake::Funnel::Support::Patch.new do |p|
-            benchmark_invoker = -> (task, &block) { @stats.benchmark(task, &block) }
+            benchmark_invoker = ->(task, &block) { @stats.benchmark(task, &block) }
 
             p.setup do
               Rake::Task.class_eval do

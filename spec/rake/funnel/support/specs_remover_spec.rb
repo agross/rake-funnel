@@ -1,7 +1,7 @@
 describe Rake::Funnel::Support::SpecsRemover do
-  before {
+  before do
     allow(Rake::Funnel::Support::Trace).to receive(:message)
-  }
+  end
 
   describe 'removal' do
     let(:projects) {}
@@ -9,25 +9,24 @@ describe Rake::Funnel::Support::SpecsRemover do
     let(:specs) {}
     let(:packages) {}
 
-    before {
+    before do
       allow(File).to receive(:open)
       allow(File).to receive(:write)
       allow(RakeFileUtils).to receive(:rm)
-    }
+    end
 
     describe 'arguments' do
-      before {
+      before do
         described_class.remove(projects: projects,
                                references: references,
                                specs: specs,
                                packages: packages)
-      }
+      end
 
       context 'string projects' do
         let(:projects) { '**/*.??proj' }
 
         it 'should succeed' do
-          expect(true).to be(true)
         end
       end
 
@@ -36,7 +35,6 @@ describe Rake::Funnel::Support::SpecsRemover do
         let(:references) { 'Reference' }
 
         it 'should succeed' do
-          expect(true).to be(true)
         end
       end
 
@@ -45,7 +43,6 @@ describe Rake::Funnel::Support::SpecsRemover do
         let(:specs) { '*Specs.cs' }
 
         it 'should succeed' do
-          expect(true).to be(true)
         end
       end
 
@@ -53,7 +50,6 @@ describe Rake::Funnel::Support::SpecsRemover do
         let(:packages) { 'SomePackage' }
 
         it 'should succeed' do
-          expect(true).to be(true)
         end
       end
     end
@@ -62,14 +58,14 @@ describe Rake::Funnel::Support::SpecsRemover do
       describe Rake::Funnel::Support::SpecsRemover::ProjectFiles do
         let(:projects) { '**/*.??proj' }
 
-        before {
+        before do
           allow(Dir).to receive(:[]).and_return([:some])
           allow(File).to receive(:read).and_return('<root></root>')
-        }
+        end
 
-        before {
+        before do
           described_class.remove_specs_and_references(projects, [], [])
-        }
+        end
 
         it 'should not write the project file' do
           expect(File).not_to have_received(:open)
@@ -79,15 +75,15 @@ describe Rake::Funnel::Support::SpecsRemover do
       describe Rake::Funnel::Support::SpecsRemover::PaketReferences do
         let(:projects) { %w(project.proj) }
 
-        before {
+        before do
           allow(Dir).to receive(:[]).and_return([:some])
           allow(File).to receive(:exist?).and_return(true)
           allow(File).to receive(:read).and_return('SomePackage')
-        }
+        end
 
-        before {
+        before do
           described_class.remove_packages(projects, [])
-        }
+        end
 
         it 'should not write the project file' do
           expect(File).not_to have_received(:write)
@@ -112,29 +108,29 @@ describe Rake::Funnel::Support::SpecsRemover do
 
     let(:temp_dir) { Dir.mktmpdir }
 
-    before {
+    before do
       allow($stderr).to receive(:puts)
-    }
+    end
 
-    before {
+    before do
       FileUtils.cp_r(File.join(example_dir(example), '.'), temp_dir)
-    }
+    end
 
-    after {
+    after do
       FileUtils.rm_rf(temp_dir)
-    }
+    end
 
     context 'project' do
       let(:example) { 'project' }
 
-      before {
+      before do
         Dir.chdir(temp_dir) do
           described_class.remove(projects: projects,
                                  references: references,
                                  specs: specs,
                                  packages: packages)
         end
-      }
+      end
 
       describe 'code files' do
         describe 'production code' do
@@ -165,7 +161,9 @@ describe Rake::Funnel::Support::SpecsRemover do
         end
 
         it 'should remove compiled specs' do
-          expect(content('Sample.csproj')).not_to include(*%w(Specs.cs SampleSpecs.cs DoesNotExistSpecs.cs))
+          expect(content('Sample.csproj')).not_to include('Specs.cs')
+          expect(content('Sample.csproj')).not_to include('SampleSpecs.cs')
+          expect(content('Sample.csproj')).not_to include('DoesNotExistSpecs.cs')
         end
       end
 
@@ -194,14 +192,14 @@ describe Rake::Funnel::Support::SpecsRemover do
     context 'project-specific paket.references' do
       let(:example) { 'project-specific paket.references' }
 
-      before {
+      before do
         Dir.chdir(temp_dir) do
           described_class.remove(projects: projects,
                                  references: references,
                                  specs: specs,
                                  packages: packages)
         end
-      }
+      end
 
       describe 'paket.references' do
         describe 'for project' do
@@ -228,14 +226,14 @@ describe Rake::Funnel::Support::SpecsRemover do
     context 'multiple projects' do
       let(:example) { 'multiple projects' }
 
-      before {
+      before do
         Dir.chdir(temp_dir) do
           described_class.remove(projects: projects,
                                  references: references,
                                  specs: specs,
                                  packages: packages)
         end
-      }
+      end
 
       describe 'projects' do
         it 'should remove references' do
@@ -244,8 +242,8 @@ describe Rake::Funnel::Support::SpecsRemover do
         end
 
         it 'should remove compiled specs' do
-          expect(content('Sample1.csproj')).not_to include(*%w(Specs.cs))
-          expect(content('Sample2.csproj')).not_to include(*%w(Specs.cs))
+          expect(content('Sample1.csproj')).not_to include('Specs.cs')
+          expect(content('Sample2.csproj')).not_to include('Specs.cs')
         end
       end
     end

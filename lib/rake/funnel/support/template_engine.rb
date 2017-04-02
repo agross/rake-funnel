@@ -12,6 +12,7 @@ module Rake
           end
 
           private
+
           def replace_at_markers(template)
             tags = /(@\w[\w\.]+\w@)/
 

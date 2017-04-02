@@ -3,13 +3,13 @@ require 'open3'
 include Rake::Funnel
 
 describe Rake::Funnel::Extensions::Shell do
-  before {
+  before do
     allow(Open3).to receive(:popen2e).and_yield(nil, stdout_and_stderr, exit)
 
     allow($stdout).to receive(:puts)
     allow($stderr).to receive(:puts)
     allow(Rake).to receive(:rake_output_message)
-  }
+  end
 
   let(:exit) { OpenStruct.new(value: OpenStruct.new(success?: true, exitstatus: 0)) }
 
@@ -87,10 +87,10 @@ describe Rake::Funnel::Extensions::Shell do
   end
 
   describe 'log file' do
-    before {
+    before do
       allow(subject).to receive(:mkdir_p)
       allow(File).to receive(:open)
-    }
+    end
 
     let(:log_file) { nil }
 
@@ -98,12 +98,12 @@ describe Rake::Funnel::Extensions::Shell do
 
     context 'no log file' do
       it 'should not create path to log file' do
-        expect(subject).to_not have_received(:mkdir_p)
+        expect(subject).not_to have_received(:mkdir_p)
       end
 
       it 'should not write log file' do
-        expect(subject).to_not have_received(:mkdir_p)
-        expect(File).to_not have_received(:open)
+        expect(subject).not_to have_received(:mkdir_p)
+        expect(File).not_to have_received(:open)
       end
     end
 
@@ -123,16 +123,16 @@ describe Rake::Funnel::Extensions::Shell do
   describe 'error detection' do
     let(:error_lines) { /error/ }
 
-    before {
+    before do
       begin
         subject.shell('foo', error_lines: error_lines)
-      rescue ExecutionError
+      rescue ExecutionError # rubocop:disable Lint/HandleExceptions
       end
-    }
+    end
 
     context 'no lines indicating errors' do
       it 'should not log to stderr' do
-        expect($stderr).to_not have_received(:puts)
+        expect($stderr).not_to have_received(:puts)
       end
     end
 
@@ -148,7 +148,7 @@ describe Rake::Funnel::Extensions::Shell do
       end
 
       it 'should not log to stdout on error' do
-        expect($stdout).to_not have_received(:puts).with(/error/)
+        expect($stdout).not_to have_received(:puts).with(/error/)
       end
 
       it 'should colorize error lines' do
@@ -205,7 +205,10 @@ describe Rake::Funnel::Extensions::Shell do
         end
 
         it 'should yield the error' do
-          expect { |b| subject.shell('foo', error_lines: /.*/, &b) }.to yield_with_args(false, 'foo', 0, /output/)
+          expect { |b| subject.shell('foo', error_lines: /.*/, &b) }.to yield_with_args(false,
+                                                                                        'foo',
+                                                                                        0,
+                                                                                        /output/)
         end
       end
     end
@@ -219,15 +222,18 @@ describe Rake::Funnel::Extensions::Shell do
         end
 
         it 'should report the exit code' do
-          expect { subject.shell('foo') }.to raise_error { |e| expect(e.exit_code).to eq(exit.value.exitstatus) }
+          expect { subject.shell('foo') }
+            .to(raise_error { |e| expect(e.exit_code).to eq(exit.value.exitstatus) })
         end
 
         it 'should report the command that was run' do
-          expect { subject.shell('foo') }.to raise_error { |e| expect(e.command).to eq('foo') }
+          expect { subject.shell('foo') }
+            .to(raise_error { |e| expect(e.command).to eq('foo') })
         end
 
         it 'should report logged lines' do
-          expect { subject.shell('foo') }.to raise_error { |e| expect(e.output).to eq(stdout_and_stderr.string) }
+          expect { subject.shell('foo') }
+            .to(raise_error { |e| expect(e.output).to eq(stdout_and_stderr.string) })
         end
       end
 
@@ -237,7 +243,10 @@ describe Rake::Funnel::Extensions::Shell do
         end
 
         it 'should yield the error' do
-          expect { |b| subject.shell('foo', error_lines: /.*/, &b) }.to yield_with_args(false, 'foo', 1, /output/)
+          expect { |b| subject.shell('foo', error_lines: /.*/, &b) }.to yield_with_args(false,
+                                                                                        'foo',
+                                                                                        1,
+                                                                                        /output/)
         end
       end
     end

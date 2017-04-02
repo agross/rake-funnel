@@ -16,8 +16,8 @@ module Rake
           @style = create(style)
         end
 
-        def map(args = {})
-          model = (args || {}).map { |switch, value|
+        def map(args = {}) # rubocop:disable Metrics/MethodLength
+          model = (args || {}).map do |switch, value|
             value = [value] unless value.is_a?(Array)
 
             values = value.map do |val|
@@ -25,20 +25,21 @@ module Rake
             end
 
             Switch.new(switch, values)
-          }.flatten
+          end.flatten
 
           @style
             .generate_from(model)
-            .map { |args| args.map { |arg| camel_case_symbols(arg) } }
+            .map { |arguments| arguments.map { |arg| camel_case_symbols(arg) } }
             .map(&:join)
         end
 
         private
+
         def get_values(value)
           if value.is_a?(Enumerable)
-            pairs = value.map { |k, v|
+            pairs = value.map do |k, v|
               KeyValuePair.new(k, v)
-            }
+            end
 
             return Array.new(pairs) if value.is_a?(Array)
             pairs
