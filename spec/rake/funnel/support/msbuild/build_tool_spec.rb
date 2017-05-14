@@ -1,5 +1,7 @@
 # rubocop:disable RSpec/FilePath
 
+require 'ostruct'
+
 describe Rake::Funnel::Support::MSBuild::BuildTool do
   before do
     allow(Rake::Win32).to receive(:windows?).and_return(windows?)
@@ -52,8 +54,64 @@ describe Rake::Funnel::Support::MSBuild::BuildTool do
   context 'not on Windows' do
     let(:windows?) { false }
 
-    it 'should find xbuild' do
-      expect(described_class.find).to eq('xbuild')
+    before do
+      allow(Open3).to receive(:capture2).with('mono', '--version').and_return(mono_version)
+    end
+
+    context 'mono not installed' do
+      let(:mono_version) do
+        [
+          'mono crashed',
+          OpenStruct.new(success?: false)
+        ]
+      end
+
+      before do
+        allow(Open3).to receive(:capture2).with('mono', '--version').and_raise(Errno::ENOENT)
+      end
+
+      it 'should find nothing' do
+        expect(described_class.find).to be_nil
+      end
+    end
+
+    context 'mono fails' do
+      let(:mono_version) do
+        [
+          'mono crashed',
+          OpenStruct.new(success?: false)
+        ]
+      end
+
+      it 'should find nothing' do
+        expect(described_class.find).to be_nil
+      end
+    end
+
+    context 'mono < 5.0' do
+      let(:mono_version) do
+        [
+          'Mono JIT compiler version 4.8.1 (mono-4.8.0-branch/22a39d7 Fri Apr  7 12:00:08 EDT 2017)',
+          OpenStruct.new(success?: true)
+        ]
+      end
+
+      it 'should find xbuild' do
+        expect(described_class.find).to eq('xbuild')
+      end
+    end
+
+    context 'mono >= 5.0' do
+      let(:mono_version) do
+        [
+          'Mono JIT compiler version 5.0.0.100 (2017-02/9667aa6 Fri May  5 09:12:57 EDT 2017)',
+          OpenStruct.new(success?: true)
+        ]
+      end
+
+      it 'should find msbuild' do
+        expect(described_class.find).to eq('msbuild')
+      end
     end
   end
 end

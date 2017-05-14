@@ -15,14 +15,15 @@ describe Rake::Funnel::Tasks::MSBuild do
     its(:project_or_solution) { should be_instance_of(Finder) }
     its(:args) { should == {} }
     its(:search_pattern) { should == %w(**/*.sln) }
+    its(:msbuild) { should be_nil }
 
-    describe 'build tool' do
+    describe 'build tool finder' do
       before do
         allow(BuildTool).to receive(:find).and_return('build tool')
       end
 
       it 'should use build tool finder' do
-        expect(subject.msbuild).to eq('build tool')
+        expect(subject.msbuild_finder.call).to eq('build tool')
       end
     end
   end

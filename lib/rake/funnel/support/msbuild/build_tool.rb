@@ -1,3 +1,5 @@
+require 'open3'
+
 module Rake
   module Funnel
     module Support
@@ -5,12 +7,25 @@ module Rake
         class BuildTool
           class << self
             def find
-              return 'xbuild'.freeze unless Rake::Win32.windows?
-
-              from_registry.compact.first
+              [mono_build, from_registry].compact.first
             end
 
             private
+
+            def mono_build
+              return nil if Rake::Win32.windows?
+
+              begin
+                out, status = Open3.capture2('mono', '--version')
+                return nil unless status.success?
+              rescue Errno::ENOENT
+                return nil
+              end
+
+              return 'msbuild'.freeze if out[/^Mono JIT compiler version ([\d\.]+)/, 1] >= '5.0'
+
+              'xbuild'.freeze
+            end
 
             KEY = 'SOFTWARE\Microsoft\MSBuild\ToolsVersions'.freeze
 
