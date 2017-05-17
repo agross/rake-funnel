@@ -17,6 +17,18 @@ Style/Documentation:
 Style/EndOfLine:
   Enabled: false
 
+Style/PercentLiteralDelimiters:
+  # Specify the default preferred delimiter for all types with the 'default' key
+  # Override individual delimiters (even with default specified) by specifying
+  # an individual key
+  PreferredDelimiters:
+    default: ()
+    '%i': ()
+    '%I': ()
+    '%r': '{}'
+    '%w': ()
+    '%W': ()
+
 RSpec/ExampleWording:
   Enabled: false
 
