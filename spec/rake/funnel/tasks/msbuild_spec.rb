@@ -39,6 +39,7 @@ describe Rake::Funnel::Tasks::MSBuild do
 
       allow(Mapper).to receive(:new).and_return(mapper)
       allow(Finder).to receive(:new).and_return(finder)
+      allow(BuildTool).to receive(:find)
     end
 
     before do
@@ -47,6 +48,10 @@ describe Rake::Funnel::Tasks::MSBuild do
 
     it 'should use solution finder' do
       expect(finder).to have_received(:single)
+    end
+
+    it 'should use MSBuild finder' do
+      expect(BuildTool).to have_received(:find)
     end
 
     it 'should use MSBuild mapper' do
