@@ -7,7 +7,7 @@ module Rake
         class BuildTool
           class << self
             def find
-              [mono_build, from_registry].compact.first
+              mono_build || from_registry.compact.first
             end
 
             private
@@ -17,9 +17,9 @@ module Rake
 
               begin
                 out, status = Open3.capture2('mono', '--version')
-                return nil unless status.success?
+                raise "Could not determine mono version: #{status}" unless status.success?
               rescue Errno::ENOENT
-                return nil
+                raise 'mono is not installed'
               end
 
               return 'msbuild'.freeze if out[/^Mono JIT compiler version ([\d\.]+)/, 1] >= '5.0'

@@ -54,63 +54,58 @@ describe Rake::Funnel::Support::MSBuild::BuildTool do
   context 'not on Windows' do
     let(:windows?) { false }
 
-    before do
-      allow(Open3).to receive(:capture2).with('mono', '--version').and_return(mono_version)
-    end
-
     context 'mono not installed' do
-      let(:mono_version) do
-        [
-          'mono crashed',
-          OpenStruct.new(success?: false)
-        ]
-      end
-
       before do
         allow(Open3).to receive(:capture2).with('mono', '--version').and_raise(Errno::ENOENT)
       end
 
-      it 'should find nothing' do
-        expect(described_class.find).to be_nil
+      it 'fails' do
+        expect { described_class.find }.to raise_error('mono is not installed')
       end
     end
 
-    context 'mono fails' do
-      let(:mono_version) do
-        [
-          'mono crashed',
-          OpenStruct.new(success?: false)
-        ]
+    context 'mono installed' do
+      before do
+        allow(Open3).to receive(:capture2).with('mono', '--version').and_return(mono_version)
       end
 
-      it 'should find nothing' do
-        expect(described_class.find).to be_nil
-      end
-    end
+      context 'mono fails' do
+        let(:mono_version) do
+          [
+            'mono crashed',
+            OpenStruct.new(success?: false)
+          ]
+        end
 
-    context 'mono < 5.0' do
-      let(:mono_version) do
-        [
-          'Mono JIT compiler version 4.8.1 (mono-4.8.0-branch/22a39d7 Fri Apr  7 12:00:08 EDT 2017)',
-          OpenStruct.new(success?: true)
-        ]
-      end
-
-      it 'should find xbuild' do
-        expect(described_class.find).to eq('xbuild')
-      end
-    end
-
-    context 'mono >= 5.0' do
-      let(:mono_version) do
-        [
-          'Mono JIT compiler version 5.0.0.100 (2017-02/9667aa6 Fri May  5 09:12:57 EDT 2017)',
-          OpenStruct.new(success?: true)
-        ]
+        it 'should find nothing' do
+          expect { described_class.find }.to raise_error(/^Could not determine mono version:/)
+        end
       end
 
-      it 'should find msbuild' do
-        expect(described_class.find).to eq('msbuild')
+      context 'mono < 5.0' do
+        let(:mono_version) do
+          [
+            'Mono JIT compiler version 4.8.1 (mono-4.8.0-branch/22a39d7 Fri Apr  7 12:00:08 EDT 2017)',
+            OpenStruct.new(success?: true)
+          ]
+        end
+
+        it 'should find xbuild' do
+          expect(described_class.find).to eq('xbuild')
+        end
+      end
+
+      context 'mono >= 5.0' do
+        let(:mono_version) do
+          [
+            'Mono JIT compiler version 5.0.0.100 (2017-02/9667aa6 Fri May  5 09:12:57 EDT 2017)',
+            OpenStruct.new(success?: true)
+          ]
+        end
+
+        it 'should find msbuild' do
+          expect(described_class.find).to eq('msbuild')
+        end
       end
     end
   end
