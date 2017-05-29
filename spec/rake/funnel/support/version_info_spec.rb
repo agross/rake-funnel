@@ -305,12 +305,12 @@ describe Rake::Funnel::Support::VersionInfo do
   describe '#read_version_from' do
     let(:file) { 'file with version info' }
     let(:contents) do
-      # rubocop:disable Style/IndentHeredoc
+      # rubocop:disable Layout/IndentHeredoc
       <<-EOF
   first line with expected version number
 other crap
       EOF
-      # rubocop:enable Style/IndentHeredoc
+      # rubocop:enable Layout/IndentHeredoc
     end
 
     it 'should read the first line with leading and trailing whitespace removed' do

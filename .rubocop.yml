@@ -11,10 +11,10 @@ Metrics/BlockLength:
 Metrics/LineLength:
   Max: 120
 
-Style/Documentation:
+Layout/EndOfLine:
   Enabled: false
 
-Style/EndOfLine:
+Style/Documentation:
   Enabled: false
 
 Style/PercentLiteralDelimiters:

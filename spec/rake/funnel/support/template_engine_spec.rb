@@ -16,21 +16,21 @@ describe Rake::Funnel::Support::TemplateEngine do
   end
 
   it 'should omit newlines for pure ruby lines' do
-    # rubocop:disable Style/IndentHeredoc
+    # rubocop:disable Layout/IndentHeredoc
     template = <<-EOF
 <%= 42 %>
     EOF
-    # rubocop:enable Style/IndentHeredoc
+    # rubocop:enable Layout/IndentHeredoc
 
     expect(described_class.render(template)).to eq('42')
   end
 
   it 'should not omit newlines for mixed ruby lines' do
-    # rubocop:disable Style/IndentHeredoc
+    # rubocop:disable Layout/IndentHeredoc
     template = <<-EOF
 12 <%= 34 %> 56
     EOF
-    # rubocop:enable Style/IndentHeredoc
+    # rubocop:enable Layout/IndentHeredoc
 
     expect(described_class.render(template)).to eq("12 34 56\n")
   end
