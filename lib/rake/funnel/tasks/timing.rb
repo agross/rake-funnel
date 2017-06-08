@@ -27,10 +27,8 @@ module Rake
           @stats = Statistics.new
         end
 
-        def define(_args, &task_block) # rubocop:disable Metrics/AbcSize
+        def define(_args, &task_block)
           patches.each(&:apply!)
-
-          desc 'Output task timing information' unless Rake.application.last_description
 
           task name, :failed do |_, task_args|
             yield(*[self, task_args].slice(0, task_block.arity)) if task_block
