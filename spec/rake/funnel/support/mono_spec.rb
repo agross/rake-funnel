@@ -3,13 +3,7 @@ require 'tmpdir'
 include Rake::Funnel::Support
 
 describe Rake::Funnel::Support::Mono do
-  before do
-    allow(Rake::Win32).to receive(:windows?).and_return(windows?)
-  end
-
-  context 'on Windows' do
-    let(:windows?) { true }
-
+  shared_examples 'on Windows' do
     it 'should return executable' do
       expect(described_class.invocation('executable.exe')).to eq(%w(executable.exe))
     end
@@ -31,10 +25,34 @@ describe Rake::Funnel::Support::Mono do
     end
   end
 
+  before do
+    allow(Rake::Win32).to receive(:windows?).and_return(windows?)
+  end
+
+  context 'on Windows' do
+    context 'plain Windows' do
+      let(:windows?) { true }
+
+      it_behaves_like 'on Windows'
+    end
+
+    context 'Windows Subsystem for Linux' do
+      let(:windows?) { false }
+
+      before do
+        allow(File).to receive(:readable?).with('/proc/version').and_return(true)
+        allow(File).to receive(:read).with('/proc/version').and_return('Microsoft')
+      end
+
+      it_behaves_like 'on Windows'
+    end
+  end
+
   context 'not on Windows' do
     let(:windows?) { false }
 
     before do
+      allow(File).to receive(:readable?).with('/proc/version').and_return(false)
       allow(Which).to receive(:which)
     end
 
