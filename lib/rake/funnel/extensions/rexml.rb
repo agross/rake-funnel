@@ -20,8 +20,10 @@ end
 
 module REXML
   module Functions
-    class << self
-      include Rake::Funnel::Extensions::REXML::Functions
+    extend Rake::Funnel::Extensions::REXML::Functions
+
+    Rake::Funnel::Extensions::REXML::Functions.public_instance_methods.each do |method|
+      singleton_method_added(method)
     end
   end
 end
