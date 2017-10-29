@@ -52,7 +52,7 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
     end
 
     context 'Windows-style path in environment variable',
-            skip: ('Windows Registry not available' unless defined?(::Win32::Registry)) do
+            skip: !Gem.win_platform? do
       let(:env_var) { 'C:\path\to\nunit plugins\nunit-' }
 
       it 'should convert path to Ruby-style' do
