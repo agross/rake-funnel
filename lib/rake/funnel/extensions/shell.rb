@@ -70,14 +70,14 @@ module Rake
         end
 
         def to_stdout(line)
-          $stdout.puts line.rstrip.green
+          $stdout.puts(line.rstrip.green)
           :success
         end
 
         def to_stderr(line, error_lines)
           return unless error_lines && line =~ error_lines
 
-          $stderr.puts line.rstrip.bold.red
+          Kernel.warn(line.rstrip.bold.red)
           :error
         end
       end

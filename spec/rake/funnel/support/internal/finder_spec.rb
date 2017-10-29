@@ -2,8 +2,6 @@
 
 require 'tmpdir'
 
-include Rake::Funnel
-
 describe Rake::Funnel::Support::Finder do
   let(:pattern) { %W(#{temp_dir}/**/*.sln #{temp_dir}/**/*.??proj) }
   let(:generate) { [] }
@@ -115,7 +113,7 @@ describe Rake::Funnel::Support::Finder do
     context 'no matching files' do
       it 'should fail' do
         Dir.chdir(temp_dir) do
-          expect { subject.single }.to raise_error(AmbiguousFileError, /error message/)
+          expect { subject.single }.to raise_error(Rake::Funnel::AmbiguousFileError, /error message/)
         end
       end
     end
@@ -125,7 +123,7 @@ describe Rake::Funnel::Support::Finder do
 
       it 'should fail' do
         Dir.chdir(temp_dir) do
-          expect { subject.single }.to raise_error(AmbiguousFileError, /error message/)
+          expect { subject.single }.to raise_error(Rake::Funnel::AmbiguousFileError, /error message/)
         end
       end
     end
@@ -174,7 +172,7 @@ describe Rake::Funnel::Support::Finder do
   describe '#all' do
     context 'no matching files' do
       it 'should fail' do
-        expect { subject.all }.to raise_error(AmbiguousFileError, /error message/)
+        expect { subject.all }.to raise_error(Rake::Funnel::AmbiguousFileError, /error message/)
       end
     end
 

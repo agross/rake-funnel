@@ -4,7 +4,7 @@ describe Rake::Funnel::Integration::SyncOutput do
       allow($stdout).to receive(:sync=)
       allow($stderr).to receive(:sync=)
 
-      expect(subject).to be
+      expect(subject).to be # rubocop:disable RSpec/ExpectInHook
     end
 
     it 'should immediately flush $stdout' do
@@ -23,7 +23,7 @@ describe Rake::Funnel::Integration::SyncOutput do
 
       allow(Rake).to receive(:rake_output_message)
 
-      expect(subject).to be
+      expect(subject).to be # rubocop:disable RSpec/ExpectInHook
     end
 
     it 'should log the error for $stdout' do

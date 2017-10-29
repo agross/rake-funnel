@@ -1,14 +1,12 @@
-include Rake::Funnel::Support::ArgumentMapper
-
-Styles.constants.reject { |x| x == :MSDeploy }.each do |style|
-  style_path = Styles.const_get(style)
+Rake::Funnel::Support::ArgumentMapper::Styles.constants.reject { |x| x == :MSDeploy }.each do |style|
+  style_path = Rake::Funnel::Support::ArgumentMapper::Styles.const_get(style)
   describe style_path do
     subject do
-      Mapper.new(style)
+      Rake::Funnel::Support::Mapper.new(style)
     end
 
     let(:style) do
-      Styles.const_get(style).new
+      Rake::Funnel::Support::ArgumentMapper::Styles.const_get(style).new
     end
 
     def styled(switch, key = nil, value = nil) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/LineLength

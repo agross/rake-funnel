@@ -1,25 +1,21 @@
 # rubocop:disable RSpec/FilePath
 
-include Rake
-include Rake::Funnel::Integration
-include Rake::Funnel::Integration::TeamCity
-
 describe Rake::Funnel::Integration::TeamCity::ProgressReport do
-  include DSL
+  include Rake::DSL
 
   let(:teamcity_running?) { false }
   let(:teamcity_rake_runner?) { false }
 
   before do
-    allow(TeamCity).to receive(:running?).and_return(teamcity_running?)
-    allow(TeamCity).to receive(:rake_runner?).and_return(teamcity_rake_runner?)
-    allow(ServiceMessages).to receive(:block_opened)
-    allow(ServiceMessages).to receive(:block_closed)
-    allow(ServiceMessages).to receive(:progress_start)
-    allow(ServiceMessages).to receive(:progress_finish)
-    allow(ServiceMessages).to receive(:build_problem)
+    allow(Rake::Funnel::Integration::TeamCity).to receive(:running?).and_return(teamcity_running?)
+    allow(Rake::Funnel::Integration::TeamCity).to receive(:rake_runner?).and_return(teamcity_rake_runner?)
+    allow(Rake::Funnel::Integration::TeamCity::ServiceMessages).to receive(:block_opened)
+    allow(Rake::Funnel::Integration::TeamCity::ServiceMessages).to receive(:block_closed)
+    allow(Rake::Funnel::Integration::TeamCity::ServiceMessages).to receive(:progress_start)
+    allow(Rake::Funnel::Integration::TeamCity::ServiceMessages).to receive(:progress_finish)
+    allow(Rake::Funnel::Integration::TeamCity::ServiceMessages).to receive(:build_problem)
 
-    Task.clear
+    Rake::Task.clear
   end
 
   subject! do
@@ -32,21 +28,25 @@ describe Rake::Funnel::Integration::TeamCity::ProgressReport do
 
   shared_examples :block_report do
     it 'should write block start' do
-      expect(ServiceMessages).to have_received(:block_opened).with(name: 'task')
+      expect(Rake::Funnel::Integration::TeamCity::ServiceMessages).to \
+        have_received(:block_opened).with(name: 'task')
     end
 
     it 'should write block end' do
-      expect(ServiceMessages).to have_received(:block_closed).with(name: 'task')
+      expect(Rake::Funnel::Integration::TeamCity::ServiceMessages).to \
+        have_received(:block_closed).with(name: 'task')
     end
   end
 
   shared_examples :no_block_report do
     it 'should not write block start' do
-      expect(ServiceMessages).not_to have_received(:block_opened)
+      expect(Rake::Funnel::Integration::TeamCity::ServiceMessages).not_to \
+        have_received(:block_opened)
     end
 
     it 'should not write block end' do
-      expect(ServiceMessages).not_to have_received(:block_closed)
+      expect(Rake::Funnel::Integration::TeamCity::ServiceMessages).not_to \
+        have_received(:block_closed)
     end
   end
 
@@ -54,11 +54,12 @@ describe Rake::Funnel::Integration::TeamCity::ProgressReport do
     before do
       task :task
 
-      Task[:task].invoke
+      Rake::Task[:task].invoke
     end
 
     it 'should not report build problems' do
-      expect(ServiceMessages).not_to have_received(:build_problem)
+      expect(Rake::Funnel::Integration::TeamCity::ServiceMessages).not_to \
+        have_received(:build_problem)
     end
 
     context 'not on TeamCity' do
@@ -103,8 +104,8 @@ describe Rake::Funnel::Integration::TeamCity::ProgressReport do
       end
 
       begin
-        Task[:task].invoke
-      rescue ApplicationAbortedException, SpecificError => e
+        Rake::Task[:task].invoke
+      rescue Rake::ApplicationAbortedException, SpecificError => e
         @raised_error = e
       end
     end
@@ -122,17 +123,18 @@ describe Rake::Funnel::Integration::TeamCity::ProgressReport do
 
       describe 'build problems' do
         it 'should report build problems' do
-          expect(ServiceMessages).to have_received(:build_problem)
+          expect(Rake::Funnel::Integration::TeamCity::ServiceMessages).to \
+            have_received(:build_problem)
         end
 
         it 'should report the error message' do
-          expect(ServiceMessages).to \
+          expect(Rake::Funnel::Integration::TeamCity::ServiceMessages).to \
             have_received(:build_problem)
             .with(hash_including(description: be_an_instance_of(String)))
         end
 
         it 'should report the first 4000 characters of the error message' do
-          expect(ServiceMessages).to \
+          expect(Rake::Funnel::Integration::TeamCity::ServiceMessages).to \
             have_received(:build_problem)
             .with(hash_including(description: have(4000).items))
         end
@@ -142,18 +144,19 @@ describe Rake::Funnel::Integration::TeamCity::ProgressReport do
         it_behaves_like :block_report
 
         it 'should report the error as a build problem' do
-          expect(ServiceMessages).to have_received(:build_problem)
+          expect(Rake::Funnel::Integration::TeamCity::ServiceMessages).to \
+            have_received(:build_problem)
         end
       end
 
       context 'with rake runner' do
         let(:teamcity_rake_runner?) { true }
         let(:error) do
-          ApplicationAbortedException.new(SpecificError.new('inner message'))
+          Rake::ApplicationAbortedException.new(SpecificError.new('inner message'))
         end
 
         it 'should report the inner error as a build problem (as it will be wrapped in a ApplicationAbortedException)' do # rubocop:disable Metrics/LineLength
-          expect(ServiceMessages).to \
+          expect(Rake::Funnel::Integration::TeamCity::ServiceMessages).to \
             have_received(:build_problem).with(description: 'inner message')
         end
 
@@ -170,11 +173,12 @@ describe Rake::Funnel::Integration::TeamCity::ProgressReport do
 
       task :task
 
-      Task[:task].invoke
+      Rake::Task[:task].invoke
     end
 
     it 'should not write' do
-      expect(ServiceMessages).not_to have_received(:block_opened)
+      expect(Rake::Funnel::Integration::TeamCity::ServiceMessages).not_to \
+        have_received(:block_opened)
     end
   end
 end

@@ -1,7 +1,7 @@
 # rubocop:disable RSpec/FilePath
 
 describe Rake::Funnel::Support::Mapper::Styles::NUnit do
-  subject { Mapper.new(:NUnit) }
+  subject { Rake::Funnel::Support::Mapper.new(:NUnit) }
 
   describe 'prefix' do
     before do

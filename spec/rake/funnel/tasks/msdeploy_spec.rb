@@ -1,13 +1,8 @@
 # rubocop:disable RSpec/FilePath
 
-include Rake
-include Rake::Funnel
-include Rake::Funnel::Support
-include Rake::Funnel::Support::MSDeploy
-
 describe Rake::Funnel::Tasks::MSDeploy do
   before do
-    Task.clear
+    Rake::Task.clear
   end
 
   describe 'defaults' do
@@ -37,22 +32,22 @@ describe Rake::Funnel::Tasks::MSDeploy do
     before do
       allow(subject).to receive(:shell)
 
-      allow(RegistryPatch).to receive(:new).and_yield
+      allow(Rake::Funnel::Support::MSDeploy::RegistryPatch).to receive(:new).and_yield
     end
 
     describe 'argument mapping and invocation' do
-      let(:mapper) { instance_double(Mapper).as_null_object }
+      let(:mapper) { instance_double(Rake::Funnel::Support::Mapper).as_null_object }
 
       before do
-        allow(Mapper).to receive(:new).and_return(mapper)
+        allow(Rake::Funnel::Support::Mapper).to receive(:new).and_return(mapper)
       end
 
       before do
-        Task[subject.name].invoke
+        Rake::Task[subject.name].invoke
       end
 
       it 'should use MSDeploy mapper' do
-        expect(Mapper).to have_received(:new).with(:MSDeploy)
+        expect(Rake::Funnel::Support::Mapper).to have_received(:new).with(:MSDeploy)
       end
 
       it 'should map arguments' do
@@ -68,7 +63,7 @@ describe Rake::Funnel::Tasks::MSDeploy do
 
     describe 'arg examples' do
       before do
-        Task[subject.name].invoke
+        Rake::Task[subject.name].invoke
       end
 
       context 'skip actions' do
@@ -148,7 +143,7 @@ describe Rake::Funnel::Tasks::MSDeploy do
             verb: :sync,
             pre_sync: {
               run_command: 'cd "C:\Program Files"',
-              dont_use_command_exe: :true
+              dont_use_command_exe: true
             },
             source: {
               content_path: 'deploy'
@@ -177,12 +172,12 @@ describe Rake::Funnel::Tasks::MSDeploy do
 
     describe "MSDeploy's idiocy" do
       before do
-        Task[subject.name].invoke
+        Rake::Task[subject.name].invoke
       end
 
       describe 'version registry value that is required to exist' do
         it 'should patch the registry' do
-          expect(RegistryPatch).to have_received(:new)
+          expect(Rake::Funnel::Support::MSDeploy::RegistryPatch).to have_received(:new)
         end
       end
 

@@ -1,13 +1,11 @@
 require 'open3'
 
-include Rake::Funnel
-
 describe Rake::Funnel::Extensions::Shell do
   before do
     allow(Open3).to receive(:popen2e).and_yield(nil, stdout_and_stderr, exit)
 
     allow($stdout).to receive(:puts)
-    allow($stderr).to receive(:puts)
+    allow(Kernel).to receive(:warn)
     allow(Rake).to receive(:rake_output_message)
   end
 
@@ -126,13 +124,13 @@ describe Rake::Funnel::Extensions::Shell do
     before do
       begin
         subject.shell('foo', error_lines: error_lines)
-      rescue ExecutionError # rubocop:disable Lint/HandleExceptions
+      rescue Rake::Funnel::ExecutionError # rubocop:disable Lint/HandleExceptions
       end
     end
 
     context 'no lines indicating errors' do
       it 'should not log to stderr' do
-        expect($stderr).not_to have_received(:puts)
+        expect(Kernel).not_to have_received(:warn)
       end
     end
 
@@ -144,7 +142,7 @@ describe Rake::Funnel::Extensions::Shell do
       end
 
       it 'should log to stderr on error' do
-        expect($stderr).to have_received(:puts).with(/error/)
+        expect(Kernel).to have_received(:warn).with(/error/)
       end
 
       it 'should not log to stdout on error' do
@@ -152,7 +150,7 @@ describe Rake::Funnel::Extensions::Shell do
       end
 
       it 'should colorize error lines' do
-        expect($stderr).to have_received(:puts).with('error'.bold.red)
+        expect(Kernel).to have_received(:warn).with('error'.bold.red)
       end
 
       it 'should log to stdout after error' do
@@ -164,7 +162,7 @@ describe Rake::Funnel::Extensions::Shell do
       let(:stdout_and_stderr) { StringIO.new('error äöüß'.encode('CP850')) }
 
       it 'should log to stdout before error' do
-        expect($stderr).to have_received(:puts).with(/error/)
+        expect(Kernel).to have_received(:warn).with(/error/)
       end
     end
   end
@@ -195,7 +193,7 @@ describe Rake::Funnel::Extensions::Shell do
     context 'error lines logged' do
       context 'without block' do
         it 'should fail' do
-          expect { subject.shell('foo', error_lines: /.*/) }.to raise_error(ExecutionError)
+          expect { subject.shell('foo', error_lines: /.*/) }.to raise_error(Rake::Funnel::ExecutionError)
         end
       end
 
@@ -218,7 +216,7 @@ describe Rake::Funnel::Extensions::Shell do
 
       context 'without block' do
         it 'should fail' do
-          expect { subject.shell('foo') }.to raise_error(ExecutionError)
+          expect { subject.shell('foo') }.to raise_error(Rake::Funnel::ExecutionError)
         end
 
         it 'should report the exit code' do

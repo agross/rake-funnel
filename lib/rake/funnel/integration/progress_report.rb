@@ -46,7 +46,7 @@ module Rake
                   error = nil
                   begin
                     old_execute.bind(self).call(args)
-                  rescue => e
+                  rescue => e # rubocop:disable Lint/RescueWithoutErrorClass
                     error = e
                   ensure
                     context.finished.call(self, args, error) if context.finished

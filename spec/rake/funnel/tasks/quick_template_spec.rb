@@ -1,11 +1,8 @@
 require 'tmpdir'
 
-include Rake
-include Rake::Funnel::Support
-
 describe Rake::Funnel::Tasks::QuickTemplate do
   before do
-    Task.clear
+    Rake::Task.clear
   end
 
   describe 'defaults' do
@@ -17,12 +14,12 @@ describe Rake::Funnel::Tasks::QuickTemplate do
   describe 'execution' do
     let(:templates) { %w(1.template two/2.template) }
 
-    let(:finder) { instance_double(Finder).as_null_object }
-    let(:engine) { TemplateEngine }
+    let(:finder) { instance_double(Rake::Funnel::Support::Finder).as_null_object }
+    let(:engine) { Rake::Funnel::Support::TemplateEngine }
 
     before do
       allow(finder).to receive(:all_or_default).and_return(templates)
-      allow(Finder).to receive(:new).and_return(finder)
+      allow(Rake::Funnel::Support::Finder).to receive(:new).and_return(finder)
       allow(engine).to receive(:render).and_return('file content')
       allow(Rake).to receive(:rake_output_message)
       allow(File).to receive(:read).and_return('template content')
@@ -32,7 +29,7 @@ describe Rake::Funnel::Tasks::QuickTemplate do
     subject! { described_class.new }
 
     before do
-      Task[subject.name].invoke
+      Rake::Task[subject.name].invoke
     end
 
     it 'should report created files' do

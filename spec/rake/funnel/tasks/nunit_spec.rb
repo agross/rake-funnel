@@ -1,13 +1,8 @@
 # rubocop:disable RSpec/FilePath
 
-include Rake
-include Rake::Funnel
-include Rake::Funnel::Integration::TeamCity
-include Rake::Funnel::Support
-
 describe Rake::Funnel::Tasks::NUnit do
   before do
-    Task.clear
+    Rake::Task.clear
   end
 
   describe 'defaults' do
@@ -20,23 +15,23 @@ describe Rake::Funnel::Tasks::NUnit do
   describe 'execution' do
     let(:args) { {} }
 
-    let(:mapper) { instance_double(Mapper).as_null_object }
-    let(:finder) { instance_double(Finder).as_null_object }
+    let(:mapper) { instance_double(Rake::Funnel::Support::Mapper).as_null_object }
+    let(:finder) { instance_double(Rake::Funnel::Support::Finder).as_null_object }
 
     before do
       allow(subject).to receive(:sh)
 
-      allow(Mapper).to receive(:new).and_return(mapper)
-      allow(Finder).to receive(:new).and_return(finder)
-      allow(NUnitPlugin).to receive(:setup)
+      allow(Rake::Funnel::Support::Mapper).to receive(:new).and_return(mapper)
+      allow(Rake::Funnel::Support::Finder).to receive(:new).and_return(finder)
+      allow(Rake::Funnel::Integration::TeamCity::NUnitPlugin).to receive(:setup)
 
-      allow(Mono).to receive(:invocation).and_wrap_original do |_original_method, *args, &_block|
+      allow(Rake::Funnel::Support::Mono).to receive(:invocation).and_wrap_original do |_original_method, *args, &_block|
         args.compact
       end
     end
 
     before do
-      Task[subject.name].invoke
+      Rake::Task[subject.name].invoke
     end
 
     it 'should use test assembly finder' do
@@ -44,11 +39,11 @@ describe Rake::Funnel::Tasks::NUnit do
     end
 
     it 'should set up TeamCity plugin' do
-      expect(NUnitPlugin).to have_received(:setup).with(subject.nunit)
+      expect(Rake::Funnel::Integration::TeamCity::NUnitPlugin).to have_received(:setup).with(subject.nunit)
     end
 
     it 'should use NUnit mapper' do
-      expect(Mapper).to have_received(:new).with(:NUnit)
+      expect(Rake::Funnel::Support::Mapper).to have_received(:new).with(:NUnit)
     end
 
     it 'should map arguments' do
@@ -56,7 +51,7 @@ describe Rake::Funnel::Tasks::NUnit do
     end
 
     it 'should use mono invocation' do
-      expect(Mono).to have_received(:invocation).with(subject.nunit)
+      expect(Rake::Funnel::Support::Mono).to have_received(:invocation).with(subject.nunit)
     end
 
     it 'should run with sh' do

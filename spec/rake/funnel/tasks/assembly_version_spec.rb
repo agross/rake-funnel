@@ -1,9 +1,6 @@
-include Rake
-include Rake::Funnel::Support
-
 describe Rake::Funnel::Tasks::AssemblyVersion do
   before do
-    Task.clear
+    Rake::Task.clear
   end
 
   describe 'defaults' do
@@ -21,10 +18,10 @@ describe Rake::Funnel::Tasks::AssemblyVersion do
   end
 
   describe 'execution' do
-    let(:writer) { instance_double(AssemblyVersionWriter).as_null_object }
+    let(:writer) { instance_double(Rake::Funnel::Support::AssemblyVersionWriter).as_null_object }
 
     before do
-      allow(AssemblyVersionWriter).to receive(:new).and_return(writer)
+      allow(Rake::Funnel::Support::AssemblyVersionWriter).to receive(:new).and_return(writer)
     end
 
     subject do
@@ -37,11 +34,12 @@ describe Rake::Funnel::Tasks::AssemblyVersion do
     end
 
     before do
-      Task[subject.name].invoke
+      Rake::Task[subject.name].invoke
     end
 
     it 'should pass source and source_args' do
-      expect(AssemblyVersionWriter).to have_received(:new).with(subject.source, subject.source_args)
+      expect(Rake::Funnel::Support::AssemblyVersionWriter).to have_received(:new)
+        .with(subject.source, subject.source_args)
     end
 
     it 'should use writer' do

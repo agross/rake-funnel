@@ -1,7 +1,5 @@
 require 'tmpdir'
 
-include Rake::Funnel::Support
-
 describe Rake::Funnel::Support::Mono do
   shared_examples 'on Windows' do
     it 'should return executable' do
@@ -53,7 +51,8 @@ describe Rake::Funnel::Support::Mono do
 
     before do
       allow(File).to receive(:readable?).with('/proc/version').and_return(false)
-      allow(Which).to receive(:which)
+
+      allow(Rake::Funnel::Support::Which).to receive(:which)
     end
 
     before do
@@ -65,7 +64,7 @@ describe Rake::Funnel::Support::Mono do
     end
 
     it 'should resolve executable through which' do
-      expect(Which).to have_received(:which).with('executable.exe')
+      expect(Rake::Funnel::Support::Which).to have_received(:which).with('executable.exe')
     end
 
     it 'should support args' do

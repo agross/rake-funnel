@@ -1,14 +1,14 @@
-include Rake
-
 describe Rake::Funnel::Tasks::Timing do
-  include DSL
+  include Rake::DSL
 
   before do
     Rake.application = nil
-    Task.clear
+    Rake::Task.clear
 
+    # rubocop:disable RSpec/ExpectInHook
     expect(define_tasks).to be
     expect(subject).to be
+    # rubocop:enable RSpec/ExpectInHook
   end
 
   let(:define_tasks) { task :task }
@@ -59,7 +59,7 @@ describe Rake::Funnel::Tasks::Timing do
       allow(Rake.application).to receive(:exit_because_of_exception)
 
       allow($stdout).to receive(:puts)
-      allow($stderr).to receive(:puts)
+      allow(Kernel).to receive(:warn)
       # The 'rake aborted!' message is #printed on $stderr.
       allow($stderr).to receive(:print)
 
@@ -125,7 +125,7 @@ describe Rake::Funnel::Tasks::Timing do
         end
 
         it 'should report failure' do
-          expect($stderr).to have_received(:puts).with(/Status\s+Failed/)
+          expect(Kernel).to have_received(:warn).with(/Status\s+Failed/)
         end
       end
     end

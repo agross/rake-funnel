@@ -1,8 +1,5 @@
-include Rake
-include Rake::Funnel::Support::Timing
-
 describe Rake::Funnel::Support::Timing::Report do
-  include DSL
+  include Rake::DSL
 
   subject { described_class.new(stats, opts) }
 
@@ -10,7 +7,7 @@ describe Rake::Funnel::Support::Timing::Report do
 
   before do
     allow($stdout).to receive(:puts)
-    allow($stderr).to receive(:puts)
+    allow(Kernel).to receive(:warn)
     subject.render
   end
 
@@ -44,20 +41,20 @@ describe Rake::Funnel::Support::Timing::Report do
       let(:opts) { { failed: true } }
 
       it 'should print the failed build status' do
-        expect($stderr).to have_received(:puts).with(/Status\s+Failed/)
+        expect(Kernel).to have_received(:warn).with(/Status\s+Failed/)
       end
     end
   end
 
-  describe 'empty report' do
-    let(:stats) { Statistics.new }
+  describe 'empty report', include: Rake::Funnel::Support::Timing do
+    let(:stats) { Rake::Funnel::Support::Timing::Statistics.new }
 
     it_behaves_like :report
   end
 
   describe 'report for 2 tasks' do
     let(:stats) do
-      s = Statistics.new
+      s = Rake::Funnel::Support::Timing::Statistics.new
       s.benchmark(task(:foo)) {}
       s.benchmark(task(:bar)) {}
       s
@@ -77,7 +74,7 @@ describe Rake::Funnel::Support::Timing::Report do
 
   describe 'formatting' do
     let(:stats) do
-      s = Statistics.new
+      s = Rake::Funnel::Support::Timing::Statistics.new
       s.benchmark(task(task_name)) {}
       s
     end

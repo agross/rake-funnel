@@ -306,10 +306,10 @@ describe Rake::Funnel::Support::VersionInfo do
     let(:file) { 'file with version info' }
     let(:contents) do
       # rubocop:disable Layout/IndentHeredoc
-      <<-EOF
+      <<-CONTENTS
   first line with expected version number
 other crap
-      EOF
+      CONTENTS
       # rubocop:enable Layout/IndentHeredoc
     end
 

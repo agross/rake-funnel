@@ -1,9 +1,6 @@
-include Rake
-include Rake::Funnel::Support
-
 describe Rake::Funnel::Tasks::Paket do
   before do
-    Task.clear
+    Rake::Task.clear
   end
 
   describe 'defaults' do
@@ -17,7 +14,7 @@ describe Rake::Funnel::Tasks::Paket do
   describe 'execution' do
     before do
       allow(subject).to receive(:sh)
-      allow(Mono).to receive(:invocation).and_wrap_original do |_original_method, *args, &_block|
+      allow(Rake::Funnel::Support::Mono).to receive(:invocation).and_wrap_original do |_original_method, *args, &_block|
         args.compact
       end
     end
@@ -38,7 +35,7 @@ describe Rake::Funnel::Tasks::Paket do
       end
 
       before do
-        Task[subject.name].invoke
+        Rake::Task[subject.name].invoke
       end
 
       it 'should use custom bootstrapper' do
@@ -52,15 +49,19 @@ describe Rake::Funnel::Tasks::Paket do
 
     describe 'mono invocation' do
       before do
-        Task[subject.name].invoke
+        Rake::Task[subject.name].invoke
       end
 
       it 'should use mono invocation for bootstrapper' do
-        expect(Mono).to have_received(:invocation).with(subject.bootstrapper, subject.bootstrapper_args)
+        expect(Rake::Funnel::Support::Mono).to have_received(:invocation)
+          .with(subject.bootstrapper,
+                subject.bootstrapper_args)
       end
 
       it 'should use mono invocation for paket' do
-        expect(Mono).to have_received(:invocation).with(subject.paket, subject.paket_args)
+        expect(Rake::Funnel::Support::Mono).to have_received(:invocation)
+          .with(subject.paket,
+                subject.paket_args)
       end
     end
 
@@ -72,7 +73,7 @@ describe Rake::Funnel::Tasks::Paket do
 
       context 'success' do
         before do
-          Task[subject.name].invoke
+          Rake::Task[subject.name].invoke
         end
 
         context 'paket.exe exists' do
@@ -110,7 +111,7 @@ describe Rake::Funnel::Tasks::Paket do
             end
 
             it 'should fail' do
-              expect { Task[subject.name].invoke }.to raise_error(RuntimeError)
+              expect { Rake::Task[subject.name].invoke }.to raise_error(RuntimeError)
             end
           end
         end
@@ -120,13 +121,13 @@ describe Rake::Funnel::Tasks::Paket do
 
           context 'bootstrapper failed' do
             before do
-              allow(subject).to receive(:sh).with(subject.bootstrapper).and_raise
+              allow(subject).to receive(:sh).with(subject.bootstrapper).and_raise(RuntimeError)
             end
 
             it 'should not run paket' do
               begin
-                Task[subject.name].invoke
-              rescue
+                Rake::Task[subject.name].invoke
+              rescue RuntimeError
                 nil
               end
 
@@ -134,7 +135,7 @@ describe Rake::Funnel::Tasks::Paket do
             end
 
             it 'should fail' do
-              expect { Task[subject.name].invoke }.to raise_error(RuntimeError)
+              expect { Rake::Task[subject.name].invoke }.to raise_error(RuntimeError)
             end
           end
         end

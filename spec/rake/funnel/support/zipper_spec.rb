@@ -1,5 +1,3 @@
-include Rake::Funnel::Support
-
 describe Rake::Funnel::Support::Zipper do
   describe '#zip' do
     let(:source) { %w(bin/1 bin/2 bin/3/4) }

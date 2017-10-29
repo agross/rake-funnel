@@ -1,9 +1,6 @@
-include Rake
-include Rake::Funnel::Support
-
 describe Rake::Funnel::Tasks::Copy do
   before do
-    Task.clear
+    Rake::Task.clear
   end
 
   describe 'defaults' do
@@ -15,15 +12,12 @@ describe Rake::Funnel::Tasks::Copy do
   describe 'execution' do
     let(:source) { %w(one two) }
     let(:target) { 'target' }
-    let(:finder) { instance_double(Finder).as_null_object }
+    let(:finder) { instance_double(Rake::Funnel::Support::Finder).as_null_object }
 
     before do
       allow(finder).to receive(:all_or_default).and_return(source)
-      allow(Finder).to receive(:new).and_return(finder)
-    end
-
-    before do
-      allow(Copier).to receive(:copy)
+      allow(Rake::Funnel::Support::Finder).to receive(:new).and_return(finder)
+      allow(Rake::Funnel::Support::Copier).to receive(:copy)
     end
 
     subject do
@@ -34,11 +28,11 @@ describe Rake::Funnel::Tasks::Copy do
     end
 
     before do
-      Task[subject.name].invoke
+      Rake::Task[subject.name].invoke
     end
 
     it 'should delegate to Copier' do
-      expect(Copier).to have_received(:copy).with(source, subject.target)
+      expect(Rake::Funnel::Support::Copier).to have_received(:copy).with(source, subject.target)
     end
   end
 end

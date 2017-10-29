@@ -84,9 +84,9 @@ module Rake
             status = 'Status'.ljust(columns[0].width) + ' ' * SPACE + status
 
             if @opts[:failed]
-              $stderr.puts status.bold.red
+              Kernel.warn(status.bold.red)
             else
-              $stdout.puts status.bold.green
+              $stdout.puts(status.bold.green)
             end
           end
         end

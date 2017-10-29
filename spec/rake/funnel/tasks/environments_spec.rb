@@ -1,14 +1,10 @@
 require 'configatron'
 
-include Rake
-include Rake::Funnel::Support::Environments
-include Rake::Funnel::Tasks
-
 describe Rake::Funnel::Tasks::Environments do
   include Rake::DSL
 
   before do
-    Task.clear
+    Rake::Task.clear
   end
 
   let(:files) { [] }
@@ -90,7 +86,7 @@ describe Rake::Funnel::Tasks::Environments do
     end
 
     before do
-      allow(Loader).to receive(:load_configuration)
+      allow(Rake::Funnel::Support::Environments::Loader).to receive(:load_configuration)
     end
 
     before do
@@ -105,18 +101,19 @@ describe Rake::Funnel::Tasks::Environments do
     end
 
     before do
-      Task['dev'].invoke
+      Rake::Task['dev'].invoke
     end
 
     it 'should store configuration in configatron singleton' do
-      expect(Loader).to have_received(:load_configuration).with(anything, configatron, any_args)
+      expect(Rake::Funnel::Support::Environments::Loader).to \
+        have_received(:load_configuration).with(anything, configatron, any_args)
     end
 
     context 'default and local config files exist' do
       let(:optional) { nil }
 
       it 'should load all files' do
-        expect(Loader)
+        expect(Rake::Funnel::Support::Environments::Loader)
           .to have_received(:load_configuration)
           .with(hash_including(config_files: %w(config/default.yaml config/dev.yaml config/local.yaml)), any_args)
       end
@@ -126,7 +123,7 @@ describe Rake::Funnel::Tasks::Environments do
       let(:optional) { 'config/default.yaml' }
 
       it 'should load environment file and local file' do
-        expect(Loader)
+        expect(Rake::Funnel::Support::Environments::Loader)
           .to have_received(:load_configuration)
           .with(hash_including(config_files: %w(config/dev.yaml config/local.yaml)), any_args)
       end
@@ -136,7 +133,7 @@ describe Rake::Funnel::Tasks::Environments do
       let(:optional) { 'config/local.yaml' }
 
       it 'should load default file and environment file' do
-        expect(Loader).to \
+        expect(Rake::Funnel::Support::Environments::Loader).to \
           have_received(:load_configuration)
           .with(hash_including(config_files: %w(config/default.yaml config/dev.yaml)),
                 any_args)
@@ -157,15 +154,16 @@ describe Rake::Funnel::Tasks::Environments do
     end
 
     before do
-      allow(Loader).to receive(:load_configuration)
+      allow(Rake::Funnel::Support::Environments::Loader).to receive(:load_configuration)
     end
 
     before do
-      Task['dev'].invoke
+      Rake::Task['dev'].invoke
     end
 
     it 'should pass customizer to loader' do
-      expect(Loader).to have_received(:load_configuration).with(anything, anything, customizer)
+      expect(Rake::Funnel::Support::Environments::Loader).to \
+        have_received(:load_configuration).with(anything, anything, customizer)
     end
   end
 

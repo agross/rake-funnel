@@ -1,25 +1,24 @@
 # rubocop:disable RSpec/FilePath
 
-include Rake::Funnel::Support
-
 describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
   before do
     allow(ENV).to receive(:[]).with(described_class::ENV_VAR).and_return(env_var)
-    allow(Which).to receive(:which).and_return(which)
+    allow(Rake::Funnel::Support::Which).to receive(:which).and_return(which)
     allow(Dir).to receive(:glob).and_return([])
     allow(RakeFileUtils).to receive(:mkdir_p)
     allow(Rake).to receive(:rake_output_message)
   end
 
   before do
-    allow(BinaryVersionReader).to receive(:read_from).with(which).and_return(nunit_version)
+    allow(Rake::Funnel::Support::BinaryVersionReader).to receive(:read_from)
+      .with(which).and_return(nunit_version)
   end
 
   describe 'success' do
     let(:env_var) { '/path/to/nunit plugins/nunit' }
     let(:addin_dlls) { [env_var + 'addin.dll'] }
     let(:which) { 'path/to/nunit-console.exe' }
-    let(:nunit_version) { VersionInfo.new(file_version: '1.2.3.4') }
+    let(:nunit_version) { Rake::Funnel::Support::VersionInfo.new(file_version: '1.2.3.4') }
     let(:plugin_version) { nunit_version.file_version.split('.').take(3).join('.') }
 
     before do
@@ -65,7 +64,7 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
   describe 'failures' do
     let(:env_var) { nil }
     let(:which) { nil }
-    let(:nunit_version) { VersionInfo.new }
+    let(:nunit_version) { Rake::Funnel::Support::VersionInfo.new }
 
     before do
       described_class.setup('nunit-console.exe')
@@ -75,7 +74,7 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
       let(:env_var) { nil }
 
       it 'should skip reading the version' do
-        expect(BinaryVersionReader).not_to have_received(:read_from)
+        expect(Rake::Funnel::Support::BinaryVersionReader).not_to have_received(:read_from)
       end
     end
 
@@ -84,7 +83,7 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
       let(:which) { nil }
 
       it 'should skip reading the version' do
-        expect(BinaryVersionReader).not_to have_received(:read_from)
+        expect(Rake::Funnel::Support::BinaryVersionReader).not_to have_received(:read_from)
       end
     end
 
@@ -106,7 +105,7 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
     context 'plugin for NUnit version not available' do
       let(:env_var) { '/path/to/nunit plugins/nunit' }
       let(:which) { 'path/to/nunit-console.exe' }
-      let(:nunit_version) { VersionInfo.new(file_version: '1.2.3.4') }
+      let(:nunit_version) { Rake::Funnel::Support::VersionInfo.new(file_version: '1.2.3.4') }
 
       it 'should report that the addin version is not available' do
         expect(Rake).to \

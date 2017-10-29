@@ -1,7 +1,5 @@
 require 'erb'
 
-include Rake::Funnel::Support
-
 describe Rake::Funnel::Support::AssemblyVersionWriter do
   describe 'version source' do
     describe 'default' do
@@ -36,7 +34,7 @@ describe Rake::Funnel::Support::AssemblyVersionWriter do
         [
           {
             source: 'from e.g. gitversion',
-            version_info: VersionInfo.new(
+            version_info: Rake::Funnel::Support::VersionInfo.new(
               assembly_version: '1',
               assembly_file_version: '1.2',
               assembly_informational_version: '1.2-abc'
@@ -60,15 +58,15 @@ describe Rake::Funnel::Support::AssemblyVersionWriter do
       [
         {
           source: 'one',
-          version_info: VersionInfo.new(assembly_version: '1',
-                                        assembly_file_version: '1.2',
-                                        assembly_informational_version: '1.2-abc')
+          version_info: Rake::Funnel::Support::VersionInfo.new(assembly_version: '1',
+                                                               assembly_file_version: '1.2',
+                                                               assembly_informational_version: '1.2-abc')
         },
         {
           source: 'two',
-          version_info: VersionInfo.new(assembly_version: '2',
-                                        assembly_file_version: '2.3',
-                                        assembly_informational_version: '2.3-def')
+          version_info: Rake::Funnel::Support::VersionInfo.new(assembly_version: '2',
+                                                               assembly_file_version: '2.3',
+                                                               assembly_informational_version: '2.3-def')
         }
       ]
     end

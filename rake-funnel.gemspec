@@ -15,10 +15,10 @@ Gem::Specification.new do |s| # rubocop:disable Metrics/BlockLength
 
   s.required_ruby_version = '>= 2.0.0'
 
+  s.add_dependency 'configatron', '~> 4.5'
   s.add_dependency 'rake', '>= 10.4', '< 13'
   s.add_dependency 'rubyzip', '~> 1.0'
   s.add_dependency 'smart_colored'
-  s.add_dependency 'configatron', '~> 4.5'
 
   git = ENV['TEAMCITY_GIT_PATH'] || 'git'
   files = `"#{git}" ls-files -z`

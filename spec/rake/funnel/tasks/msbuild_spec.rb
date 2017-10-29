@@ -1,25 +1,20 @@
 # rubocop:disable RSpec/FilePath
 
-include Rake
-include Rake::Funnel
-include Rake::Funnel::Support
-include Rake::Funnel::Support::MSBuild
-
 describe Rake::Funnel::Tasks::MSBuild do
   before do
-    Task.clear
+    Rake::Task.clear
   end
 
   describe 'defaults' do
     its(:name) { should == :compile }
-    its(:project_or_solution) { should be_instance_of(Finder) }
+    its(:project_or_solution) { should be_instance_of(Rake::Funnel::Support::Finder) }
     its(:args) { should == {} }
     its(:search_pattern) { should == %w(**/*.sln) }
     its(:msbuild) { should be_nil }
 
     describe 'build tool finder' do
       before do
-        allow(BuildTool).to receive(:find).and_return('build tool')
+        allow(Rake::Funnel::Support::MSBuild::BuildTool).to receive(:find).and_return('build tool')
       end
 
       it 'should use build tool finder' do
@@ -31,19 +26,19 @@ describe Rake::Funnel::Tasks::MSBuild do
   describe 'execution' do
     let(:args) { {} }
 
-    let(:mapper) { instance_double(Mapper).as_null_object }
-    let(:finder) { instance_double(Finder).as_null_object }
+    let(:mapper) { instance_double(Rake::Funnel::Support::Mapper).as_null_object }
+    let(:finder) { instance_double(Rake::Funnel::Support::Finder).as_null_object }
 
     before do
       allow(subject).to receive(:sh)
 
-      allow(Mapper).to receive(:new).and_return(mapper)
-      allow(Finder).to receive(:new).and_return(finder)
-      allow(BuildTool).to receive(:find)
+      allow(Rake::Funnel::Support::Mapper).to receive(:new).and_return(mapper)
+      allow(Rake::Funnel::Support::Finder).to receive(:new).and_return(finder)
+      allow(Rake::Funnel::Support::MSBuild::BuildTool).to receive(:find)
     end
 
     before do
-      Task[subject.name].invoke
+      Rake::Task[subject.name].invoke
     end
 
     it 'should use solution finder' do
@@ -51,11 +46,11 @@ describe Rake::Funnel::Tasks::MSBuild do
     end
 
     it 'should use MSBuild finder' do
-      expect(BuildTool).to have_received(:find)
+      expect(Rake::Funnel::Support::MSBuild::BuildTool).to have_received(:find)
     end
 
     it 'should use MSBuild mapper' do
-      expect(Mapper).to have_received(:new).with(:MSBuild)
+      expect(Rake::Funnel::Support::Mapper).to have_received(:new).with(:MSBuild)
     end
 
     it 'should map arguments' do
@@ -79,7 +74,7 @@ describe Rake::Funnel::Tasks::MSBuild do
 
       context 'when project or solution is specified' do
         before do
-          allow(Finder).to receive(:new).and_call_original
+          allow(Rake::Funnel::Support::Finder).to receive(:new).and_call_original
         end
 
         subject do
@@ -88,12 +83,13 @@ describe Rake::Funnel::Tasks::MSBuild do
           end
         end
 
-        its(:project_or_solution) { should be_instance_of(Finder) }
+        its(:project_or_solution) { should be_instance_of(Rake::Funnel::Support::Finder) }
 
         it 'should set project or solution' do
-          expect(Finder).to have_received(:new).with('project.sln',
-                                                     subject,
-                                                     'No projects or more than one project found.')
+          expect(Rake::Funnel::Support::Finder).to have_received(:new)
+            .with('project.sln',
+                  subject,
+                  'No projects or more than one project found.')
         end
       end
     end

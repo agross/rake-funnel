@@ -40,7 +40,7 @@ describe Rake::Funnel::Support::MSDeploy::RegistryPatch do
     context 'on Windows', skip: ('Windows Registry not available' unless defined?(::Win32::Registry)) do
       let(:root) { Win32::Registry::HKEY_LOCAL_MACHINE }
 
-      let(:keys) do
+      let(:registry_keys) do
         described_class::KEYS.map do |key|
           instance_double(Win32::Registry, keyname: key)
         end
@@ -62,7 +62,7 @@ describe Rake::Funnel::Support::MSDeploy::RegistryPatch do
 
       context 'MSDeploy registry key and "Version" value does not exist' do
         before do
-          keys.each do |key|
+          registry_keys.each do |key|
             allow(key).to receive(:created?).and_return(true)
             allow(key).to receive(:[]).and_raise(key_access_error)
             allow(key).to receive(:[]=)
@@ -71,7 +71,7 @@ describe Rake::Funnel::Support::MSDeploy::RegistryPatch do
         end
 
         before do
-          keys.each do |key|
+          registry_keys.each do |key|
             allow_open_or_create(key)
             allow_open_for_deletion(key)
           end
@@ -82,17 +82,17 @@ describe Rake::Funnel::Support::MSDeploy::RegistryPatch do
         end
 
         it 'should create the key' do
-          keys.each do |key|
+          registry_keys.each do |key|
             expect(root).to have_received(:create).with(key.keyname)
           end
         end
 
         it 'should create the version' do
-          expect(keys).to all(have_received(:[]=).with('Version', described_class::FAKE_VERSION))
+          expect(registry_keys).to all(have_received(:[]=).with('Version', described_class::FAKE_VERSION))
         end
 
         it 'should delete the key' do
-          keys.each do |key| # rubocop:disable RSpec/IteratedExpectation
+          registry_keys.each do |key| # rubocop:disable RSpec/IteratedExpectation
             expect(key).to have_received(:delete_key).with(File.basename(key.keyname), true)
           end
         end
@@ -114,14 +114,14 @@ describe Rake::Funnel::Support::MSDeploy::RegistryPatch do
 
       context 'MSDeploy registry key does exist' do
         before do
-          keys.each do |key|
+          registry_keys.each do |key|
             allow_open_or_create(key)
           end
         end
 
         context '"Version" value does not exist' do
           before do
-            keys.each do |key|
+            registry_keys.each do |key|
               allow(key).to receive(:created?).and_return(false)
               allow(key).to receive(:[]).and_raise(key_access_error)
               allow(key).to receive(:[]=)
@@ -134,17 +134,17 @@ describe Rake::Funnel::Support::MSDeploy::RegistryPatch do
           end
 
           it 'should create the version' do
-            expect(keys).to all(have_received(:[]=).with('Version', described_class::FAKE_VERSION))
+            expect(registry_keys).to all(have_received(:[]=).with('Version', described_class::FAKE_VERSION))
           end
 
           it 'should delete the version' do
-            expect(keys).to all(have_received(:delete_value).with(described_class::VERSION_VALUE))
+            expect(registry_keys).to all(have_received(:delete_value).with(described_class::VERSION_VALUE))
           end
         end
 
         context '"Version" value does exist' do
           before do
-            keys.each do |key|
+            registry_keys.each do |key|
               allow(key).to receive(:created?).and_return(false)
               allow(key).to receive(:[])
             end

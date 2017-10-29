@@ -31,7 +31,7 @@ describe Rake::Funnel::Support::InstantiateSymbol do
     class SnakeCase
     end
 
-    class Snake_Case # rubocop:disable Style/ClassAndModuleCamelCase
+    class Snake_Case # rubocop:disable Naming/ClassAndModuleCamelCase
     end
   end
 

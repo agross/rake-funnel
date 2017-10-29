@@ -1,9 +1,6 @@
-include Rake
-include Rake::Funnel::Support
-
 describe Rake::Funnel::Tasks::Zip do
   before do
-    Task.clear
+    Rake::Task.clear
   end
 
   describe 'defaults' do
@@ -16,15 +13,15 @@ describe Rake::Funnel::Tasks::Zip do
 
   describe 'execution' do
     let(:source) { %w(bin/1 bin/2 bin/3/4) }
-    let(:finder) { instance_double(Finder).as_null_object }
+    let(:finder) { instance_double(Rake::Funnel::Support::Finder).as_null_object }
 
     before do
       allow(finder).to receive(:all_or_default).and_return(source)
-      allow(Finder).to receive(:new).and_return(finder)
+      allow(Rake::Funnel::Support::Finder).to receive(:new).and_return(finder)
     end
 
     before do
-      allow(Zipper).to receive(:zip)
+      allow(Rake::Funnel::Support::Zipper).to receive(:zip)
       allow(Rake).to receive(:rake_output_message)
     end
 
@@ -37,11 +34,12 @@ describe Rake::Funnel::Tasks::Zip do
     end
 
     before do
-      Task[subject.name].invoke
+      Rake::Task[subject.name].invoke
     end
 
     it 'should delegate to Zipper' do
-      expect(Zipper).to have_received(:zip).with(subject.source, subject.target, subject.zip_root)
+      expect(Rake::Funnel::Support::Zipper).to have_received(:zip)
+        .with(subject.source, subject.target, subject.zip_root)
     end
 
     it 'should report the created zip file' do
@@ -63,11 +61,11 @@ describe Rake::Funnel::Tasks::Zip do
         let(:allow_empty) { true }
 
         before do
-          Task[subject.name].invoke
+          Rake::Task[subject.name].invoke
         end
 
         it 'should invoker Zipper' do
-          expect(Zipper).to have_received(:zip)
+          expect(Rake::Funnel::Support::Zipper).to have_received(:zip)
         end
       end
 
@@ -76,11 +74,11 @@ describe Rake::Funnel::Tasks::Zip do
         let(:allow_empty) { false }
 
         before do
-          Task[subject.name].invoke
+          Rake::Task[subject.name].invoke
         end
 
         it 'should not invoker Zipper' do
-          expect(Zipper).not_to have_received(:zip)
+          expect(Rake::Funnel::Support::Zipper).not_to have_received(:zip)
         end
 
         it 'should warn' do

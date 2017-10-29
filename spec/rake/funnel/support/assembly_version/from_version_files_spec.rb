@@ -1,5 +1,3 @@
-include Rake::Funnel::Support
-
 describe Rake::Funnel::Support::AssemblyVersion::FromVersionFiles do
   describe 'defaults' do
     its(:search_pattern) { should == %w(**/VERSION) }
@@ -26,16 +24,17 @@ describe Rake::Funnel::Support::AssemblyVersion::FromVersionFiles do
   end
 
   describe 'enumeration' do
-    let(:finder) { instance_double(Finder).as_null_object }
+    let(:finder) { instance_double(Rake::Funnel::Support::Finder).as_null_object }
     let(:files) { %w(1 2) }
 
     before do
       allow(finder).to receive(:all_or_default).and_return(files)
-      allow(Finder).to receive(:new).and_return(finder)
+      allow(Rake::Funnel::Support::Finder).to receive(:new).and_return(finder)
     end
 
     before do
-      allow(VersionInfo).to receive(:read_version_from).and_return(*files)
+      allow(Rake::Funnel::Support::VersionInfo).to \
+        receive(:read_version_from).and_return(*files)
     end
 
     before do
@@ -50,11 +49,11 @@ describe Rake::Funnel::Support::AssemblyVersion::FromVersionFiles do
       args = files.map do |file|
         {
           source: file,
-          version_info: VersionInfo.parse(version: file, metadata: {
-                                            pre: subject.metadata[:pre],
-                                            build: subject.metadata[:build],
-                                            sha: subject.metadata[:sha]
-                                          })
+          version_info: Rake::Funnel::Support::VersionInfo.parse(version: file, metadata: {
+                                                                   pre: subject.metadata[:pre],
+                                                                   build: subject.metadata[:build],
+                                                                   sha: subject.metadata[:sha]
+                                                                 })
         }
       end
 

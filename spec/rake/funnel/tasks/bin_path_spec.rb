@@ -1,8 +1,6 @@
-include Rake
-
 describe Rake::Funnel::Tasks::BinPath do
   before do
-    Task.clear
+    Rake::Task.clear
   end
 
   describe 'defaults' do
@@ -42,7 +40,7 @@ describe Rake::Funnel::Tasks::BinPath do
       end
 
       before do
-        Task[subject.name].invoke
+        Rake::Task[subject.name].invoke
       end
 
       it 'should prepend sorted matching folders to the PATH environment variable' do
@@ -96,7 +94,7 @@ describe Rake::Funnel::Tasks::BinPath do
       end
 
       before do
-        Task[subject.name].invoke
+        Rake::Task[subject.name].invoke
       end
 
       it 'should not print message' do

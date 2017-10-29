@@ -2,13 +2,13 @@
 
 describe Rake::Funnel::Extensions::REXML::Functions do
   let(:xml) do
-    <<EOF
+    <<XML
   <editors xmlns="http://example.com">
     <editor id="emacs">EMACS</editor>
     <editor id="vi">VIM</editor>
     <editor id="notepad">Notepad</editor>
   </editors>
-EOF
+XML
   end
 
   subject { REXML::Document.new(xml) }

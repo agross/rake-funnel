@@ -8,7 +8,7 @@ module Rake
         include Rake::Funnel::Support::MSBuild
 
         attr_accessor :name, :msbuild, :msbuild_finder, :project_or_solution, :args, :search_pattern
-        attr_writer :project_or_solution
+        attr_writer :project_or_solution # rubocop:disable Lint/DuplicateMethods
 
         def initialize(*args, &task_block)
           setup_ivars(args)
@@ -16,7 +16,7 @@ module Rake
           define(args, &task_block)
         end
 
-        def project_or_solution
+        def project_or_solution # rubocop:disable Lint/DuplicateMethods
           Finder.new(@project_or_solution || search_pattern, self, 'No projects or more than one project found.')
         end
 
