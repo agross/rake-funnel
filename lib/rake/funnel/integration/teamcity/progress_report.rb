@@ -12,17 +12,13 @@ module Rake
               task_starting do |task, _args|
                 next unless TeamCity.running?
 
-                unless TeamCity.rake_runner?
-                  ServiceMessages.block_opened(name: task.name)
-                end
+                ServiceMessages.block_opened(name: task.name) unless TeamCity.rake_runner?
               end
 
               task_finished do |task, _args, error|
                 next unless TeamCity.running?
 
-                if error.respond_to?(:inner_exception)
-                  error = error.inner_exception
-                end
+                error = error.inner_exception if error.respond_to?(:inner_exception)
 
                 ServiceMessages.build_problem(description: error.message[0..4000 - 1]) if error
 

@@ -1,8 +1,6 @@
-# rubocop:disable RSpec/FilePath
-
 require 'ostruct'
 
-describe Rake::Funnel::Support::MSBuild::BuildTool do
+describe Rake::Funnel::Support::MSBuild::BuildTool do # rubocop:disable RSpec/FilePath
   before do
     allow(Rake::Win32).to receive(:windows?).and_return(windows?)
   end

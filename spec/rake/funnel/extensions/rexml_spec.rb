@@ -1,6 +1,4 @@
-# rubocop:disable RSpec/FilePath
-
-describe Rake::Funnel::Extensions::REXML::Functions do
+describe Rake::Funnel::Extensions::REXML::Functions do # rubocop:disable RSpec/FilePath
   let(:xml) do
     <<XML
   <editors xmlns="http://example.com">

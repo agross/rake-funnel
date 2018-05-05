@@ -11,7 +11,7 @@ module Rake
 
         def sync(stream)
           stream.sync = true
-        rescue => e # rubocop:disable Lint/RescueWithoutErrorClass
+        rescue => e # rubocop:disable Style/RescueStandardError
           Rake.rake_output_message "Failed to set up sync output #{e}"
         end
       end

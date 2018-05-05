@@ -1,7 +1,7 @@
 describe Rake::Funnel::Extensions::CommonPath do
   describe 'Manual debugging test case' do
     it 'should work' do
-      expect(%w(/common/one /com/two).common_path).to be
+      expect(%w(/common/one /com/two).common_path).to be_truthy
 
       skip('for manual testing only')
     end
@@ -12,7 +12,8 @@ describe Rake::Funnel::Extensions::CommonPath do
       input = FileList[File.join(File.dirname(__FILE__), '**/*')]
       duped = input.dup
 
-      expect(input.common_path).to be
+      expect(input.common_path).to be_truthy
+
       expect(input).to match_array(duped)
     end
   end

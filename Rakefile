@@ -1,6 +1,6 @@
 require 'rake/funnel'
 
-include Rake::Funnel
+include Rake::Funnel # rubocop:disable Style/MixinUsage
 
 Dir['lib/tasks/*.rake'].each { |file| load(file) }
 

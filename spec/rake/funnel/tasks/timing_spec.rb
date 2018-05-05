@@ -4,14 +4,14 @@ describe Rake::Funnel::Tasks::Timing do
   before do
     Rake.application = nil
     Rake::Task.clear
-
-    # rubocop:disable RSpec/ExpectInHook
-    expect(define_tasks).to be
-    expect(subject).to be
-    # rubocop:enable RSpec/ExpectInHook
   end
 
   let(:define_tasks) { task :task }
+
+  subject! do
+    define_tasks
+    described_class.new
+  end
 
   after do
     subject.reset!

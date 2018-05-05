@@ -1,6 +1,4 @@
-# rubocop:disable RSpec/FilePath
-
-describe Rake::Funnel::Support::Mapper::Styles::MSDeploy do
+describe Rake::Funnel::Support::Mapper::Styles::MSDeploy do # rubocop:disable RSpec/FilePath
   subject { Rake::Funnel::Support::Mapper.new(:MSDeploy) }
 
   describe 'no arguments' do

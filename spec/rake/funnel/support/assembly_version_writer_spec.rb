@@ -43,12 +43,8 @@ describe Rake::Funnel::Support::AssemblyVersionWriter do
         ]
       end
 
-      subject do
-        described_class.new(source)
-      end
-
       it 'should succeed' do
-        expect(subject).to be
+        described_class.new(source)
       end
     end
   end

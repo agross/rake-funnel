@@ -1,6 +1,4 @@
-# rubocop:disable RSpec/FilePath
-
-describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do
+describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do # rubocop:disable RSpec/FilePath
   before do
     allow(ENV).to receive(:[]).with(described_class::ENV_VAR).and_return(env_var)
     allow(Rake::Funnel::Support::Which).to receive(:which).and_return(which)

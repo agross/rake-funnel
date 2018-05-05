@@ -26,7 +26,7 @@ module Rake
           @name = args.shift || :compile
 
           @msbuild = nil
-          @msbuild_finder = ->() { BuildTool.find }
+          @msbuild_finder = -> { BuildTool.find }
           @args = {}
           @search_pattern = %w(**/*.sln)
         end

@@ -1,4 +1,4 @@
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'rake/funnel/version'
 
@@ -13,7 +13,8 @@ Gem::Specification.new do |s| # rubocop:disable Metrics/BlockLength
   s.description = 'A standardized build pipeline'
   s.summary     = 'A build pipeline targeted at .NET projects. Supports environment configuration and makes invoking .NET-related tasks easier.' # rubocop:disable Metrics/LineLength
 
-  s.required_ruby_version = '>= 2.0.0'
+  # We support Ruby 2.0 whereas rubocop does not.
+  s.required_ruby_version = '>= 2.0.0' # rubocop:disable Gemspec/RequiredRubyVersion
 
   s.add_dependency 'configatron', '~> 4.5'
   s.add_dependency 'rake', '>= 10.4', '< 13'

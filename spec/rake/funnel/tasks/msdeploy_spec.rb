@@ -1,6 +1,4 @@
-# rubocop:disable RSpec/FilePath
-
-describe Rake::Funnel::Tasks::MSDeploy do
+describe Rake::Funnel::Tasks::MSDeploy do # rubocop:disable RSpec/FilePath
   before do
     Rake::Task.clear
   end

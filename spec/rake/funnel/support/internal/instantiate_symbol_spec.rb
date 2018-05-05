@@ -1,6 +1,4 @@
-# rubocop:disable RSpec/FilePath
-
-describe Rake::Funnel::Support::InstantiateSymbol do
+describe Rake::Funnel::Support::InstantiateSymbol do # rubocop:disable RSpec/FilePath
   module Creatable
     class One
     end

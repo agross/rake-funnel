@@ -1,8 +1,6 @@
-# rubocop:disable RSpec/FilePath
-
 require 'tmpdir'
 
-describe Rake::Funnel::Support::Finder do
+describe Rake::Funnel::Support::Finder do # rubocop:disable RSpec/FilePath
   let(:pattern) { %W(#{temp_dir}/**/*.sln #{temp_dir}/**/*.??proj) }
   let(:generate) { [] }
   let(:temp_dir) { Dir.mktmpdir }

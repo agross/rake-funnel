@@ -1,6 +1,4 @@
-# rubocop:disable RSpec/FilePath
-
-describe Rake::Funnel::Support::Mapper::Styles::NUnit do
+describe Rake::Funnel::Support::Mapper::Styles::NUnit do # rubocop:disable RSpec/FilePath
   subject { Rake::Funnel::Support::Mapper.new(:NUnit) }
 
   describe 'prefix' do

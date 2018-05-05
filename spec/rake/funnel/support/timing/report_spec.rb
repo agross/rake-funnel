@@ -11,7 +11,7 @@ describe Rake::Funnel::Support::Timing::Report do
     subject.render
   end
 
-  shared_examples_for :report do
+  shared_examples_for 'report' do
     it 'should separator lines' do
       expect($stdout).to have_received(:puts)
         .with(Regexp.new('-' * described_class::HEADER_WIDTH)).exactly(4).times
@@ -49,7 +49,7 @@ describe Rake::Funnel::Support::Timing::Report do
   describe 'empty report', include: Rake::Funnel::Support::Timing do
     let(:stats) { Rake::Funnel::Support::Timing::Statistics.new }
 
-    it_behaves_like :report
+    it_behaves_like 'report'
   end
 
   describe 'report for 2 tasks' do
@@ -60,7 +60,7 @@ describe Rake::Funnel::Support::Timing::Report do
       s
     end
 
-    it_behaves_like :report
+    it_behaves_like 'report'
 
     it 'should print each task' do
       expect($stdout).to have_received(:puts).with(/^foo/)
@@ -95,7 +95,7 @@ describe Rake::Funnel::Support::Timing::Report do
       diff + described_class::SPACE
     end
 
-    shared_examples_for :padding do
+    shared_examples_for 'padding' do
       it 'should pad headers' do
         expect($stdout).to have_received(:puts)
           .with(Regexp.new("^#{subject.columns[0].header}\\s{#{header_space}}#{subject.columns[1].header}"))
@@ -113,13 +113,13 @@ describe Rake::Funnel::Support::Timing::Report do
     context 'task names are shorter than headers' do
       let(:task_name) { :a }
 
-      it_behaves_like :padding
+      it_behaves_like 'padding'
     end
 
     context 'task names are longer than headers' do
       let(:task_name) { :aaaaaaaaaaaa }
 
-      it_behaves_like :padding
+      it_behaves_like 'padding'
     end
   end
 end

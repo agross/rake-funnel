@@ -1,6 +1,4 @@
-# rubocop:disable RSpec/FilePath
-
-describe Rake::Funnel::Integration::TeamCity::ServiceMessages do
+describe Rake::Funnel::Integration::TeamCity::ServiceMessages do # rubocop:disable RSpec/FilePath
   before do
     allow(Rake::Funnel::Integration::TeamCity).to receive(:running?).and_return(teamcity_running?)
     allow($stdout).to receive(:puts)

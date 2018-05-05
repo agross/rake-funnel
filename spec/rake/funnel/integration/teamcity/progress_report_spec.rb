@@ -1,6 +1,4 @@
-# rubocop:disable RSpec/FilePath
-
-describe Rake::Funnel::Integration::TeamCity::ProgressReport do
+describe Rake::Funnel::Integration::TeamCity::ProgressReport do # rubocop:disable RSpec/FilePath
   include Rake::DSL
 
   let(:teamcity_running?) { false }
@@ -26,7 +24,7 @@ describe Rake::Funnel::Integration::TeamCity::ProgressReport do
     subject.disable!
   end
 
-  shared_examples :block_report do
+  shared_examples 'block report' do
     it 'should write block start' do
       expect(Rake::Funnel::Integration::TeamCity::ServiceMessages).to \
         have_received(:block_opened).with(name: 'task')
@@ -38,7 +36,7 @@ describe Rake::Funnel::Integration::TeamCity::ProgressReport do
     end
   end
 
-  shared_examples :no_block_report do
+  shared_examples 'no block report' do
     it 'should not write block start' do
       expect(Rake::Funnel::Integration::TeamCity::ServiceMessages).not_to \
         have_received(:block_opened)
@@ -63,20 +61,20 @@ describe Rake::Funnel::Integration::TeamCity::ProgressReport do
     end
 
     context 'not on TeamCity' do
-      it_behaves_like :no_block_report
+      it_behaves_like 'no block report'
     end
 
     context 'on TeamCity' do
       let(:teamcity_running?) { true }
 
       context 'without rake runner' do
-        it_behaves_like :block_report
+        it_behaves_like 'block report'
       end
 
       context 'with rake runner' do
         let(:teamcity_rake_runner?) { true }
 
-        it_behaves_like :no_block_report
+        it_behaves_like 'no block report'
       end
     end
   end
@@ -111,7 +109,7 @@ describe Rake::Funnel::Integration::TeamCity::ProgressReport do
     end
 
     context 'not on TeamCity' do
-      it_behaves_like :no_block_report
+      it_behaves_like 'no block report'
 
       it 'should not swallow the error' do
         expect(@raised_error).to be_a_kind_of(SpecificError) # rubocop:disable RSpec/InstanceVariable
@@ -141,7 +139,7 @@ describe Rake::Funnel::Integration::TeamCity::ProgressReport do
       end
 
       context 'without rake runner' do
-        it_behaves_like :block_report
+        it_behaves_like 'block report'
 
         it 'should report the error as a build problem' do
           expect(Rake::Funnel::Integration::TeamCity::ServiceMessages).to \
@@ -160,7 +158,7 @@ describe Rake::Funnel::Integration::TeamCity::ProgressReport do
             have_received(:build_problem).with(description: 'inner message')
         end
 
-        it_behaves_like :no_block_report
+        it_behaves_like 'no block report'
       end
     end
   end

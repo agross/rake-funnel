@@ -1,6 +1,4 @@
-# rubocop:disable RSpec/FilePath
-
-describe Rake::Funnel::Support::MSDeploy::RegistryPatch do
+describe Rake::Funnel::Support::MSDeploy::RegistryPatch do # rubocop:disable RSpec/FilePath
   before do
     # rubocop:disable RSpec/AnyInstance
     allow_any_instance_of(described_class).to receive(:warn)

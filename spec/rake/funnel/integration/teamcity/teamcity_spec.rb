@@ -1,6 +1,4 @@
-# rubocop:disable RSpec/FilePath
-
-describe Rake::Funnel::Integration::TeamCity do
+describe Rake::Funnel::Integration::TeamCity do # rubocop:disable RSpec/FilePath
   describe 'runner detection' do
     before do
       allow(ENV).to receive(:include?).with(described_class::PROJECT_ENV_VAR).and_return(teamcity_running?)

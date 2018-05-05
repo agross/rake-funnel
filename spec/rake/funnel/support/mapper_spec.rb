@@ -17,7 +17,7 @@ describe Rake::Funnel::Support::Mapper do
   end
 
   class CustomMapper
-    def generate_from(_)
+    def generate_from(_ignored)
       [
         ['-', 'switch'],
         ['-', :some_switch],
@@ -40,7 +40,7 @@ describe Rake::Funnel::Support::Mapper do
   describe 'mapper style' do
     context 'default mapper' do
       it 'should use default mapper' do
-        expect(described_class.new).to be
+        expect(described_class.new).to be_kind_of(described_class)
       end
     end
 
@@ -59,7 +59,7 @@ describe Rake::Funnel::Support::Mapper do
 
     context 'custom mapper' do
       it 'should take custom mapper instance' do
-        expect(described_class.new(CustomMapper.new)).to be
+        expect(described_class.new(CustomMapper.new)).to be_kind_of(described_class)
       end
     end
   end
