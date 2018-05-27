@@ -40,16 +40,16 @@ module Rake
               Rake::Task.class_eval do
                 old_execute = instance_method(:execute)
 
-                define_method(:execute) do |args|
-                  context.starting.call(self, args) if context.starting
+                define_method(:execute) do |*args|
+                  context.starting.call(self, *args) if context.starting
 
                   error = nil
                   begin
-                    old_execute.bind(self).call(args)
+                    old_execute.bind(self).call(*args)
                   rescue => e # rubocop:disable Style/RescueStandardError
                     error = e
                   ensure
-                    context.finished.call(self, args, error) if context.finished
+                    context.finished.call(self, *args, error) if context.finished
                     raise error if error
                   end
                 end
@@ -60,8 +60,8 @@ module Rake
 
             p.reset do |memo|
               Rake::Task.class_eval do
-                define_method(:execute) do |args|
-                  memo.bind(self).call(args)
+                define_method(:execute) do |*args|
+                  memo.bind(self).call(*args)
                 end
               end
             end

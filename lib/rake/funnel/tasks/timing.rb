@@ -54,8 +54,8 @@ module Rake
               Rake::Application.class_eval do
                 orig_display_error_message = instance_method(:display_error_message)
 
-                define_method(:display_error_message) do |ex|
-                  orig_display_error_message.bind(self).call(ex)
+                define_method(:display_error_message) do |*ex|
+                  orig_display_error_message.bind(self).call(*ex)
 
                   report_invoker.call(failed: true)
                 end
@@ -66,8 +66,8 @@ module Rake
 
             p.reset do |memo|
               Rake::Application.class_eval do
-                define_method(:display_error_message) do |ex|
-                  memo.bind(self).call(ex)
+                define_method(:display_error_message) do |*ex|
+                  memo.bind(self).call(*ex)
                 end
               end
             end
@@ -82,9 +82,9 @@ module Rake
               Rake::Task.class_eval do
                 orig_execute = instance_method(:execute)
 
-                define_method(:execute) do |args|
+                define_method(:execute) do |*args|
                   benchmark_invoker.call(self) do
-                    orig_execute.bind(self).call(args)
+                    orig_execute.bind(self).call(*args)
                   end
                 end
 
@@ -94,8 +94,8 @@ module Rake
 
             p.reset do |memo|
               Rake::Task.class_eval do
-                define_method(:execute) do |ex|
-                  memo.bind(self).call(ex)
+                define_method(:execute) do |*ex|
+                  memo.bind(self).call(*ex)
                 end
               end
             end
