@@ -32,13 +32,13 @@ module Rake
             yield(*[self, task_args].slice(0, task_block.arity)) if task_block
 
             if files.empty? && !allow_empty
-              Rake.rake_output_message('No files to zip')
+              $stderr.print("No files to zip\n")
               next
             end
 
             Zipper.zip(files, target, zip_root)
 
-            Rake.rake_output_message("Created #{target}")
+            $stderr.print("Created #{target}\n")
           end
 
           self

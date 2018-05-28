@@ -58,9 +58,7 @@ describe Rake::Funnel::Tasks::Timing do
       Rake.application.top_level_tasks.unshift(:task)
       allow(Rake.application).to receive(:exit_because_of_exception)
 
-      allow($stdout).to receive(:puts)
-      allow(Kernel).to receive(:warn)
-      # The 'rake aborted!' message is #printed on $stderr.
+      allow($stdout).to receive(:print)
       allow($stderr).to receive(:print)
 
       Rake.application.run
@@ -69,12 +67,12 @@ describe Rake::Funnel::Tasks::Timing do
     context 'with task defined' do
       let(:define_tasks) do
         task :task do
-          puts 'hello'
+          $stdout.print 'hello'
         end
       end
 
       it 'should execute tasks' do
-        expect($stdout).to have_received(:puts).with('hello')
+        expect($stdout).to have_received(:print).with('hello')
       end
 
       it 'should record timing information for executed tasks' do
@@ -105,11 +103,11 @@ describe Rake::Funnel::Tasks::Timing do
     describe 'build finished' do
       context 'when rake succeeded' do
         it 'should print the report' do
-          expect($stdout).to have_received(:puts).with(/Build time report/)
+          expect($stdout).to have_received(:print).with(/Build time report/)
         end
 
         it 'should report success' do
-          expect($stdout).to have_received(:puts).with(/Status\s+OK/)
+          expect($stdout).to have_received(:print).with(/Status\s+OK/)
         end
       end
 
@@ -121,11 +119,11 @@ describe Rake::Funnel::Tasks::Timing do
         end
 
         it 'should print the report' do
-          expect($stdout).to have_received(:puts).with(/Build time report/)
+          expect($stdout).to have_received(:print).with(/Build time report/)
         end
 
         it 'should report failure' do
-          expect(Kernel).to have_received(:warn).with(/Status\s+Failed/)
+          expect($stderr).to have_received(:print).with(/Status\s+Failed/)
         end
       end
     end

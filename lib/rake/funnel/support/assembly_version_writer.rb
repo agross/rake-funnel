@@ -25,7 +25,7 @@ module Rake
 
               contents = evaluate_erb(language, version_info, target)
 
-              Rake.rake_output_message("Writing #{target}")
+              $stderr.print("Writing #{target}\n")
               File.write(target, contents)
             end
           end

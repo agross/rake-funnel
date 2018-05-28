@@ -30,7 +30,7 @@ module Rake
 
             templates.all_or_default.each do |template|
               target = result_filename(template)
-              Rake.rake_output_message "Creating file #{target}"
+              $stderr.print "Creating file #{target}\n"
 
               content = TemplateEngine.render(File.read(template), template, context)
               File.write(target, content)

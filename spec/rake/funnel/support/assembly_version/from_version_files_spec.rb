@@ -38,7 +38,7 @@ describe Rake::Funnel::Support::AssemblyVersion::FromVersionFiles do
     end
 
     before do
-      allow(Rake).to receive(:rake_output_message)
+      allow($stderr).to receive(:print)
     end
 
     subject do

@@ -28,7 +28,7 @@ module Rake
               version = Rake::Funnel::Support::BinaryVersionReader.read_from(nunit)
 
               unless version.file_version
-                Rake.rake_output_message("Could read version from NUnit executable in #{nunit}")
+                $stderr.print("Could read version from NUnit executable in #{nunit}\n")
                 return
               end
 
@@ -39,7 +39,7 @@ module Rake
               addin_files = Dir.glob("#{addins}-#{version}.*")
 
               if addin_files.none?
-                Rake.rake_output_message("Could not find TeamCity NUnit addin for version #{version} in #{addins}")
+                $stderr.print("Could not find TeamCity NUnit addin for version #{version} in #{addins}\n")
                 return
               end
 
@@ -47,7 +47,7 @@ module Rake
             end
 
             def copy_addin_files(nunit, addin_files, version)
-              Rake.rake_output_message("Installing TeamCity NUnit addin for version #{version} in #{nunit}")
+              $stderr.print("Installing TeamCity NUnit addin for version #{version} in #{nunit}\n")
 
               destination = File.join(File.dirname(nunit), 'addins')
 

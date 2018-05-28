@@ -22,7 +22,7 @@ describe Rake::Funnel::Tasks::Zip do
 
     before do
       allow(Rake::Funnel::Support::Zipper).to receive(:zip)
-      allow(Rake).to receive(:rake_output_message)
+      allow($stderr).to receive(:print)
     end
 
     subject do
@@ -43,7 +43,7 @@ describe Rake::Funnel::Tasks::Zip do
     end
 
     it 'should report the created zip file' do
-      expect(Rake).to have_received(:rake_output_message).with("Created #{subject.target}")
+      expect($stderr).to have_received(:print).with("Created #{subject.target}\n")
     end
 
     describe '#allow_empty' do
@@ -82,7 +82,7 @@ describe Rake::Funnel::Tasks::Zip do
         end
 
         it 'should warn' do
-          expect(Rake).to have_received(:rake_output_message).with('No files to zip')
+          expect($stderr).to have_received(:print).with("No files to zip\n")
         end
       end
     end

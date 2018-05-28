@@ -75,7 +75,7 @@ describe Rake::Funnel::Support::AssemblyVersionWriter do
     end
 
     before do
-      allow(Rake).to receive(:rake_output_message)
+      allow($stderr).to receive(:print)
     end
 
     before do

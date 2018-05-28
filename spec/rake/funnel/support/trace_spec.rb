@@ -1,6 +1,6 @@
 describe Rake::Funnel::Support::Trace do
   before do
-    allow(Rake).to receive(:rake_output_message)
+    allow($stderr).to receive(:print)
   end
 
   context 'Rake run with --trace' do
@@ -11,7 +11,7 @@ describe Rake::Funnel::Support::Trace do
     it 'should write messages' do
       described_class.message('foo')
 
-      expect(Rake).to have_received(:rake_output_message).with('foo')
+      expect($stderr).to have_received(:print).with("foo\n")
     end
   end
 
@@ -23,7 +23,7 @@ describe Rake::Funnel::Support::Trace do
     it 'should not write messages' do
       described_class.message('foo')
 
-      expect(Rake).not_to have_received(:rake_output_message)
+      expect($stderr).not_to have_received(:print)
     end
   end
 end

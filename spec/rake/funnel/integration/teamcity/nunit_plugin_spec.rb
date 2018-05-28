@@ -4,7 +4,7 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do # rubocop:disable R
     allow(Rake::Funnel::Support::Which).to receive(:which).and_return(which)
     allow(Dir).to receive(:glob).and_return([])
     allow(RakeFileUtils).to receive(:mkdir_p)
-    allow(Rake).to receive(:rake_output_message)
+    allow($stderr).to receive(:print)
   end
 
   before do
@@ -44,9 +44,9 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do # rubocop:disable R
     end
 
     it 'should report that the addin is installed' do
-      expect(Rake).to \
-        have_received(:rake_output_message)
-        .with("Installing TeamCity NUnit addin for version #{plugin_version} in #{which}")
+      expect($stderr).to \
+        have_received(:print)
+        .with("Installing TeamCity NUnit addin for version #{plugin_version} in #{which}\n")
     end
 
     context 'Windows-style path in environment variable',
@@ -90,9 +90,9 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do # rubocop:disable R
       let(:which) { 'path/to/nunit-console.exe' }
 
       it 'should report that the version could not be read' do
-        expect(Rake).to \
-          have_received(:rake_output_message)
-          .with("Could read version from NUnit executable in #{which}")
+        expect($stderr).to \
+          have_received(:print)
+          .with("Could read version from NUnit executable in #{which}\n")
       end
 
       it 'should skip' do
@@ -106,8 +106,8 @@ describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do # rubocop:disable R
       let(:nunit_version) { Rake::Funnel::Support::VersionInfo.new(file_version: '1.2.3.4') }
 
       it 'should report that the addin version is not available' do
-        expect(Rake).to \
-          have_received(:rake_output_message)
+        expect($stderr).to \
+          have_received(:print)
           .with(/Could not find TeamCity NUnit addin for version 1\.2\.3 in .*#{env_var}$/)
       end
 

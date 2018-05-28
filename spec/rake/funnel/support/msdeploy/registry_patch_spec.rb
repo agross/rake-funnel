@@ -1,8 +1,6 @@
 describe Rake::Funnel::Support::MSDeploy::RegistryPatch do # rubocop:disable RSpec/FilePath
   before do
-    # rubocop:disable RSpec/AnyInstance
-    allow_any_instance_of(described_class).to receive(:warn)
-    # rubocop:enable RSpec/AnyInstance
+    allow($stderr).to receive(:print)
   end
 
   describe 'execution' do
@@ -106,7 +104,7 @@ describe Rake::Funnel::Support::MSDeploy::RegistryPatch do # rubocop:disable RSp
         end
 
         it 'should warn' do
-          expect(subject).to have_received(:warn).with(/Could not patch registry to pretend MSDeploy is installed/)
+          expect($stderr).to have_received(:print).with(/Could not patch registry to pretend MSDeploy is installed/)
         end
       end
 

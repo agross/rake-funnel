@@ -4,9 +4,8 @@ describe Rake::Funnel::Extensions::Shell do
   before do
     allow(Open3).to receive(:popen2e).and_yield(nil, stdout_and_stderr, exit)
 
-    allow($stdout).to receive(:puts)
-    allow(Kernel).to receive(:warn)
-    allow(Rake).to receive(:rake_output_message)
+    allow($stdout).to receive(:print)
+    allow($stderr).to receive(:print)
   end
 
   let(:exit) { OpenStruct.new(value: OpenStruct.new(success?: true, exitstatus: 0)) }
@@ -63,7 +62,7 @@ describe Rake::Funnel::Extensions::Shell do
 
       subject.shell(arg)
 
-      expect(Rake).to have_received(:rake_output_message).with(arg.join(' '))
+      expect($stderr).to have_received(:print).with("1 2\n")
     end
   end
 
@@ -75,12 +74,12 @@ describe Rake::Funnel::Extensions::Shell do
     before { subject.shell('foo') }
 
     it 'should redirect command output to stdout' do
-      expect($stdout).to have_received(:puts).with(/output 1/)
-      expect($stdout).to have_received(:puts).with(/output 2/)
+      expect($stdout).to have_received(:print).with(/output 1/)
+      expect($stdout).to have_received(:print).with(/output 2/)
     end
 
     it 'should colorize lines' do
-      expect($stdout).to have_received(:puts).with('output 1'.green)
+      expect($stdout).to have_received(:print).with('output 1'.green + "\n")
     end
   end
 
@@ -130,7 +129,7 @@ describe Rake::Funnel::Extensions::Shell do
 
     context 'no lines indicating errors' do
       it 'should not log to stderr' do
-        expect(Kernel).not_to have_received(:warn)
+        expect($stdout).not_to have_received(:print).with(/error/)
       end
     end
 
@@ -138,23 +137,23 @@ describe Rake::Funnel::Extensions::Shell do
       let(:stdout_and_stderr) { StringIO.new("output 1\nerror\noutput 2\n") }
 
       it 'should log to stdout before error' do
-        expect($stdout).to have_received(:puts).with(/output 1/)
+        expect($stdout).to have_received(:print).with(/output 1/)
       end
 
       it 'should log to stderr on error' do
-        expect(Kernel).to have_received(:warn).with(/error/)
+        expect($stderr).to have_received(:print).with(/error/)
       end
 
       it 'should not log to stdout on error' do
-        expect($stdout).not_to have_received(:puts).with(/error/)
+        expect($stdout).not_to have_received(:print).with(/error/)
       end
 
       it 'should colorize error lines' do
-        expect(Kernel).to have_received(:warn).with('error'.bold.red)
+        expect($stderr).to have_received(:print).with('error'.bold.red + "\n")
       end
 
       it 'should log to stdout after error' do
-        expect($stdout).to have_received(:puts).with(/output 2/)
+        expect($stdout).to have_received(:print).with(/output 2/)
       end
     end
 
@@ -162,7 +161,7 @@ describe Rake::Funnel::Extensions::Shell do
       let(:stdout_and_stderr) { StringIO.new('error äöüß'.encode('CP850')) }
 
       it 'should log to stdout before error' do
-        expect(Kernel).to have_received(:warn).with(/error/)
+        expect($stderr).to have_received(:print).with(/error/)
       end
     end
   end

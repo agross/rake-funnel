@@ -8,7 +8,8 @@ module Rake
 
         def initialize
           task_starting do |task, _args|
-            puts "\n[#{task.name}]".bold.cyan unless Rake::Funnel::Integration::TeamCity.running?
+            name = "[#{task.name}]".bold.cyan
+            print "\n#{name}\n" unless Rake::Funnel::Integration::TeamCity.running?
           end
 
           yield self if block_given?

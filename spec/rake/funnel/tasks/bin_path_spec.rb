@@ -22,7 +22,7 @@ describe Rake::Funnel::Tasks::BinPath do
     before do
       allow(ENV).to receive(:[]).with('PATH').and_return(default_path)
       allow(ENV).to receive(:[]=)
-      allow(Rake).to receive(:rake_output_message)
+      allow($stderr).to receive(:print)
     end
 
     subject do
@@ -56,8 +56,8 @@ describe Rake::Funnel::Tasks::BinPath do
       end
 
       it 'should report added paths' do
-        expect(Rake).to have_received(:rake_output_message).with(%r{/foo$})
-        expect(Rake).to have_received(:rake_output_message).with(%r{/bar$})
+        expect($stderr).to have_received(:print).with(%r{/foo$})
+        expect($stderr).to have_received(:print).with(%r{/bar$})
       end
 
       describe 'path modifier' do
@@ -98,7 +98,7 @@ describe Rake::Funnel::Tasks::BinPath do
       end
 
       it 'should not print message' do
-        expect(Rake).not_to have_received(:rake_output_message)
+        expect($stderr).not_to have_received(:print)
       end
 
       it 'should not set environment variable' do

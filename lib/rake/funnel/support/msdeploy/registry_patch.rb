@@ -75,7 +75,7 @@ module Rake
                     end
                   end
                 rescue ::Win32::Registry::Error => e
-                  warn "Could not patch registry to pretend MSDeploy is installed: #{e}"
+                  $stderr.print "Could not patch registry to pretend MSDeploy is installed: #{e}\n"
                 end
               end
 

@@ -18,7 +18,7 @@ module Rake
             def mono
               out, status = Open3.capture2('mono', '--version')
               unless status.success?
-                warn "Could not determine mono version: #{status}"
+                $stderr.print "Could not determine mono version: #{status}\n"
                 return nil
               end
 
@@ -40,7 +40,7 @@ module Rake
 
               path, status = Open3.capture2(*args)
               unless status.success?
-                warn "vswhere failed: #{status}"
+                $stderr.print "vswhere failed: #{status}\n"
                 return nil
               end
 

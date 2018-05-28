@@ -21,7 +21,7 @@ module Rake
               args = [message_name] << escaped_array_of(args)
               args = args.flatten.reject(&:nil?)
 
-              puts "##teamcity[#{args.join(' ')}]"
+              print "##teamcity[#{args.join(' ')}]\n"
             end
 
             def escape(string) # rubocop:disable Metrics/MethodLength

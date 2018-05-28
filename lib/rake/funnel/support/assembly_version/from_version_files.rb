@@ -17,7 +17,7 @@ module Rake
             block_given? || (return enum_for(__method__))
 
             files.each do |file|
-              Rake.rake_output_message("Reading #{file}")
+              $stderr.print("Reading #{file}\n")
 
               version_info = VersionInfo.parse(
                 version: VersionInfo.read_version_from(file),

@@ -54,25 +54,25 @@ module Rake
           private
 
           def header # rubocop:disable Metrics/AbcSize
-            puts '-' * HEADER_WIDTH
-            puts 'Build time report'
-            puts '-' * HEADER_WIDTH
+            $stdout.print '-' * HEADER_WIDTH + "\n"
+            $stdout.print "Build time report\n"
+            $stdout.print '-' * HEADER_WIDTH + "\n"
 
-            puts columns.map(&:format_header).join(' ' * SPACE)
-            puts columns.map { |c| c.format_header.gsub(/./, '-') }.join(' ' * SPACE)
+            $stdout.print columns.map(&:format_header).join(' ' * SPACE) + "\n"
+            $stdout.print columns.map { |c| c.format_header.gsub(/./, '-') }.join(' ' * SPACE) + "\n"
           end
 
           def rows
             @stats.each do |timing|
-              puts columns.map { |c| c.format_value(timing) }.join(' ' * SPACE)
+              $stdout.print columns.map { |c| c.format_value(timing) }.join(' ' * SPACE) + "\n"
             end
           end
 
           def footer # rubocop:disable Metrics/AbcSize
-            puts '-' * HEADER_WIDTH
-            puts 'Total'.ljust(columns[0].width) + ' ' * SPACE + format(Time.now - @stats.started_at)
+            $stdout.print '-' * HEADER_WIDTH + "\n"
+            $stdout.print 'Total'.ljust(columns[0].width) + ' ' * SPACE + format(Time.now - @stats.started_at) + "\n"
             status_message
-            puts '-' * HEADER_WIDTH
+            $stdout.print '-' * HEADER_WIDTH + "\n"
           end
 
           def format(seconds)
@@ -84,9 +84,9 @@ module Rake
             status = 'Status'.ljust(columns[0].width) + ' ' * SPACE + status
 
             if @opts[:failed]
-              Kernel.warn(status.bold.red)
+              $stderr.print(status.bold.red + "\n")
             else
-              $stdout.puts(status.bold.green)
+              $stdout.print(status.bold.green + "\n")
             end
           end
         end

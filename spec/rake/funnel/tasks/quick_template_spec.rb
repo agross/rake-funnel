@@ -21,7 +21,7 @@ describe Rake::Funnel::Tasks::QuickTemplate do
       allow(finder).to receive(:all_or_default).and_return(templates)
       allow(Rake::Funnel::Support::Finder).to receive(:new).and_return(finder)
       allow(engine).to receive(:render).and_return('file content')
-      allow(Rake).to receive(:rake_output_message)
+      allow($stderr).to receive(:print)
       allow(File).to receive(:read).and_return('template content')
       allow(File).to receive(:write)
     end
@@ -34,7 +34,7 @@ describe Rake::Funnel::Tasks::QuickTemplate do
 
     it 'should report created files' do
       templates.each do |template|
-        expect(Rake).to have_received(:rake_output_message).with("Creating file #{template.ext}")
+        expect($stderr).to have_received(:print).with("Creating file #{template.ext}\n")
       end
     end
 

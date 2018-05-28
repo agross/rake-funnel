@@ -8,7 +8,7 @@ module Rake
         class Loader
           class << self
             def load_configuration(config, store = configatron, customizer = nil)
-              Rake.rake_output_message("Configuring for #{config[:name]}")
+              $stderr.print("Configuring for #{config[:name]}\n")
               store.unlock!
               store.reset!
 
@@ -19,8 +19,7 @@ module Rake
 
               store.lock!
 
-              Rake.rake_output_message('')
-              Rake.rake_output_message(store.inspect)
+              $stderr.print("\n" + store.inspect + "\n")
             end
 
             private
@@ -28,7 +27,7 @@ module Rake
             def load(config, store)
               operation = 'Loading'
               config.fetch(:config_files, []).each do |file|
-                Rake.rake_output_message("#{operation} #{file}")
+                $stderr.print("#{operation} #{file}\n")
                 operation = 'Merging'
 
                 yaml = File.read(file)

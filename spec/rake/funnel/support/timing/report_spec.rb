@@ -6,34 +6,34 @@ describe Rake::Funnel::Support::Timing::Report do
   let(:opts) { {} }
 
   before do
-    allow($stdout).to receive(:puts)
-    allow(Kernel).to receive(:warn)
+    allow($stdout).to receive(:print)
+    allow($stderr).to receive(:print)
     subject.render
   end
 
   shared_examples_for 'report' do
     it 'should separator lines' do
-      expect($stdout).to have_received(:puts)
+      expect($stdout).to have_received(:print)
         .with(Regexp.new('-' * described_class::HEADER_WIDTH)).exactly(4).times
     end
 
     it 'should print the header' do
-      expect($stdout).to have_received(:puts).with('Build time report')
+      expect($stdout).to have_received(:print).with("Build time report\n")
     end
 
     it 'should print the total time' do
-      expect($stdout).to have_received(:puts).with(/^Total\s+00:00:00/)
+      expect($stdout).to have_received(:print).with(/^Total\s+00:00:00/)
     end
 
     it 'should print the build status' do
-      expect($stdout).to have_received(:puts).with(/Status\s+OK/)
+      expect($stdout).to have_received(:print).with(/Status\s+OK/)
     end
 
     context 'when rake succeeded' do
       let(:opts) { { failed: false } }
 
       it 'should print the successful build status' do
-        expect($stdout).to have_received(:puts).with(/Status\s+OK/)
+        expect($stdout).to have_received(:print).with(/Status\s+OK/)
       end
     end
 
@@ -41,7 +41,7 @@ describe Rake::Funnel::Support::Timing::Report do
       let(:opts) { { failed: true } }
 
       it 'should print the failed build status' do
-        expect(Kernel).to have_received(:warn).with(/Status\s+Failed/)
+        expect($stderr).to have_received(:print).with(/Status\s+Failed/)
       end
     end
   end
@@ -63,12 +63,12 @@ describe Rake::Funnel::Support::Timing::Report do
     it_behaves_like 'report'
 
     it 'should print each task' do
-      expect($stdout).to have_received(:puts).with(/^foo/)
-      expect($stdout).to have_received(:puts).with(/^bar/)
+      expect($stdout).to have_received(:print).with(/^foo/)
+      expect($stdout).to have_received(:print).with(/^bar/)
     end
 
     it "should print each task's time" do
-      expect($stdout).to have_received(:puts).with(/00:00:00/).exactly(3).times
+      expect($stdout).to have_received(:print).with(/00:00:00/).exactly(3).times
     end
   end
 
@@ -97,16 +97,16 @@ describe Rake::Funnel::Support::Timing::Report do
 
     shared_examples_for 'padding' do
       it 'should pad headers' do
-        expect($stdout).to have_received(:puts)
+        expect($stdout).to have_received(:print)
           .with(Regexp.new("^#{subject.columns[0].header}\\s{#{header_space}}#{subject.columns[1].header}"))
       end
 
       it 'should pad header underlines' do
-        expect($stdout).to have_received(:puts).with(Regexp.new("^-{#{header_underline}}\\s+"))
+        expect($stdout).to have_received(:print).with(Regexp.new("^-{#{header_underline}}\\s+"))
       end
 
       it 'should pad the task names' do
-        expect($stdout).to have_received(:puts).with(Regexp.new("^#{task_name}\\s{#{value_space}}\\d"))
+        expect($stdout).to have_received(:print).with(Regexp.new("^#{task_name}\\s{#{value_space}}\\d"))
       end
     end
 

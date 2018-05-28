@@ -35,7 +35,7 @@ describe Rake::Funnel::Support::MSBuild::BuildTool do # rubocop:disable RSpec/Fi
         end
 
         before do
-          allow(described_class).to receive(:warn)
+          allow($stderr).to receive(:print)
         end
 
         it 'finds nothing' do
@@ -44,7 +44,7 @@ describe Rake::Funnel::Support::MSBuild::BuildTool do # rubocop:disable RSpec/Fi
 
         it 'warns about the crash' do
           described_class.find rescue nil # rubocop:disable Style/RescueModifier
-          expect(described_class).to have_received(:warn).with(/^vswhere failed:/)
+          expect($stderr).to have_received(:print).with(/^vswhere failed:/)
         end
       end
 
@@ -158,7 +158,7 @@ describe Rake::Funnel::Support::MSBuild::BuildTool do # rubocop:disable RSpec/Fi
         end
 
         before do
-          allow(described_class).to receive(:warn)
+          allow($stderr).to receive(:print)
         end
 
         it 'finds nothing' do
@@ -167,7 +167,7 @@ describe Rake::Funnel::Support::MSBuild::BuildTool do # rubocop:disable RSpec/Fi
 
         it 'warns about the crash' do
           described_class.find rescue nil # rubocop:disable Style/RescueModifier
-          expect(described_class).to have_received(:warn).with(/^Could not determine mono version:/)
+          expect($stderr).to have_received(:print).with(/^Could not determine mono version:/)
         end
       end
 

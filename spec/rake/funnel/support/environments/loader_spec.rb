@@ -17,7 +17,7 @@ describe Rake::Funnel::Support::Environments::Loader do
       allow(File).to receive(:read).with(file.to_s).and_return(content)
     end
 
-    allow(Rake).to receive(:rake_output_message)
+    allow($stderr).to receive(:print)
   end
 
   describe 'loading configuration' do

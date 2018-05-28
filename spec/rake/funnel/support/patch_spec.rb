@@ -17,12 +17,12 @@ describe Rake::Funnel::Support::Patch do
     subject do
       described_class.new do |p|
         p.setup do
-          output.puts 'setup'
+          output.print 'setup'
           42
         end
 
         p.reset do |memo|
-          output.puts memo
+          output.print memo
         end
       end
     end
@@ -33,7 +33,7 @@ describe Rake::Funnel::Support::Patch do
       let!(:ret) { subject.apply! }
 
       it 'should execute the setup' do
-        expect(output).to have_received(:puts).with('setup')
+        expect(output).to have_received(:print).with('setup')
       end
 
       it 'should return self' do
@@ -48,7 +48,7 @@ describe Rake::Funnel::Support::Patch do
       end
 
       it 'should execute the reset' do
-        expect(output).to have_received(:puts).with(42)
+        expect(output).to have_received(:print).with(42)
       end
 
       it 'should return self' do
@@ -60,7 +60,7 @@ describe Rake::Funnel::Support::Patch do
       before { subject.revert! }
 
       it 'should not execute the reset' do
-        expect(output).not_to have_received(:puts).with(42)
+        expect(output).not_to have_received(:print).with(42)
       end
     end
 
@@ -71,7 +71,7 @@ describe Rake::Funnel::Support::Patch do
       end
 
       it 'should execute the setup once' do
-        expect(output).to have_received(:puts).with('setup').once
+        expect(output).to have_received(:print).with('setup').once
       end
     end
 
@@ -83,7 +83,7 @@ describe Rake::Funnel::Support::Patch do
       end
 
       it 'should execute the revert once' do
-        expect(output).to have_received(:puts).with(42).once
+        expect(output).to have_received(:print).with(42).once
       end
     end
 
@@ -93,7 +93,7 @@ describe Rake::Funnel::Support::Patch do
       subject do
         described_class.new(context) do |p|
           p.setup do |context|
-            output.puts context
+            output.print context
           end
         end
       end
@@ -101,7 +101,7 @@ describe Rake::Funnel::Support::Patch do
       before { subject.apply!.revert! }
 
       it 'should be accessible from within the patch definition' do
-        expect(output).to have_received(:puts).with(42)
+        expect(output).to have_received(:print).with(42)
       end
     end
   end

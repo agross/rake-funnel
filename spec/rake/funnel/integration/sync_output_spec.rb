@@ -21,17 +21,17 @@ describe Rake::Funnel::Integration::SyncOutput do
       allow($stdout).to receive(:sync=).and_raise('$stdout.sync not supported')
       allow($stderr).to receive(:sync=).and_raise('$stderr.sync not supported')
 
-      allow(Rake).to receive(:rake_output_message)
+      allow($stderr).to receive(:print)
     end
 
     subject! { described_class.new }
 
     it 'should log the error for $stdout' do
-      expect(Rake).to have_received(:rake_output_message).with(/Failed.*\$stdout/)
+      expect($stderr).to have_received(:print).with(/Failed.*\$stdout/)
     end
 
     it 'should log the error for $stderr' do
-      expect(Rake).to have_received(:rake_output_message).with(/Failed.*\$stderr/)
+      expect($stderr).to have_received(:print).with(/Failed.*\$stderr/)
     end
   end
 end

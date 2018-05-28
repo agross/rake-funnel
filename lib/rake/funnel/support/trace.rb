@@ -6,7 +6,7 @@ module Rake
           def message(message)
             return unless Rake.application.options.trace
 
-            Rake.rake_output_message(message)
+            $stderr.print("#{message}\n")
           end
         end
       end

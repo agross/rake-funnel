@@ -20,10 +20,10 @@ module Rake
 
         private
 
-        def run(cmd, log_file, error_lines)
+        def run(cmd, log_file, error_lines) # rubocop:disable Metrics/AbcSize
           cmd, readable_cmd = normalize(cmd)
 
-          Rake.rake_output_message(readable_cmd)
+          $stderr.print(readable_cmd + "\n")
 
           Open3.popen2e(*cmd) do |_, stdout_and_stderr, wait_thread|
             log, error_logged = log_output(stdout_and_stderr, log_file, error_lines)
@@ -70,14 +70,14 @@ module Rake
         end
 
         def to_stdout(line)
-          $stdout.puts(line.rstrip.green)
+          $stdout.print(line.rstrip.green + "\n")
           :success
         end
 
         def to_stderr(line, error_lines)
           return unless error_lines && line =~ error_lines
 
-          Kernel.warn(line.rstrip.bold.red)
+          $stderr.print(line.rstrip.bold.red + "\n")
           :error
         end
       end

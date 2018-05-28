@@ -29,9 +29,9 @@ module Rake
             next unless paths.any?
 
             prepend_pattern_to_path_environment(paths)
-            Rake.rake_output_message 'Added the following paths to the PATH environment variable:'
+            $stderr.print "Added the following paths to the PATH environment variable:\n"
             paths.each do |p|
-              Rake.rake_output_message "  - #{p}"
+              $stderr.print "  - #{p}\n"
             end
           end
 
