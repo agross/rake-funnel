@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Integration::TeamCity::ProgressReport do # rubocop:disable RSpec/FilePath
   include Rake::DSL
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rake
   module Funnel
     module Integration
@@ -8,7 +10,7 @@ module Rake
               true
             end
 
-            def method_missing(method, *args, &_block) # rubocop:disable Style/MethodMissing
+            def method_missing(method, *args, &_block) # rubocop:disable Style/MethodMissingSuper
               return unless Rake::Funnel::Integration::TeamCity.running?
 
               message_name = method.camelize
@@ -42,6 +44,7 @@ module Rake
               return [] if args.nil?
 
               return "'#{escape(args)}'" unless args.is_a?(Hash)
+
               args.map { |key, value| "#{key.camelize}='#{escape(value.to_s)}'" }
             end
           end

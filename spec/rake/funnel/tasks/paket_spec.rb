@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Tasks::Paket do
   before do
     Rake::Task.clear

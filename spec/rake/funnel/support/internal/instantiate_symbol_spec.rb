@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Support::InstantiateSymbol do # rubocop:disable RSpec/FilePath
   module Creatable
     class One

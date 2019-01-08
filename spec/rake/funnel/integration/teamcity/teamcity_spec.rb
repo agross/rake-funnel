@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Integration::TeamCity do # rubocop:disable RSpec/FilePath
   describe 'runner detection' do
     before do

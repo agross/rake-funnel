@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Dir[File.join(File.dirname(__FILE__), 'argument_mapper', '*.rb')].each do |path|
   require path
 end
@@ -42,6 +44,7 @@ module Rake
             end
 
             return Array.new(pairs) if value.is_a?(Array)
+
             pairs
           else
             Value.new(value)
@@ -50,6 +53,7 @@ module Rake
 
         def camel_case_symbols(value)
           return value unless value.is_a?(Symbol)
+
           value.camelize
         end
       end

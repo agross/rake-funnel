@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rake
   module Funnel
     class AmbiguousFileError < StandardError
@@ -33,6 +35,7 @@ module Rake
 
       def inspect_candidates
         return if (candidates || []).empty?
+
         ['Candidates:', candidates.map { |c| "  - #{c}" }]
       end
     end

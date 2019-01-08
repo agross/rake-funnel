@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rubygems/package_task'
 
 spec = Gem::Specification.load('rake-funnel.gemspec')

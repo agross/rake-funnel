@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Support::MSDeploy::RegistryPatch do # rubocop:disable RSpec/FilePath
   before do
     allow($stderr).to receive(:print)

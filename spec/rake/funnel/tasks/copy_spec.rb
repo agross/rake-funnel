@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Tasks::Copy do
   before do
     Rake::Task.clear

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Integration::TeamCity::NUnitPlugin do # rubocop:disable RSpec/FilePath
   before do
     allow(ENV).to receive(:[]).with(described_class::ENV_VAR).and_return(env_var)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Support::Trace do
   before do
     allow($stderr).to receive(:print)

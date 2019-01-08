@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'abbrev'
 require 'pathname'
 
@@ -39,6 +41,7 @@ module Rake
 
             path.zip(min).each do |left, right|
               next if left != right
+
               longest_prefix << right
             end
 

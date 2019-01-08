@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Support::AssemblyVersion::FromVersionFiles do
   describe 'defaults' do
     its(:search_pattern) { should == %w(**/VERSION) }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Support::Timing::Report do
   include Rake::DSL
 

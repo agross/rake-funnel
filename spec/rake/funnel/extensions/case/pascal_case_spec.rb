@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Extensions::Case::PascalCase do
   it 'should convert strings' do
     expect('foo'.pascalize).to eq('Foo')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'configatron'
 
 describe Rake::Funnel::Tasks::Environments do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'open3'
 
 module Rake
@@ -22,9 +24,9 @@ module Rake
                 return nil
               end
 
-              return 'msbuild'.freeze if out[/^Mono JIT compiler version ([\d\.]+)/, 1] >= '5.0'
+              return 'msbuild' if out[/^Mono JIT compiler version ([\d\.]+)/, 1] >= '5.0'
 
-              'xbuild'.freeze
+              'xbuild'
             rescue Errno::ENOENT
               nil
             end

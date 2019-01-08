@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'open3'
 
 describe Rake::Funnel::Extensions::Shell do

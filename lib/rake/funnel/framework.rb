@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 [
   "#{File.dirname(__FILE__)}/*.rb",
   "#{File.dirname(__FILE__)}/extensions/*.rb",

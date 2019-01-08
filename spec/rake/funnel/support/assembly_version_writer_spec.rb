@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'erb'
 
 describe Rake::Funnel::Support::AssemblyVersionWriter do

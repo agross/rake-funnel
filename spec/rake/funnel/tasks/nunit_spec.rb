@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Tasks::NUnit do # rubocop:disable RSpec/FilePath
   before do
     Rake::Task.clear

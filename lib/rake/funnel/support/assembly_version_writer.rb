@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'erb'
 
 Dir[File.join(File.dirname(__FILE__), 'assembly_version', '*.rb')].each do |path|

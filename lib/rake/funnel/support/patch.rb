@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rake
   module Funnel
     module Support
@@ -18,6 +20,7 @@ module Rake
 
         def apply!
           return self if @memo
+
           @memo = (@setup || noop).call(@context)
 
           self
@@ -25,6 +28,7 @@ module Rake
 
         def revert!
           return self unless @memo
+
           (@reset || noop).call(@memo)
           @memo = nil
 

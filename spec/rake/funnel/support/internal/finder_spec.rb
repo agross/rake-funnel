@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'tmpdir'
 
 describe Rake::Funnel::Support::Finder do # rubocop:disable RSpec/FilePath
@@ -25,6 +27,7 @@ describe Rake::Funnel::Support::Finder do # rubocop:disable RSpec/FilePath
   def map_temp(*files)
     mapped = files.map { |f| File.join(temp_dir, f) }
     return mapped.first if mapped.one?
+
     mapped
   end
 

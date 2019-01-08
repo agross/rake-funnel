@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Support::BinaryVersionReader do
   def binary_version(*version_parts)
     version = version_parts.map { |p| p.to_s + "\0" }.join(".\0")

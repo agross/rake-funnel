@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rake
   module Funnel
     module Support
@@ -46,6 +48,7 @@ module Rake
             def quote(value)
               value = value.gsub(/"/, '""') if value.is_a?(String)
               return %("#{value}") if value =~ /\s/
+
               value
             end
           end

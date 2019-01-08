@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'ostruct'
 
 module Rake
@@ -49,11 +51,13 @@ module Rake
             version = assembly_version(context)
             build_number = numeric(context.fetch(:metadata, {})[:build])
             return version.sub(/\.0$/, ".#{build_number}") if build_number
+
             version
           end
 
           def numeric(str)
             return str if str.to_s =~ /^\d+$/
+
             nil
           end
 
@@ -89,6 +93,7 @@ module Rake
             end.compact
 
             return nil if metadata.empty?
+
             metadata.join('.')
           end
         end

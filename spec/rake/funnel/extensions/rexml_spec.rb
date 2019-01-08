@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Extensions::REXML::Functions do # rubocop:disable RSpec/FilePath
   let(:xml) do
     <<XML

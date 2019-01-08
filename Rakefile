@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rake/funnel'
 
 include Rake::Funnel # rubocop:disable Style/MixinUsage

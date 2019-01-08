@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Support::TemplateEngine do
   it 'should render nil' do
     expect(described_class.render(nil)).to eq('')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Extensions::CommonPath do
   describe 'Manual debugging test case' do
     it 'should work' do

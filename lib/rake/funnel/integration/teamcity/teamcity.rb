@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rake
   module Funnel
     module Integration
@@ -32,6 +34,7 @@ module Rake
 
           def teamcity_jre
             return nil unless ENV.include?(JRE_ENV_VAR)
+
             File.join(ENV[JRE_ENV_VAR], 'bin')
           end
         end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::ExecutionError do
   its(:to_s) { should == described_class.to_s }
 

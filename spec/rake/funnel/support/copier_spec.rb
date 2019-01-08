@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Support::Copier do
   let(:source) { files + directories }
   let(:files) { %w(bin/1 bin/2 bin/3/4 bin/directory/file) }

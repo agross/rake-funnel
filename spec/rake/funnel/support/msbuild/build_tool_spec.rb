@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'ostruct'
 
 describe Rake::Funnel::Support::MSBuild::BuildTool do # rubocop:disable RSpec/FilePath

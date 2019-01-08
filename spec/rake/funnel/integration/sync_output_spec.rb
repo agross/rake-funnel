@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Integration::SyncOutput do
   context 'stream supports sync mode' do
     before do

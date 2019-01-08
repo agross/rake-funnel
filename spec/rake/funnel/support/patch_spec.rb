@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Support::Patch do
   describe 'without definition' do
     it 'should be applicable' do

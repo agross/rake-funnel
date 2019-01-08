@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rake'
 require 'open3'
 require 'smart_colored/extend'
@@ -88,6 +90,6 @@ end
 module Rake
   module DSL
     include Rake::Funnel::Extensions::Shell
-    private(*Rake::Funnel::Extensions::Shell.instance_methods(false))
+    private(*Rake::Funnel::Extensions::Shell.instance_methods(false)) # rubocop:disable Style/AccessModifierDeclarations
   end
 end

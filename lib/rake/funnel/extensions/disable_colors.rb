@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'smart_colored'
 require 'smart_colored/extend'
 

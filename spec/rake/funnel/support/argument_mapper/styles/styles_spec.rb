@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rake::Funnel::Support::ArgumentMapper::Styles.constants.reject { |x| x == :MSDeploy }.each do |style|
   style_path = Rake::Funnel::Support::ArgumentMapper::Styles.const_get(style)
   describe style_path do

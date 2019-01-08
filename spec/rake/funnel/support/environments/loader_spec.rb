@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe Rake::Funnel::Support::Environments::Loader do
   let(:store) do
     double(Configatron::RootStore).as_null_object # rubocop:disable RSpec/VerifiedDoubles
