@@ -5,7 +5,7 @@ language: ruby
 cache:
   - bundler
 before_install:
-  - gem install bundler
+  - gem install bundler --version 1.17.3
 bundler_args: --without development
 script:
   - bundle exec rspec
