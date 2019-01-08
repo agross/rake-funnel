@@ -4,7 +4,7 @@ require 'rubygems/package_task'
 
 spec = Gem::Specification.load('rake-funnel.gemspec')
 
-task gem: :spec do
+task :gem do
   Integration::TeamCity::ServiceMessages.build_number(spec.version.to_s)
 end
 
