@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-xdescribe Rake::Funnel::Support::SpecsRemover do
+describe Rake::Funnel::Support::SpecsRemover do
   before do
     allow(Rake::Funnel::Support::Trace).to receive(:message)
   end
