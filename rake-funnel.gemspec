@@ -20,7 +20,7 @@ Gem::Specification.new do |s| # rubocop:disable Metrics/BlockLength
 
   s.add_dependency 'configatron', '~> 4.5'
   s.add_dependency 'rake', '>= 10.4', '< 14'
-  s.add_dependency 'rubyzip', '~> 1.0'
+  s.add_dependency 'rubyzip', '>= 1.3.0', '< 3'
   s.add_dependency 'smart_colored'
 
   git = ENV['TEAMCITY_GIT_PATH'] || 'git'
