@@ -25,6 +25,7 @@ rvm:
 jobs:
   allow_failures:
     - rvm: ruby-head
+    - os: osx
   exclude:
     - rvm: 2.0.0
       os: osx
