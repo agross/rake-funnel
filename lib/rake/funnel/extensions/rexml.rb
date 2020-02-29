@@ -8,11 +8,11 @@ module Rake
       module REXML
         module Functions
           def lower_case(string)
-            string.first.to_s.downcase
+            string(string).downcase
           end
 
           def matches(string, test)
-            File.fnmatch?(test, string.first.to_s, File::FNM_CASEFOLD)
+            File.fnmatch?(test, string(string), File::FNM_CASEFOLD)
           end
         end
       end
