@@ -3,7 +3,7 @@ cache:
   - bundler
 before_install:
   - gem install bundler --version 1.17.3
-bundler_args: --without development
+bundler_args: --without guard
 script:
   - bundle exec rspec
 after_success:

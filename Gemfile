@@ -21,7 +21,7 @@ group :test do
   gem 'rspec-its'
 end
 
-group :development, :guard do
+group :guard do
   gem 'guard-bundler'
   gem 'guard-rspec'
   gem 'guard-rubocop'
