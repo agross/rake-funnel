@@ -90,6 +90,6 @@ end
 module Rake
   module DSL
     include Rake::Funnel::Extensions::Shell
-    private(*Rake::Funnel::Extensions::Shell.instance_methods(false)) # rubocop:disable Style/AccessModifierDeclarations
+    private(*Rake::Funnel::Extensions::Shell.instance_methods(false))
   end
 end

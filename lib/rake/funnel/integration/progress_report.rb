@@ -49,7 +49,7 @@ module Rake
                   error = nil
                   begin
                     old_execute.bind(self).call(*args)
-                  rescue => e # rubocop:disable Style/RescueStandardError
+                  rescue => e
                     error = e
                   ensure
                     context.finished.call(self, *args, error) if context.finished

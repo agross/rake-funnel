@@ -10,7 +10,7 @@ module Rake
               true
             end
 
-            def method_missing(method, *args, &_block) # rubocop:disable Style/MethodMissingSuper
+            def method_missing(method, *args, &_block) # rubocop:disable Style/MethodMissing
               return unless Rake::Funnel::Integration::TeamCity.running?
 
               message_name = method.camelize

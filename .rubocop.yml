@@ -1,6 +1,6 @@
 AllCops:
   DisplayCopNames: true
-  TargetRubyVersion: 2.2
+  TargetRubyVersion: 2.0
 
 require: rubocop-rspec
 
@@ -28,9 +28,6 @@ Style/PercentLiteralDelimiters:
     '%r': '{}'
     '%w': ()
     '%W': ()
-
-RSpec/ContextWording:
-  Enabled: false
 
 RSpec/ExampleWording:
   Enabled: false

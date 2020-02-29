@@ -11,7 +11,7 @@ group :coverage do
 end
 
 group :style do
-  gem 'rubocop', '~> 0.46'
+  gem 'rubocop', '< 0.50'
   gem 'rubocop-rspec'
 end
 

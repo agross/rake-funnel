@@ -16,7 +16,7 @@ Gem::Specification.new do |s| # rubocop:disable Metrics/BlockLength
   s.summary     = 'A build pipeline targeted at .NET projects. Supports environment configuration and makes invoking .NET-related tasks easier.' # rubocop:disable Metrics/LineLength
 
   # We support Ruby 2.0 whereas rubocop does not.
-  s.required_ruby_version = '>= 2.0.0' # rubocop:disable Gemspec/RequiredRubyVersion
+  s.required_ruby_version = '>= 2.0.0'
 
   s.add_dependency 'configatron', '~> 4.5'
   s.add_dependency 'rake', '>= 10.4', '< 13'
