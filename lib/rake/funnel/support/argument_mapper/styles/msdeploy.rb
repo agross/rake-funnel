@@ -47,7 +47,7 @@ module Rake
 
             def quote(value)
               value = value.gsub(/"/, '""') if value.is_a?(String)
-              return %("#{value}") if value =~ /\s/
+              return %("#{value}") if value.to_s =~ /\s/
 
               value
             end
