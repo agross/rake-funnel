@@ -1,3 +1,8 @@
+# 0.24.0 / 2021-01-04
+
+* [FEATURE] Support paket.references with whitespace in front of package names,
+  i.e. grouped packages.
+
 # 0.23.0 / 2020-02-29
 
 * [FEATURE] Support rake < 14.
