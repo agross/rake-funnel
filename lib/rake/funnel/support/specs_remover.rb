@@ -130,7 +130,7 @@ module Rake
             def remove(text, packages)
               Trace.message("Removing packages: #{packages.inspect}")
               packages.each do |package|
-                text = text.gsub(/^#{package}.*\n?/i, '')
+                text = text.gsub(/^\s*#{package}.*\n?/i, '')
               end
               text
             end
